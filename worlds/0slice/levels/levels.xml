@@ -1,0 +1,16 @@
+<!DOCTYPE PPXLML>
+<levels>
+  <title>slice</title>
+  <world directory="worlds/0slice/levels/">
+    <level id="0" name="1/level.xml" stars="0" image="1/preview.png"/>
+    <level id="1" name="2/level.xml" stars="0" image="2/preview.png"/>
+    <level id="2" name="3/level.xml" stars="0" image="3/preview.png"/>
+    <level id="3" name="4/level.xml" stars="0" image="4/preview.png"/>
+    <level id="4" name="5/level.xml" stars="0" image="5/preview.png"/>
+    <level id="5" name="6/level.xml" stars="0" image="6/preview.png"/>
+    <level id="6" name="7/level.xml" stars="0" image="7/preview.png"/>
+    <level id="7" name="8/level.xml" stars="0" image="8/preview.png"/>
+    <level id="8" name="9/level.xml" stars="0" image="9/preview.png"/>
+    <level id="9" name="10/level.xml" stars="0" image="10/preview.png"/>
+  </world>
+</levels>
