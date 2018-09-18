@@ -1,0 +1,7 @@
+<!DOCTYPE PieceOfCakeLevelsML>
+<levels>
+  <title>Cut Polygons</title>
+  <level id="0" name="resources/levels/pack4/0.xml" stars="6" image="resources/levels/pack4/0.png"/>
+  <level id="1" name="resources/levels/pack4/1.xml" stars="6" image="resources/levels/pack4/1.png"/>
+  <level id="2" name="resources/levels/pack4/2.xml" stars="6" image="resources/levels/pack4/2.png"/>
+</levels>

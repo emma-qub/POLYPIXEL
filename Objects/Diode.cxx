@@ -8,9 +8,10 @@ Diode::Diode(ppxl::Point const& A, ppxl::Point const& B, ppxl::Point const& O, p
 
 Diode::~Diode() = default;
 
-bool Diode::crossing(const ppxl::Segment& line) const {
+bool Diode::crossing(ppxl::Segment const& line) const {
   if (line.ComputeIntersection(m_diodeLine) == ppxl::Segment::Regular) {
-    return line * m_diodeDirection >= 0.;
+    auto lineVector = ppxl::Vector::FromSegment(line);
+    return (lineVector * m_diodeDirection) >= 0.;
   }
 
   return true;

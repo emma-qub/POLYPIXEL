@@ -1,5 +1,7 @@
 #include "Portal.hxx"
 
+#include <cmath>
+
 Portal::Portal(int xaIn, int p_yaIn, int p_xbIn, int p_ybIn, int p_xaOut, int p_yaOut, int p_xbOut, int p_ybOut):
   Deviation(),
   m_in(ppxl::Segment(xaIn, p_yaIn, p_xbIn, p_ybIn)),
@@ -48,7 +50,7 @@ QList<ppxl::Segment> Portal::deviateLine(ppxl::Segment const& p_line) const {
     assert(det != 0.);
     double tx = t.GetX();
     double ty = t.GetY();
-    ppxl::Vector w((tx*cos(theta) - ty*sin(theta))/det, (tx*sin(theta) + ty*cos(theta))/det);
+    ppxl::Vector w((tx*std::cos(theta) - ty*std::sin(theta))/det, (tx*std::sin(theta) + ty*std::cos(theta))/det);
 
     // Compute other bound of exit line
     ppxl::Point P = J + ppxl::Point::Distance(p_line.GetA(), I)*w;
@@ -88,7 +90,7 @@ QList<ppxl::Segment> Portal::deviateLine2(ppxl::Segment const& p_line) const {
     ppxl::Point A2 = A1.ApplyVector(ppxl::Vector(-I.GetX(), -I.GetY()));
 
     // Apply rotation
-    ppxl::Point A3(A2.GetX()*cos(theta)-A2.GetY()*sin(theta), A2.GetX()*sin(theta)+A2.GetY()*cos(theta));
+    ppxl::Point A3(A2.GetX()*std::cos(theta)-A2.GetY()*std::sin(theta), A2.GetX()*std::sin(theta)+A2.GetY()*std::cos(theta));
 
     // Translate back
     ppxl::Point A4 = A3.ApplyVector(ppxl::Vector(J.GetX(), J.GetY()));

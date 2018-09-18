@@ -2,6 +2,8 @@
 
 #include "Core/Vector.hxx"
 
+#include <cmath>
+
 Mirror::Mirror(int p_xa, int p_ya, int p_xb, int p_yb):
   Deviation(),
   m_mirrorLine(p_xa, p_ya, p_xb, p_yb) {

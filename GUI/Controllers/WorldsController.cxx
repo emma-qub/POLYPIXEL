@@ -11,7 +11,7 @@ WorldsController::WorldsController(WorldsView* p_view, WorldsModel* p_model, QOb
   m_view(p_view),
   m_model(p_model) {
 
-  QDir worldsDir("../Polygon/worlds");
+  QDir worldsDir("../POLYPIXEL/worlds");
   for (auto entry: worldsDir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot))
   {
     m_model->AppendWorld(entry);

@@ -9,7 +9,7 @@ public:
   Polarisator();
   ~Polarisator() override;
 
-  QList<ppxl::Segment> deviateLine(ppxl::Segment const& line) const final;
+  QList<ppxl::Segment> deviateLine(ppxl::Segment const& p_line) const final;
 
 private:
   double m_cx;

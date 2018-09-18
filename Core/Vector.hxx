@@ -12,7 +12,6 @@ class Segment;
 class Vector {
 public:
   Vector(double const& p_x = 0.0, double const& p_y = 0.0);
-  Vector(Segment const& p_segment);
   Vector(Point const& p_a, Point const& p_b);
   Vector(Vector const& p_vector);
   virtual ~Vector();
