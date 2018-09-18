@@ -14,7 +14,7 @@ Segment::Segment(Point const& p_a, Point const& p_b) {
   m_b = p_b;
 }
 
-Segment::Segment(int p_xa, int p_ya, int p_xb, int p_yb) {
+Segment::Segment(double p_xa, double p_ya, double p_xb, double p_yb) {
   m_a = Point(p_xa, p_ya);
   m_b = Point(p_xb, p_yb);
 }

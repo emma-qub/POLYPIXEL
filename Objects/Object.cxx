@@ -1,6 +1,5 @@
 #include "Object.hxx"
 
-Object::Object()
-{
+Object::Object() = default;
 
-}
+Object::~Object() = default;

@@ -3,3 +3,5 @@
 Deviation::Deviation():
   Object() {
 }
+
+Deviation::~Deviation() = default;

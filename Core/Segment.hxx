@@ -28,7 +28,7 @@ public:
   };
 
   Segment(Point const& a = Point(), Point const& b = Point());
-  Segment(int p_xa, int p_ya, int p_xb, int p_yb);
+  Segment(double p_xa, double p_ya, double p_xb, double p_yb);
   Segment(Segment const& p_segment);
   virtual ~Segment();
 

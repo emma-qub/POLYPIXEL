@@ -45,7 +45,7 @@ SOURCES += \
     Objects/Mirror.cxx \
     Objects/Portal.cxx \
     Objects/Polarisator.cxx \
-    Objects/Scotch.cxx \
+    Objects/Tape.cxx \
     Objects/Diode.cxx
 
 HEADERS += \
@@ -79,7 +79,7 @@ HEADERS += \
     Objects/Mirror.hxx \
     Objects/Portal.hxx \
     Objects/Polarisator.hxx \
-    Objects/Scotch.hxx \
+    Objects/Tape.hxx \
     Objects/Diode.hxx
 
 # Default rules for deployment.

@@ -484,11 +484,11 @@ void GameController::clearGame() {
 Deviation* GameController::getNearestDeviation(const ppxl::Segment& line) const {
   DeviationList deviations = m_model->getDeviationList();
 
-  float minDist = -1;
+  double minDist = -1.;
   Deviation* nearestDeviation = nullptr;
 
   for (Deviation* deviation: deviations) {
-    std::vector<ppxl::Segment> deviateLines = deviation->deviateLine(line);
+    QList<ppxl::Segment> deviateLines = deviation->deviateLine(line);
     // If there is at least one reflected line
     if (deviateLines.size() > 1) {
       if (minDist == -1)
@@ -502,11 +502,11 @@ Deviation* GameController::getNearestDeviation(const ppxl::Segment& line) const 
   return nearestDeviation;
 }
 
-void GameController::computeDeviateLines(float firstLineLength, const ppxl::Segment& line, std::vector<ppxl::Segment>& lines) const {
+void GameController::computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const {
   Deviation* nearestDeviation = getNearestDeviation(line);
 
   if (nearestDeviation) {
-    std::vector<ppxl::Segment> deviateLines = nearestDeviation->deviateLine(line);
+    QList<ppxl::Segment> deviateLines = nearestDeviation->deviateLine(line);
     // Init firstLineLength
     if (firstLineLength == -1.f)
       firstLineLength = deviateLines.at(0).length();
@@ -527,12 +527,12 @@ void GameController::computeDeviateLines(float firstLineLength, const ppxl::Segm
     deviateLine.setB(A + BB);
 
     // Push line and its reflexion
-    lines.push_back(deviateLines.at(0));
-    lines.push_back(deviateLine);
+    lines << deviateLines.at(0));
+    lines << deviateLine);
 
     computeDeviateLines(firstLineLength, deviateLine, lines);
   } else {
-    lines.push_back(line);
+    lines << line);
   }
 }
 

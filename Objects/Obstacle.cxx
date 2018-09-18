@@ -1,6 +1,7 @@
 #include "Obstacle.hxx"
 
-Obstacle::Obstacle()
-{
-
+Obstacle::Obstacle():
+  Object() {
 }
+
+Obstacle::~Obstacle() = default;
