@@ -24,8 +24,8 @@ public:
   QList<ppxl::Point> getTapeVertices() const;
   QList<ppxl::Segment> getTapeEdges() const;
 
-  std::string getName() const;
-  bool crossing(ppxl::Segment const& line) const final;
+  std::string GetName() const;
+  bool Crossing(ppxl::Segment const& line) const final;
 
 private:
   double m_x;

@@ -10,7 +10,7 @@ public:
   Obstacle();
   ~Obstacle() override;
 
-  virtual bool crossing(ppxl::Segment const& line) const = 0;
+  virtual bool Crossing(ppxl::Segment const& line) const = 0;
 };
 
 #endif

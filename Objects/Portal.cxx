@@ -20,11 +20,11 @@ Portal::Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out):
 
 Portal::~Portal() = default;
 
-std::string Portal::getName() const {
+std::string Portal::GetName() const {
   return "portal";
 }
 
-QList<ppxl::Segment> Portal::deviateLine(ppxl::Segment const& p_line) const {
+QList<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {
   QList<ppxl::Segment> deviatedLines;
 
   ppxl::Segment in(m_in);
@@ -65,7 +65,7 @@ QList<ppxl::Segment> Portal::deviateLine(ppxl::Segment const& p_line) const {
   return deviatedLines;
 }
 
-QList<ppxl::Segment> Portal::deviateLine2(ppxl::Segment const& p_line) const {
+QList<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) const {
   QList<ppxl::Segment> deviatedLines;
 
   ppxl::Segment in(m_in);

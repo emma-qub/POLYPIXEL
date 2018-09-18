@@ -14,8 +14,6 @@
 #include <cmath>
 #include <cassert>
 
-#define cerro(x) std::cerr << x << std::endl;
-
 GameController::GameController(GameModel* p_model, GameView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_model(p_model),
@@ -321,7 +319,7 @@ void GameController::OpenLevel(QString const& p_levelPath) {
   m_view->ClearImage();
 
   Parser parser(p_levelPath);
-  PolygonList polygonList(parser.CreatePolygonList());
+  PolygonList polygonList(parser.GetPolygonList());
   m_model->SetPolygonsList(polygonList);
 
 //  TapeList tapeList(parser.createTapeList());

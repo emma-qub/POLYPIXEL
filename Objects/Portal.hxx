@@ -11,14 +11,14 @@ public:
   Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out);
   virtual ~Portal();
 
-  inline ppxl::Segment getIn() const { return m_in; }
-  inline ppxl::Segment getOut() const { return m_out; }
-  inline ppxl::Vector getNormalIn() const { return m_normalIn; }
-  inline ppxl::Vector getNormalOut() const { return m_normalOut; }
+  inline ppxl::Segment GetIn() const { return m_in; }
+  inline ppxl::Segment GetOut() const { return m_out; }
+  inline ppxl::Vector GetNormalIn() const { return m_normalIn; }
+  inline ppxl::Vector GetNormalOut() const { return m_normalOut; }
 
-  std::string getName() const;
-  QList<ppxl::Segment> deviateLine(ppxl::Segment const& p_line) const final;
-  virtual QList<ppxl::Segment> deviateLine2(ppxl::Segment const& p_line) const final;
+  std::string GetName() const;
+  QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const final;
+  QList<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
 
 private:
   ppxl::Segment m_in;

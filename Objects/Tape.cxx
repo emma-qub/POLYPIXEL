@@ -10,7 +10,7 @@ Tape::Tape(double p_x, double p_y, double p_w, double p_h):
 
 Tape::~Tape() = default;
 
-std::string Tape::getName() const {
+std::string Tape::GetName() const {
   return "tape";
 }
 
@@ -37,7 +37,7 @@ QList<ppxl::Segment> Tape::getTapeEdges() const  {
   return tapeEdges;
 }
 
-bool Tape::crossing(ppxl::Segment const& p_line) const {
+bool Tape::Crossing(ppxl::Segment const& p_line) const {
   auto edges = getTapeEdges();
 
   for (auto const& edge: edges) {

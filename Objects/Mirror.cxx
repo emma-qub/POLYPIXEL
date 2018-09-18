@@ -11,11 +11,11 @@ Mirror::Mirror(int p_xa, int p_ya, int p_xb, int p_yb):
 
 Mirror::~Mirror() = default;
 
-std::string Mirror::getName() const {
+std::string Mirror::GetName() const {
   return "mirror";
 }
 
-QList<ppxl::Segment> Mirror::deviateLine(ppxl::Segment const& p_line) const {
+QList<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
   QList<ppxl::Segment> deviatedLines;
 
   if (m_mirrorLine.ComputeIntersection(p_line) == ppxl::Segment::Regular) {

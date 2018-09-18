@@ -6,18 +6,14 @@
 #include "Core/Point.hxx"
 #include "Core/Segment.hxx"
 #include "Core/Polygon.hxx"
-//#include "Tape.h"
-//#include "Mirror.h"
-//#include "Portal.h"
-//#include "Refractor.h"
-//#include "Hint.h"
+#include "Objects/Tape.hxx"
+#include "Objects/Mirror.hxx"
+#include "Objects/Portal.hxx"
 
 using PolygonList = QList<ppxl::Polygon>;
-//using TapeList = QList<Tape>;
-//using MirrorList = QList<Mirror>;
-//using PortalList = QList<Portal>;
-//using RefractorList = QList<Refractor>;
-//using HintList = QList<Hint>;
+using TapeList = QList<Tape>;
+using MirrorList = QList<Mirror>;
+using PortalList = QList<Portal>;
 
 class Parser {
 public:
@@ -25,44 +21,42 @@ public:
   Parser(QString const& p_xmlFileName);
   virtual ~Parser();
 
+  // Primitives
+  int GetInt(QDomElement const& p_element, QString const& p_attributeName) const;
+  double GetDouble(QDomElement const& p_element, QString const& p_attributeName) const;
+  int GetIntValue(QString const& p_tagName, QString const& p_attributeName = "value") const;
+  QDomElement GetElementById(QDomElement const& parent, QString const& p_name, int p_id) const;
+  inline QDomDocument GetDoc() const { return m_doc; }
+
+  // Game Infos
+  int GetPartsGoal() const;
+  int GetLinesGoal() const;
+  int GetMaxGapToWin() const;
+  int GetStarsCount() const;
+  int GetTolerances() const;
+
+  // Polygon
+  ppxl::Point GetPoint(QDomElement const& p_element) const;
+  ppxl::Segment GetSegment(QDomElement const& p_element) const;
+  ppxl::Polygon GetPolygon(QDomElement const& p_element) const;
+  QDomElement GetPolygonById(int p_id) const;
+  PolygonList GetPolygonList() const;
   inline int GetPolygonNodesCount() const { return m_polygonNodesCount; }
 
-  int CreateInt(QDomElement const& p_element, QString const& p_attributeName);
-  double CreateDouble(QDomElement const& p_element, QString const& p_attributeName);
-  ppxl::Point CreatePoint(QDomElement const& p_element);
-  ppxl::Segment CreateSegment(QDomElement const& p_element);
+  // Tape
+  Tape GetTape(QDomElement const& element) const;
+  QDomElement GetTapeById(int p_id) const;
+  TapeList GetTapeList();
 
-  int GetIntValue(QString const& p_tagName, QString const& p_attributeName = "value");
-  int GetPartsGoal();
-  int GetLinesGoal();
-  int GetMaxGapToWin();
-  int GetStarsCount();
-  int GetTolerances();
+  // Mirror
+  Mirror GetMirror(QDomElement const& element) const;
+  QDomElement GetMirrorById(int p_id) const;
+  MirrorList GetMirrorList() const;
 
-  ppxl::Polygon CreatePolygon(QDomElement const& p_element);
-//  Tape createTape(QDomElement const& element);
-//  Mirror createMirror(QDomElement const& element);
-//  Portal createPortal(QDomElement const& element);
-//  Refractor createRefractor(QDomElement const& element);
-//  Hint createHint(QDomElement const& element);
-
-  QDomElement GetElementById(QDomElement& parent, QString const& p_name, int p_id);
-  QDomElement GetPolygon(int p_id);
-  QDomElement GetTape(int p_id);
-  QDomElement GetMirror(int p_id);
-  QDomElement GetPortal(int p_id);
-  QDomElement GetRefractor(int p_id);
-  QDomElement GetHint(int p_id);
-
-  PolygonList CreatePolygonList();
-//  TapeList createTapeList();
-//  MirrorList createMirrorList();
-//  PortalList createPortalList();
-//  RefractorList createRefractorList();
-//  HintList createHintList();
-
-  inline QDomDocument GetDoc() const { return m_doc; }
-  inline void InitFileName(QString const& fileName) { if (m_xmlFileName.isEmpty()) m_xmlFileName = fileName; }
+  // Portal
+  Portal GetPortal(QDomElement const& element) const;
+  QDomElement GetPortalById(int p_id) const;
+  PortalList GetPortalList() const;
 
 private:
   QString m_xmlFileName;
@@ -80,8 +74,6 @@ private:
   int m_tapeNodesCount;
   int m_mirrorNodesCount;
   int m_portalNodesCount;
-  int m_refractorNodesCount;
-  int m_hintNodesCount;
 };
 
 #endif

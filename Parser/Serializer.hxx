@@ -6,6 +6,9 @@
 #include "Core/Point.hxx"
 #include "Core/Segment.hxx"
 #include "Core/Polygon.hxx"
+#include "Objects/Tape.hxx"
+#include "Objects/Mirror.hxx"
+#include "Objects/Portal.hxx"
 
 class Serializer
 {
@@ -15,49 +18,50 @@ public:
 
   virtual ~Serializer();
 
-  QDomElement IntToNode(int p_value, QString const& p_nodeName);
+  // Serialize
+  void WriteXML(int p_indent = 2);
+
+  // GameInfos
+  void SetPartsGoal(int p_partsGoal = 1);
+  void SetLinesGoal(int p_linesGoal = 0);
+  void SetMaxGapToWin(int p_maxGapToWin = 1);
+  void SetStarsCount(int p_starscount = 0);
+  void SetTolerances(int p_tolerances = 1);
+
+  // Polygon
   QDomElement PointToNode(ppxl::Point const& p_point, QString const& p_nodeName);
   QDomElement SegmentToNode(ppxl::Segment const& p_segment);
-  QDomElement PartsGoalToNode(int p_partsGoal = 1);
-  QDomElement LinesGoalToNode(int p_linesGoal = 0);
-  QDomElement StarscountToNode(int p_starscount = 0);
-  QDomElement TolerancesToNode(int p_tolerances = 1);
-  QDomElement PolygonToNode(ppxl::Polygon const& p_polygon, int p_id);
-//  QDomElement tapeToNode(Tape const& tape, int id);
-//  QDomElement mirrorToNode(Mirror const& mirror, int id);
-//  QDomElement portalToNode(Portal const& portal, int id);
-//  QDomElement refractorToNode(Refractor const& refractor, int id);
-//  QDomElement hintToNode(Hint const& hint, int id);
+  void AppendPolygon(ppxl::Polygon const& p_polygon, int p_id);
+  void SetPolygonsList(QList<ppxl::Polygon> const& p_polygons);
 
-  void AddPolygon(ppxl::Polygon const& p_polygon);
-//  void addTape(Tape const& tape);
-//  void addMirror(Mirror const& mirror);
-//  void addPortal(Portal const& portal);
-//  void addRefractor(Refractor const& refractor);
-//  void addHint(Hint const& hint);
+  // Tape
+  QDomElement TapeToNode(Tape const& tape, int id);
+  void AppendTape(Tape const& p_tape, int p_id);
+  void SetTapeList(QList<Tape> const& p_tapes);
 
-  void SetStarsCount(int p_starscount);
+  // Mirror
+  QDomElement MirrorToNode(Mirror const& p_mirror, int p_id);
+  void AppendMirror(Mirror const& p_mirror, int p_id);
+  void SetMirrorsList(QList<Mirror> const& p_mirrors);
 
-  void WriteXML(int p_indent = 4);
+  // Portal
+  QDomElement PortalToNode(Portal const& portal, int id);
+  void AppendPortal(Portal const& p_portal, int p_id);
+  void SetPortalsList(QList<Portal> const& p_portals);
 
 private:
   QString m_xmlFileName;
   QDomDocument m_doc;
 
   QDomElement m_polygons;
-  QDomElement m_lineModifiers;
   QDomElement m_tapes;
   QDomElement m_mirrors;
   QDomElement m_portals;
-  QDomElement m_refractors;
-  QDomElement m_hints;
-
-  int m_polygonNodesCount;
-  int m_tapeNodesCount;
-  int m_mirrorNodesCount;
-  int m_portalNodesCount;
-  int m_refractorNodesCount;
-  int m_hintNodesCount;
+  QDomElement m_linesGoal;
+  QDomElement m_partsGoal;
+  QDomElement m_maxGapToWin;
+  QDomElement m_starsCount;
+  QDomElement m_tolerance;
 };
 
 #endif

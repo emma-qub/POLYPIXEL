@@ -12,7 +12,7 @@ public:
     ppxl::Point const& O = ppxl::Point(), ppxl::Point const& D = ppxl::Point());
   ~Diode() override;
 
-  bool crossing(ppxl::Segment const& line) const final;
+  bool Crossing(ppxl::Segment const& line) const final;
 
 private:
   ppxl::Segment m_diodeLine;
