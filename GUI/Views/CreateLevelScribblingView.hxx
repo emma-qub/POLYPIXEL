@@ -2,6 +2,10 @@
 #define CREATELEVELSCRIBBLINGVIEW_HXX
 
 #include "GUI/Views/AbstractScribblingView.hxx"
+#include "Core/Point.hxx"
+#include "Core/Vector.hxx"
+#include "Core/Polygon.hxx"
+
 
 class CreateLevelModel;
 class QItemSelectionModel;
@@ -18,7 +22,12 @@ public:
   void DrawFromModel() override;
 
 signals:
-  void PolygonMoved();
+  void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);
+  void PolygonRemoved(int p_polygonRow, ppxl::Polygon const& p_polygon);
+  void PolygonMoved(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack);
+  void VertexInserted(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void VertexRemoved(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
 
 protected:
   void mousePressEvent(QMouseEvent* event) override;
@@ -27,7 +36,6 @@ protected:
   void paintEvent(QPaintEvent* event) override;
 
 private:
-  CreateLevelModel* m_model;
   QItemSelectionModel* m_selectionModel;
   bool m_isMagnetic;
   bool m_isStuck;

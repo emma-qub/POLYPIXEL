@@ -4,12 +4,13 @@ AbstractLevelModel::AbstractLevelModel(QObject* p_parent):
   QStandardItemModel(p_parent),
   m_polygonsItem(new QStandardItem("Polygons")) {
 
+  setColumnCount(3);
+
   m_polygonsItem->setData(ePolygons, eItemTypeRole);
   appendRow(m_polygonsItem);
 }
 
-QStandardItem* AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {
-
+void AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {
   char i = 'A';
   i += p_row;
   auto vertexItem = new QStandardItem(QString(i));
@@ -18,19 +19,18 @@ QStandardItem* AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_poly
   xItem->setData(eX, eItemTypeRole);
   auto yItem = new QStandardItem(QString::number(p_vertex.GetY()));
   yItem->setData(eY, eItemTypeRole);
-  vertexItem->appendRow(QList<QStandardItem*>() << xItem << yItem);
-  p_polygonItem->insertRow(p_row, vertexItem);
-
-  return vertexItem;
+  QList<QStandardItem*> vertexItemsList;
+  vertexItemsList << vertexItem << xItem << yItem;
+  p_polygonItem->insertRow(p_row, vertexItemsList);
 }
 
-QStandardItem* AbstractLevelModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {
-  return InsertVertex(p_polygonItem->rowCount(), p_polygonItem, p_vertex);
+void AbstractLevelModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {
+  InsertVertex(p_polygonItem->rowCount(), p_polygonItem, p_vertex);
 }
 
 AbstractLevelModel::~AbstractLevelModel() = default;
 
-QStandardItem* AbstractLevelModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
+void AbstractLevelModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
   auto polygonItem = new QStandardItem("Polygon #"+QString::number(p_row));
   polygonItem->setData(ePolygon, eItemTypeRole);
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon>(p_polygon), ePolygonRole);
@@ -41,11 +41,10 @@ QStandardItem* AbstractLevelModel::InsertPolygon(int p_row, ppxl::Polygon const&
   }
 
   m_polygonsItem->insertRow(p_row, polygonItem);
-  return polygonItem;
 }
 
-QStandardItem* AbstractLevelModel::AppendPolygon(ppxl::Polygon const& p_polygon) {
-  return InsertPolygon(m_polygonsItem->rowCount(), p_polygon);
+void AbstractLevelModel::AppendPolygon(ppxl::Polygon const& p_polygon) {
+  InsertPolygon(m_polygonsItem->rowCount(), p_polygon);
 }
 
 QList<QStandardItem*> AbstractLevelModel::GetPolygonItemsList() const

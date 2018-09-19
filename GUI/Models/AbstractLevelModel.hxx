@@ -25,12 +25,12 @@ public:
   ~AbstractLevelModel() override;
 
   // Vertex
-  QStandardItem* InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex);
-  QStandardItem* AppendVertex(QStandardItem* p_polygonItem, const ppxl::Point& p_vertex);
+  void InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex);
+  void AppendVertex(QStandardItem* p_polygonItem, const ppxl::Point& p_vertex);
 
   // Polygon
-  QStandardItem* InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
-  QStandardItem* AppendPolygon(const ppxl::Polygon& p_polygon);
+  void InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
+  void AppendPolygon(const ppxl::Polygon& p_polygon);
   inline int GetPolygonsCount() const { return m_polygonsItem->rowCount(); }
   QList<QStandardItem*> GetPolygonItemsList() const;
   QList<ppxl::Polygon> GetPolygonsList() const;
@@ -45,5 +45,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(ppxl::Polygon)
+Q_DECLARE_METATYPE(AbstractLevelModel::ItemType);
 
 #endif

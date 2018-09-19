@@ -22,12 +22,12 @@ public:
   void InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
   void AppendPolygon(const ppxl::Polygon& p_polygon);
   void RemovePolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void MovePolygon(int p_polygonRow, ppxl::Point const& p_oldBarycenter, ppxl::Point const& p_newBarycenter, bool p_pushToStack = true);
+  void MovePolygon(int p_polygonRow, const ppxl::Vector& p_direction, bool p_pushToStack = true);
 
-  void InsertVertex(int p_vertexRow, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex);
-  void AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex);
-  void RemoveVertex(int p_vertexRow, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex);
-  void MoveVertex(QStandardItem* p_polygonItem, int p_vertexRow, ppxl::Point const& p_oldVertex, ppxl::Point p_newVertex, bool p_pushToStack = true);
+  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void AppendVertex(int p_polygonRow, ppxl::Point const& p_vertex);
+  void RemoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void MoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_pushToStack = true);
 
 private:
   CreateLevelModel* m_model;

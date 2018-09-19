@@ -40,7 +40,7 @@ QList<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {
     // Compute in point (I) and out point (J)
     ppxl::Point I(ppxl::Segment::IntersectionPoint(in, p_line));
     double ratio = ppxl::Point::Distance(in.GetA(), I)/out.Length();
-    ppxl::Point J = out.GetA().ApplyVector(ratio*ppxl::Vector::FromSegment(out));
+    ppxl::Point J = out.GetA().Translate(ratio*ppxl::Vector::FromSegment(out));
 
     // Get second portal vector direction
     ppxl::Vector t(out.GetDirection());
@@ -81,19 +81,19 @@ QList<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) const {
     // Compute in point (I) and out point (J)
     ppxl::Point I(ppxl::Segment::IntersectionPoint(in, p_line));
     double ratio = ppxl::Point::Distance(in.GetA(), I)/out.Length();
-    ppxl::Point J = out.GetA().ApplyVector(ratio*ppxl::Vector::FromSegment(out));
+    ppxl::Point J = out.GetA().Translate(ratio*ppxl::Vector::FromSegment(out));
 
     // Compute extended point
-    ppxl::Point A1 = I.ApplyVector(ppxl::Vector(p_line.GetA(), I));
+    ppxl::Point A1 = I.Translate(ppxl::Vector(p_line.GetA(), I));
 
     // Compute point after moving rotation's center to origin
-    ppxl::Point A2 = A1.ApplyVector(ppxl::Vector(-I.GetX(), -I.GetY()));
+    ppxl::Point A2 = A1.Translate(ppxl::Vector(-I.GetX(), -I.GetY()));
 
     // Apply rotation
     ppxl::Point A3(A2.GetX()*std::cos(theta)-A2.GetY()*std::sin(theta), A2.GetX()*std::sin(theta)+A2.GetY()*std::cos(theta));
 
     // Translate back
-    ppxl::Point A4 = A3.ApplyVector(ppxl::Vector(J.GetX(), J.GetY()));
+    ppxl::Point A4 = A3.Translate(ppxl::Vector(J.GetX(), J.GetY()));
 
     // Add in line and out line
     deviatedLines << ppxl::Segment(p_line.GetA(), I);

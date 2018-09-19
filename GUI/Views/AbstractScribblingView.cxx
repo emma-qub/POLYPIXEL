@@ -32,14 +32,14 @@ void AbstractScribblingView::DrawFromModel() {
   // Draw every polygon in model color
   auto polygonItems = m_model->GetPolygonItemsList();
   for (auto polygonItem: polygonItems) {
-    auto polygon = polygonItem->data(GameModel::ePolygonRole).value<ppxl::Polygon>();
-    auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
-
-    auto vertices = polygon.GetVertices();
-    for (unsigned k = 0; k < vertices.size(); k++) {
-      ppxl::Point A(vertices.at(k));
-      ppxl::Point B(vertices.at((k+1)%vertices.size()));
-
+    for (int row = 0; row < polygonItem->rowCount(); ++row) {
+      int indexA = row;
+      int indexB =(row+1)%polygonItem->rowCount();
+      ppxl::Point A(polygonItem->child(indexA, 1)->data(Qt::DisplayRole).toString().toInt(),
+                    polygonItem->child(indexA, 2)->data(Qt::DisplayRole).toString().toInt());
+      ppxl::Point B(polygonItem->child(indexB, 1)->data(Qt::DisplayRole).toString().toInt(),
+                    polygonItem->child(indexB, 2)->data(Qt::DisplayRole).toString().toInt());
+      auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
       DrawLine(A, B, color);
     }
   }

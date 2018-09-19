@@ -6,13 +6,37 @@
 #include <QMouseEvent>
 #include <QItemSelectionModel>
 
+
+
+#include <QDebug>
+
+
+
+
 const int CreateLevelScribblingView::PEN_WIDTH = 7;
 const QColor CreateLevelScribblingView::NOT_SELECTED_COLOR = QColor("#CCCCCC");
 
 CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   AbstractScribblingView(p_parent),
-  m_model(static_cast<CreateLevelModel*>(GetModel())),
-  m_selectionModel(nullptr) {
+  m_selectionModel(new QItemSelectionModel),
+  m_isMagnetic(false),
+  m_isStuck(false),
+  m_nearToVertex(false),
+  m_nearToBarycenter(false),
+  m_movingVertex(false),
+  m_movingPolygon(false),
+  m_lengthOn(true),
+  m_angleOn(false),
+  m_currPolygonRow(-1),
+  m_currVertexRow(-1),
+  m_beforeMovingVertexX(-1),
+  m_beforeMovingVertexY(-1),
+  m_beforeMovingPolygonX(-1),
+  m_beforeMovingPolygonY(-1),
+  m_currOldX(-1),
+  m_currOldY(-1) {
+
+  setMouseTracking(true);
 }
 
 CreateLevelScribblingView::~CreateLevelScribblingView() = default;
@@ -20,6 +44,10 @@ CreateLevelScribblingView::~CreateLevelScribblingView() = default;
 void CreateLevelScribblingView::SetModel(AbstractLevelModel* p_model) {
   AbstractScribblingView::SetModel(p_model);
   m_selectionModel->setModel(p_model);
+
+  connect(GetModel(), &AbstractLevelModel::dataChanged, this, [](){
+    qDebug() << "OUI";
+  });
 }
 
 void CreateLevelScribblingView::DrawGrid() {
@@ -63,133 +91,177 @@ void CreateLevelScribblingView::DrawFromModel() {
 }
 
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
-  if (p_event->buttons() == Qt::LeftButton && m_nearToVertex) {
-    QPoint pos = mapToGlobal(QPoint(m_beforeMovingVertexX, m_beforeMovingVertexY));
-    QCursor::setPos(pos);
-    setCursor(Qt::ClosedHandCursor);
-  }
+//  if (p_event->buttons() == Qt::LeftButton && m_nearToVertex) {
+//    QPoint pos = mapToGlobal(QPoint(m_beforeMovingVertexX, m_beforeMovingVertexY));
+//    QCursor::setPos(pos);
+//    setCursor(Qt::ClosedHandCursor);
+//    if (GetModel()->GetPolygonsCount() == 0) {
+//      std::vector<ppxl::Point> vertices;
+//      vertices.push_back(ppxl::Point(pos.x(), pos.y()));
+//      GetModel()->AppendPolygon(ppxl::Polygon(vertices));
+//    }
+//  }
 }
 
 void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
-  m_movingVertex = (p_event->buttons() == Qt::LeftButton && m_nearToVertex);
-  m_movingPolygon = (p_event->buttons() == Qt::LeftButton && m_nearToBarycenter);
+//  m_movingVertex = (p_event->buttons() == Qt::LeftButton && m_nearToVertex);
+//  m_movingPolygon = (p_event->buttons() == Qt::LeftButton && m_nearToBarycenter);
 
-  if (p_event->buttons() == Qt::NoButton && m_model->rowCount() > 0) {
-    ppxl::Point currPos(p_event->pos().x(), p_event->pos().y());
+//  if (p_event->buttons() == Qt::NoButton && GetModel()->rowCount() > 0) {
+//    ppxl::Point currPos(p_event->pos().x(), p_event->pos().y());
 
-    QModelIndex currIndex = m_selectionModel->currentIndex();
-    if (!currIndex.isValid()) {
-      qDebug() << "now";
-      m_selectionModel->setCurrentIndex(m_model->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-      currIndex = m_selectionModel->currentIndex();
-    }
+//    QModelIndex currIndex = m_selectionModel->currentIndex();
+//    if (!currIndex.isValid()) {
+//      qDebug() << "now";
+//      m_selectionModel->setCurrentIndex(GetModel()->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+//      currIndex = m_selectionModel->currentIndex();
+//    }
 
-    if (currIndex.column() != 0)
-      currIndex = m_model->index(currIndex.row(), 0, currIndex.parent());
+//    if (currIndex.column() != 0)
+//      currIndex = GetModel()->index(currIndex.row(), 0, currIndex.parent());
 
-    QString fstData = currIndex.data().toString();
+//    QString fstData = currIndex.data().toString();
 
-    // This is a vertex
-    if (!fstData.startsWith("Polygon")) {
-      currIndex = currIndex.parent();
-      // This is the header
-    } else if (fstData == "Polygon") {
-      currIndex = m_model->index(0, 0);
-      // This is a polygon
-    } else if (fstData.startsWith("Polygon ")) {
-    } else {
-      qDebug() << currIndex << fstData;
-      return;
-    }
+//    // This is a vertex
+//    if (!fstData.startsWith("Polygon")) {
+//      currIndex = currIndex.parent();
+//      // This is the header
+//    } else if (fstData == "Polygon") {
+//      currIndex = GetModel()->index(0, 0);
+//      // This is a polygon
+//    } else if (fstData.startsWith("Polygon ")) {
+//    } else {
+//      qDebug() << currIndex << fstData;
+//      return;
+//    }
 
-    auto polygon = currIndex.data(AbstractLevelModel::ePolygonRole).value<ppxl::Polygon>();
-    auto vertices = polygon.GetVertices();
-    m_nearToVertex = false;
-    m_nearToBarycenter = false;
-    ppxl::Point barycenter;
-    if (m_model->rowCount(currIndex) > 2) {
-      //qDebug() << "Compute polygon barycenter from LevelDesignerScribbleView::mouseMoveEvent";
-      barycenter = polygon.Barycenter();
-      m_nearToBarycenter = (ppxl::Point::Distance(currPos, barycenter) < 20);
-    }
-    for (unsigned int k = 0; k < vertices.size(); ++k) {
-      ppxl::Point vertex = vertices.at(k);
-      if (ppxl::Point::Distance(currPos, vertex) < 10 || m_nearToBarycenter) {
-        m_nearToVertex = !m_nearToBarycenter;
-        m_currPolygonRow = currIndex.row();
-        m_currVertexRow = k;
-        m_currOldX = p_event->pos().x();
-        m_currOldY = p_event->pos().y();
-        m_beforeMovingVertexX = static_cast<int>(vertex.GetX());
-        m_beforeMovingPolygonX = static_cast<int>(barycenter.GetX());
-        m_beforeMovingVertexY = static_cast<int>(vertex.GetY());
-        m_beforeMovingPolygonY = static_cast<int>(barycenter.GetY());
-        break;
-      }
-    }
-  }
-  if (m_nearToVertex || m_nearToBarycenter) {
-    setCursor(Qt::OpenHandCursor);
-  } else {
-    setCursor(Qt::ArrowCursor);
-  }
+//    auto polygon = currIndex.data(AbstractLevelModel::ePolygonRole).value<ppxl::Polygon>();
+//    auto vertices = polygon.GetVertices();
+//    m_nearToVertex = false;
+//    m_nearToBarycenter = false;
+//    ppxl::Point barycenter;
+//    if (GetModel()->rowCount(currIndex) > 2) {
+//      //qDebug() << "Compute polygon barycenter from LevelDesignerScribbleView::mouseMoveEvent";
+//      barycenter = polygon.Barycenter();
+//      m_nearToBarycenter = (ppxl::Point::Distance(currPos, barycenter) < 20);
+//    }
+//    for (unsigned int k = 0; k < vertices.size(); ++k) {
+//      ppxl::Point vertex = vertices.at(k);
+//      if (ppxl::Point::Distance(currPos, vertex) < 10 || m_nearToBarycenter) {
+//        m_nearToVertex = !m_nearToBarycenter;
+//        m_currPolygonRow = currIndex.row();
+//        m_currVertexRow = k;
+//        m_currOldX = p_event->pos().x();
+//        m_currOldY = p_event->pos().y();
+//        m_beforeMovingVertexX = static_cast<int>(vertex.GetX());
+//        m_beforeMovingPolygonX = static_cast<int>(barycenter.GetX());
+//        m_beforeMovingVertexY = static_cast<int>(vertex.GetY());
+//        m_beforeMovingPolygonY = static_cast<int>(barycenter.GetY());
+//        break;
+//      }
+//    }
+//  }
+//  if (m_nearToVertex || m_nearToBarycenter) {
+//    setCursor(Qt::OpenHandCursor);
+//  } else {
+//    setCursor(Qt::ArrowCursor);
+//  }
 
-  if (p_event->buttons() == Qt::LeftButton && !m_nearToVertex && m_nearToBarycenter) {
-    int newX = p_event->pos().x();
-    int newY = p_event->pos().y();
-    ///Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Point(m_currOldX, m_currOldY), ppxl::Point(newX, newY), false));
-    m_currOldX = newX;
-    m_currOldY = newY;
-  }
+//  if (p_event->buttons() == Qt::LeftButton && !m_nearToVertex && m_nearToBarycenter) {
+//    int newX = p_event->pos().x();
+//    int newY = p_event->pos().y();
+//    Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(m_currOldX, m_currOldY), ppxl::Point(newX, newY)), false));
+//    m_currOldX = newX;
+//    m_currOldY = newY;
+//  }
 
-  if (p_event->buttons() == Qt::LeftButton && m_nearToVertex && !m_nearToBarycenter) {
-    int newX = p_event->pos().x();
-    int newY = p_event->pos().y();
-    ///Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, m_currOldX, m_currOldY, newX, newY, false));
-    m_currOldX = newX;
-    m_currOldY = newY;
-  }
+//  if (p_event->buttons() == Qt::LeftButton && m_nearToVertex && !m_nearToBarycenter) {
+//    int newX = p_event->pos().x();
+//    int newY = p_event->pos().y();
+//    Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, ppxl::Vector(ppxl::Point(m_currOldX, m_currOldY), ppxl::Point(newX, newY)), false));
+//    m_currOldX = newX;
+//    m_currOldY = newY;
+//  }
 
-  if (p_event->buttons() == Qt::LeftButton && m_isMagnetic) {
-    QPoint globalPosition = QCursor::pos();
+//  if (p_event->buttons() == Qt::LeftButton && m_isMagnetic) {
+//    QPoint globalPosition = QCursor::pos();
 
-    const int oldX = globalPosition.x();
-    int newX = oldX;
-    const int oldY = globalPosition.y();
-    int newY = oldY;
+//    const int oldX = globalPosition.x();
+//    int newX = oldX;
+//    const int oldY = globalPosition.y();
+//    int newY = oldY;
 
-    int extraX = p_event->pos().x()%50;
-    int extraY = p_event->pos().y()%50;
+//    int extraX = p_event->pos().x()%50;
+//    int extraY = p_event->pos().y()%50;
 
-    int delta = 0;
-    if (!m_isStuck) {
-      delta = 3;
-    }
+//    int delta = 0;
+//    if (!m_isStuck) {
+//      delta = 3;
+//    }
 
-    if (extraX < delta) {
-      newX -= extraX - 5;
-    } else if (extraX > 50-delta) {
-      newX += 4 + 50-extraX;
-    }
+//    if (extraX < delta) {
+//      newX -= extraX - 5;
+//    } else if (extraX > 50-delta) {
+//      newX += 4 + 50-extraX;
+//    }
 
-    if (extraY < delta) {
-      newY -= extraY - 5;
-    } else if (extraY > 50-delta) {
-      extraY += 4 + 50-extraY;
-    }
+//    if (extraY < delta) {
+//      newY -= extraY - 5;
+//    } else if (extraY > 50-delta) {
+//      extraY += 4 + 50-extraY;
+//    }
 
-    m_isStuck = (newX != oldX || newY != oldY);
+//    m_isStuck = (newX != oldX || newY != oldY);
 
-    QCursor::setPos(newX, newY);
-  }
+//    QCursor::setPos(newX, newY);
+//  }
 }
 
 void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
-//  if (m_model->rowCount() < 1)
-//    return;
+  ppxl::Point point(p_event->pos().x(), p_event->pos().y());
 
-//  if (m_nearToVertex || m_nearToBarycenter)
+  if (GetModel()->GetPolygonsCount() == 0)
+  {
+    std::vector<ppxl::Point> vertices;
+    vertices.push_back(point);
+    Q_EMIT(PolygonInserted(0, ppxl::Polygon(vertices)));
+  } else {
+    auto index = m_selectionModel->currentIndex();
+    int polygonRow;
+    int vertexRow;
+    auto itemType = index.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
+    switch (itemType) {
+    case (CreateLevelModel::ePolygons): {
+      auto polygonItem = GetModel()->GetPolygonItemsList().last();
+      polygonRow = polygonItem->row();
+      vertexRow = polygonItem->rowCount();
+      break;
+    } case (CreateLevelModel::ePolygon): {
+      auto polygonItem = GetModel()->itemFromIndex(index);
+      polygonRow = polygonItem->row();
+      vertexRow = polygonItem->rowCount();
+      break;
+    } case (CreateLevelModel::eVertex): {
+      polygonRow = index.parent().row();
+      vertexRow = index.row();
+      break;
+    } case (CreateLevelModel::eX):
+      case (CreateLevelModel::eY): {
+      polygonRow = index.parent().parent().row();
+      vertexRow = index.parent().row();
+      break;
+    }
+    }
+    Q_EMIT(VertexInserted(polygonRow, vertexRow, point));
+  }
+
+//  if (GetModel()->rowCount() < 1) {
+//    return;
+//  }
+
+//  if (m_nearToVertex || m_nearToBarycenter) {
 //    setCursor(Qt::OpenHandCursor);
+//  }
 
 //  QModelIndex polygonIndex;
 //  QModelIndex vertexIndex;
@@ -201,10 +273,11 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
 //    return;
 //  }
 
-//  if (currIndex.column() != 0)
-//    currIndex = m_model->index(currIndex.row(), 0, currIndex.parent());
+//  if (currIndex.column() != 0) {
+//    currIndex = GetModel()->index(currIndex.row(), 0, currIndex.parent());
+//  }
 
-//  QString fstData = m_model->itemData(currIndex).value(Qt::DisplayRole).toString();
+//  QString fstData = currIndex.data(Qt::DisplayRole).toString();
 
 //  // This is a vertex
 //  if (!fstData.startsWith("Polygon")) {
@@ -214,38 +287,38 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
 //    // This is the header
 //  } else if (fstData == "Polygon") {
 //    qDebug() << "There";
-//    m_controller->addPolygon(m_model->rowCount(), poc::Polygon());
-//    polygonIndex = m_model->index(m_model->rowCount()-1, 0);
+//    ///m_controller->addPolygon(m_model->rowCount(), ppxl::Polygon());
+//    polygonIndex = GetModel()->index(GetModel()->rowCount()-1, 0);
 //    vertexRow = 0;
 //    // This is a polygon
 //  } else if (fstData.startsWith("Polygon ")) {
 //    polygonIndex = currIndex;
-//    vertexRow = m_model->rowCount(polygonIndex);
+//    vertexRow = GetModel()->rowCount(polygonIndex);
 //  } else {
 //    qDebug() << "###" << fstData;
 //    return;
 //  }
 
 //  if (m_movingVertex) {
-//    if (m_beforeMovingVertexX != event->pos().x() || event->pos().y() != m_beforeMovingVertexY) {
-//      m_controller->moveVertex(m_currPolygonRow, m_currVertexRow, m_beforeMovingVertexX, m_beforeMovingVertexY, event->pos().x(), event->pos().y());
+//    if (m_beforeMovingVertexX != p_event->pos().x() || p_event->pos().y() != m_beforeMovingVertexY) {
+//      Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, ppxl::Vector(ppxl::Point(m_beforeMovingVertexX, m_beforeMovingVertexY), ppxl::Point(p_event->pos().x(), p_event->pos().y())), true));
 //    }
 //    m_beforeMovingVertexX = -1;
 //    m_beforeMovingVertexY = -1;
 //    return;
 //  } else if (m_movingPolygon) {
-//    poc::Polygon polygon = m_model->polygonFromIndex(polygonIndex);
+//    auto polygon = GetModel()->itemFromIndex(polygonIndex)->data(AbstractLevelModel::ePolygonRole).value<ppxl::Polygon>();
 //    //        qDebug() << "Compute polygon barycenter from LevelDesignerScribbleView::mouseReleaseEvent";
-//    poc::Point barycenter = polygon.barycenter();
-//    if (barycenter.getX() != m_beforeMovingPolygonX || barycenter.getY() != m_beforeMovingPolygonY) {
-//      m_controller->movePolygon(m_currPolygonRow, barycenter.getX(), barycenter.getY(), m_beforeMovingPolygonX, m_beforeMovingPolygonY, false);
-//      m_controller->movePolygon(m_currPolygonRow, m_beforeMovingPolygonX, m_beforeMovingPolygonY, barycenter.getX(), barycenter.getY());
+//    ppxl::Point barycenter = polygon.Barycenter();
+//    if (barycenter.GetX() != m_beforeMovingPolygonX || barycenter.GetY() != m_beforeMovingPolygonY) {
+//      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(barycenter.GetX(), barycenter.GetY()), ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY)), false));
+//      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY), ppxl::Point(barycenter.GetX(), barycenter.GetY())), true));
 //    }
 //    m_beforeMovingPolygonX = -1;
 //    m_beforeMovingPolygonY = -1;
 //    return;
 //  } else {
-//    m_controller->addVertex(polygonIndex.row(), vertexRow, poc::Point(event->pos().x(), event->pos().y()));
+//    Q_EMIT(VertexInserted(polygonIndex.row(), vertexRow, ppxl::Point(p_event->pos().x(), p_event->pos().y())));
 //  }
 }
 

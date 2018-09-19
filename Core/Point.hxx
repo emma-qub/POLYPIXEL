@@ -25,7 +25,8 @@ public:
   void Symetry();
 
   void Homothetie(Point const& p_origin, double p_scale);
-  Point ApplyVector(Vector const& p_vector) const;
+  Point Translate(Vector const& p_vector) const;
+  Point& Translated(Vector const& p_vector);
 
   Point operator/(double const& p_scalar) const;
   Point& operator/=(double const& p_scalar);

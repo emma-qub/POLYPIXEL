@@ -47,8 +47,14 @@ void Point::Homothetie(Point const& p_origin, double p_scale) {
   m_y = p_scale*(m_y - p_origin.m_y) + p_origin.m_y;
 }
 
-Point Point::ApplyVector(Vector const& p_vector) const {
+Point Point::Translate(Vector const& p_vector) const {
   return Point(m_x + p_vector.GetX(), m_y + p_vector.GetY());
+}
+
+Point& Point::Translated(const Vector& p_vector) {
+  m_x += p_vector.GetX();
+  m_y += p_vector.GetY();
+  return *this;
 }
 
 Point Point::operator/(double const& p_scalar) const {

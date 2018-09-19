@@ -10,8 +10,15 @@ public:
   CreateLevelModel(QObject* p_parent = nullptr);
   ~CreateLevelModel() override;
 
+  // Polygon
   void SetPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void SetVertex(QStandardItem* p_polygonItem, int p_vertexRow, ppxl::Point const& p_vertex);
+  void RemovePolygonAt(int p_polygonRow);
+  void TranslatePolygon(int p_polygonRow, ppxl::Vector const& p_direction);
+
+  // Vertex
+  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void RemoveVertexAt(int p_polygonRow, int p_vertexRow);
+  void TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction);
 };
 
 #endif
