@@ -1,5 +1,5 @@
-#ifndef SCOTCH_HXX
-#define SCOTCH_HXX
+#ifndef TAPE_HXX
+#define TAPE_HXX
 
 #include "Obstacle.hxx"
 

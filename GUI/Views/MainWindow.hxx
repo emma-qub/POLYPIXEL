@@ -5,7 +5,9 @@
 #include <QStateMachine>
 
 class AchievementsView;
+class CreateLevelModel;
 class CreateLevelView;
+class CreateLevelController;
 class GameView;
 class GameModel;
 class GameController;
@@ -36,7 +38,9 @@ private:
 
   QStackedWidget* m_centralWidget;
   AchievementsView* m_achievementsView;
+  CreateLevelModel* m_createLevelModel;
   CreateLevelView* m_createLevelView;
+  CreateLevelController* m_createLevelController;
   GameView* m_gameView;
   GameModel* m_gameModel;
   GameController* m_gameController;

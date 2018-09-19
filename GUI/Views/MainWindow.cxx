@@ -12,10 +12,12 @@
 #include "TestLevelView.hxx"
 #include "WorldsView.hxx"
 
+#include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Models/GameModel.hxx"
 #include "GUI/Models/LevelsModel.hxx"
 #include "GUI/Models/WorldsModel.hxx"
 
+#include "GUI/Controllers/CreateLevelController.hxx"
 #include "GUI/Controllers/GameController.hxx"
 #include "GUI/Controllers/LevelsController.hxx"
 #include "GUI/Controllers/WorldsController.hxx"
@@ -27,9 +29,11 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_stateMachine(this),
   m_centralWidget(new QStackedWidget),
   m_achievementsView(new AchievementsView),
+  m_createLevelModel(new CreateLevelModel(this)),
   m_createLevelView(new CreateLevelView),
+  m_createLevelController(new CreateLevelController(m_createLevelModel, m_createLevelView, this)),
   m_gameView(new GameView),
-  m_gameModel(new GameModel),
+  m_gameModel(new GameModel(this)),
   m_gameController(new GameController(m_gameModel, m_gameView, this)),
   m_levelsView(new LevelsView),
   m_levelsModel(new LevelsModel),
@@ -133,6 +137,11 @@ MainWindow::MainWindow(QWidget* p_parent):
   connect(m_worldsController, &WorldsController::LevelsPathChanged, m_levelsController, &LevelsController::SetLevelsPath);
   connect(m_levelsController, &LevelsController::PlayLevelRequested, m_gameController, &GameController::PlayLevel);
   connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
+  connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
+    if (m_centralWidget->currentWidget() == m_createLevelView) {
+      m_createLevelController->Redraw();
+    }
+  });
 
   showFullScreen();
 }

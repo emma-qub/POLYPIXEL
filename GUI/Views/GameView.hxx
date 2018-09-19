@@ -6,46 +6,11 @@
 #include "Core/Point.hxx"
 #include "Core/Segment.hxx"
 
+
 class QLabel;
 class QPushButton;
 class GameModel;
-
-class ScriblingView: public QWidget {
-  Q_OBJECT
-
-public:
-  explicit ScriblingView(QWidget* parent = nullptr);
-  ~ScriblingView() override;
-
-  void setModel(GameModel* p_gameModel);
-
-  void drawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
-  void drawFromModel();
-  void clearImage();
-
-signals:
-  void Scribbling(QPoint const& p_startPoint);
-  void Moving(QPoint const& p_currentPoint);
-  void Slicing(QPoint const& p_endPoint);
-
-protected:
-  void drawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
-  void drawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
-  void resizeImage(QImage* image, const QSize& newSize);
-
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseMoveEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
-  void paintEvent(QPaintEvent* event) override;
-  void resizeEvent(QResizeEvent* event) override;
-
-private:
-  GameModel* m_gameModel;
-  int m_myPenWidth;
-  QColor m_myPenColor;
-  QImage m_image;
-  bool m_scribbling;
-};
+class GameScribblingView;
 
 class GameView: public QWidget {
   Q_OBJECT
@@ -74,7 +39,7 @@ private:
   QLabel* m_gameLabel;
   QPushButton* m_pauseButton;
   GameModel* m_gameModel;
-  ScriblingView* m_scriblingView;
+  GameScribblingView* m_scribblingView;
   int m_linesCount;
   int m_linesGoal;
   QLabel* m_linesCountLabel;

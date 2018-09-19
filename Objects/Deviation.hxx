@@ -5,7 +5,7 @@
 
 #include "Core/Segment.hxx"
 
-class Deviation: Object {
+class Deviation: public Object {
 
 public:
   Deviation();

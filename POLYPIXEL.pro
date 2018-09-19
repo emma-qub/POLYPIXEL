@@ -46,7 +46,14 @@ SOURCES += \
     Objects/Portal.cxx \
     Objects/Polarisator.cxx \
     Objects/Tape.cxx \
-    Objects/Diode.cxx
+    Objects/Diode.cxx \
+    GUI/Controllers/CreateLevelController.cxx \
+    GUI/Models/AbstractLevelModel.cxx \
+    GUI/Views/GameScribblingView.cxx \
+    GUI/Views/CreateLevelScribblingView.cxx \
+    GUI/Views/AbstractScribblingView.cxx \
+    GUI/Models/CreateLevelModel.cxx \
+    GUI/Commands/Commands.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -80,7 +87,14 @@ HEADERS += \
     Objects/Portal.hxx \
     Objects/Polarisator.hxx \
     Objects/Tape.hxx \
-    Objects/Diode.hxx
+    Objects/Diode.hxx \
+    GUI/Controllers/CreateLevelController.hxx \
+    GUI/Models/AbstractLevelModel.hxx \
+    GUI/Views/GameScribblingView.hxx \
+    GUI/Views/CreateLevelScribblingView.hxx \
+    GUI/Views/AbstractScribblingView.hxx \
+    GUI/Models/CreateLevelModel.hxx \
+    GUI/Commands/Commands.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
