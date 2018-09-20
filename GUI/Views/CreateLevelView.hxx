@@ -13,6 +13,8 @@ class QLabel;
 class QPushButton;
 class QTreeView;
 class QItemSelectionModel;
+class QUndoView;
+class QUndoStack;
 
 class CreateLevelView: public QWidget {
   Q_OBJECT
@@ -21,6 +23,7 @@ public:
   explicit CreateLevelView(QWidget* parent = nullptr);
 
   void SetModel(CreateLevelModel* p_model);
+  void SetUndoStack(QUndoStack* p_undoStack);
   QItemSelectionModel* GetSelectionModel() const;
 
   void DrawFromModel();
@@ -44,6 +47,7 @@ private:
   CreateLevelModel* m_model;
   CreateLevelScribblingView* m_scribblingView;
   QTreeView* m_treeView;
+  QUndoView* m_undoView;
 };
 
 #endif

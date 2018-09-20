@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTreeView>
+#include <QUndoView>
+#include <QUndoStack>
 
 CreateLevelView::CreateLevelView(QWidget* parent):
   QWidget(parent),
@@ -13,7 +15,8 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_testLevelButton(new QPushButton("Test")),
   m_menuButton(new QPushButton("Menu")),
   m_scribblingView(new CreateLevelScribblingView),
-  m_treeView(new QTreeView) {
+  m_treeView(new QTreeView),
+  m_undoView(new QUndoView) {
 
   m_treeView->setHeaderHidden(true);
 
@@ -25,13 +28,16 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   menuLayout->setAlignment(Qt::AlignCenter);
   auto viewLayout = new QHBoxLayout;
   viewLayout->addWidget(m_scribblingView);
-  viewLayout->addWidget(m_treeView);
+  auto rightViewLayout = new QVBoxLayout;
+  rightViewLayout->addWidget(m_treeView);
+  rightViewLayout->addWidget(m_undoView);
+  viewLayout->addLayout(rightViewLayout);
   viewLayout->setStretchFactor(m_scribblingView, 4);
-  viewLayout->setStretchFactor(m_treeView, 1);
+  viewLayout->setStretchFactor(rightViewLayout, 1);
   mainLayout->addLayout(menuLayout);
   mainLayout->addLayout(viewLayout);
   mainLayout->setStretchFactor(menuLayout, 0);
-  mainLayout->setStretchFactor(m_scribblingView, 1);
+  mainLayout->setStretchFactor(viewLayout, 1);
   setLayout(mainLayout);
 
   connect(m_testLevelButton, &QPushButton::clicked, this, &CreateLevelView::TestLevelRequested);
@@ -57,6 +63,11 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
       m_treeView->resizeColumnToContents(column);
     }
   });
+}
+
+void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack)
+{
+  m_undoView->setStack(p_undoStack);
 }
 
 QItemSelectionModel* CreateLevelView::GetSelectionModel() const {

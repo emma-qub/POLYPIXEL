@@ -16,6 +16,8 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   m_view->SetModel(m_model);
   connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
 
+  m_view->SetUndoStack(m_undoStack);
+
   connect(m_view, &CreateLevelView::PolygonInserted, this, &CreateLevelController::InsertPolygon);
   connect(m_view, &CreateLevelView::PolygonRemoved, this, &CreateLevelController::RemovePolygon);
   connect(m_view, &CreateLevelView::PolygonMoved, this, &CreateLevelController::MovePolygon);
