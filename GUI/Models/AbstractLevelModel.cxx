@@ -11,9 +11,10 @@ AbstractLevelModel::AbstractLevelModel(QObject* p_parent):
 }
 
 void AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {
-  char i = 'A';
-  i += p_row;
-  auto vertexItem = new QStandardItem(QString(i));
+  char vertexLetter = 'A';
+  vertexLetter += p_row;
+
+  auto vertexItem = new QStandardItem(QString(vertexLetter));
   vertexItem->setData(eVertex, eItemTypeRole);
   auto xItem = new QStandardItem(QString::number(p_vertex.GetX()));
   xItem->setData(eX, eItemTypeRole);
@@ -22,6 +23,20 @@ void AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, p
   QList<QStandardItem*> vertexItemsList;
   vertexItemsList << vertexItem << xItem << yItem;
   p_polygonItem->insertRow(p_row, vertexItemsList);
+
+  // Update vertices letters
+  for (int row = p_row+1; row < p_polygonItem->rowCount(); ++row) {
+    auto vertexItem = p_polygonItem->child(row, 0);
+    char newLetter = vertexItem->text().toLatin1().data()[0];
+    ++newLetter;
+    vertexItem->setText(QString(newLetter));
+  }
+
+  auto polygon = p_polygonItem->data(ePolygonRole).value<ppxl::Polygon>();
+  auto vertices = polygon.GetVertices();
+  vertices.insert(vertices.cbegin()+p_row, p_vertex);
+  polygon.SetVertices(vertices);
+  p_polygonItem->setData(QVariant::fromValue<ppxl::Polygon>(polygon), ePolygonRole);
 }
 
 void AbstractLevelModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex) {

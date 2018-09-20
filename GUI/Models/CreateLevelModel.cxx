@@ -54,3 +54,15 @@ void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::
   polygon.SetVertices(newVertices);
   SetPolygon(p_polygonRow, polygon);
 }
+
+QModelIndex CreateLevelModel::GetVertexIndex(int p_polygonRow, int p_vertexRow) const {
+  auto polygonItemsList = GetPolygonItemsList();
+  if (polygonItemsList.size() > p_polygonRow) {
+    auto polygonItem = polygonItemsList.at(p_polygonRow);
+    if (polygonItem->rowCount() > p_vertexRow) {
+      return polygonItem->child(p_vertexRow, 0)->index();
+    }
+  }
+
+  return QModelIndex();
+}

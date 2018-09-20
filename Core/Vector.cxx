@@ -153,4 +153,8 @@ std::ostream& operator<<(std::ostream& p_os, Vector const& p_vector) {
   return p_os << "(Vector) (" << p_vector.m_x << "; " << p_vector.m_y << ")";
 }
 
+QDebug operator<<(QDebug p_debug, Vector const& p_vector) {
+  return p_debug << "(" << p_vector.m_x << "; " << p_vector.m_y << ")";
+}
+
 }

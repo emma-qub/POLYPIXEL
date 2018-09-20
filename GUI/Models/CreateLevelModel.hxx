@@ -19,6 +19,7 @@ public:
   void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void RemoveVertexAt(int p_polygonRow, int p_vertexRow);
   void TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction);
+  QModelIndex GetVertexIndex(int p_polygonRow, int p_vertexRow) const;
 };
 
 #endif

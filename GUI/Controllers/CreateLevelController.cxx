@@ -20,6 +20,14 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexInserted, this, &CreateLevelController::InsertVertex);
   connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
+
+  connect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+}
+
+CreateLevelController::~CreateLevelController() {
+  // When QUndoStack is deleted, it emits a last indexChanged, calling Redraw
+  // from the scribbling view, whose model is already deleted, so disconnect.
+  disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
 }
 
 void CreateLevelController::Redraw() {

@@ -1,7 +1,8 @@
-#ifndef Point_H
-#define Point_H
+#ifndef POINT_H
+#define POINT_H
 
 #include <iostream>
+
 #include <QDebug>
 
 namespace ppxl {

@@ -49,6 +49,7 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   m_model = p_model;
   m_scribblingView->SetModel(p_model);
   m_treeView->setModel(p_model);
+  m_scribblingView->SetSelectionModel(m_treeView->selectionModel());
 
   connect(m_model, &CreateLevelModel::rowsInserted, m_treeView, &QTreeView::expandAll);
   connect(m_model, &CreateLevelModel::rowsInserted, this, [this]() {
@@ -56,8 +57,6 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
       m_treeView->resizeColumnToContents(column);
     }
   });
-
-  connect(m_model, &CreateLevelModel::rowsInserted, this, &CreateLevelView::Redraw);
 }
 
 void CreateLevelView::DrawFromModel() {

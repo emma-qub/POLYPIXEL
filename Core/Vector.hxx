@@ -1,8 +1,10 @@
-#ifndef VECTEUR2D_H_
-#define VECTEUR2D_H_
+#ifndef VECTEUR_H_
+#define VECTEUR_H_
 
 #include <iostream>
 #include <cassert>
+
+#include <QDebug>
 
 namespace ppxl {
 
@@ -55,6 +57,7 @@ public:
   static double Angle(Vector const& p_vector1, Vector const& p_vector2);
 
   friend std::ostream& operator<<(std::ostream& p_os, Vector const& p_vector);
+  friend QDebug operator<<(QDebug p_debug, Vector const& p_vector);
 
 private:
   double m_x;

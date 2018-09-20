@@ -18,6 +18,8 @@ public:
   ~CreateLevelScribblingView() override;
 
   void SetModel(AbstractLevelModel* p_model) override;
+  void SetSelectionModel(QItemSelectionModel* p_selectionModel);
+
   void DrawGrid();
   void DrawFromModel() override;
 
@@ -30,12 +32,15 @@ signals:
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
 
 protected:
+  void DrawPoint(QPoint const& p_point, QColor const& p_color);
+  void DrawText(ppxl::Point p_position, const QString& p_text, const ppxl::Vector& shiftVector, int p_weight);
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
 
 private:
+  CreateLevelModel* m_model;
   QItemSelectionModel* m_selectionModel;
   bool m_isMagnetic;
   bool m_isStuck;

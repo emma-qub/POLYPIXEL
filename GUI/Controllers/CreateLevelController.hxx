@@ -16,6 +16,7 @@ class CreateLevelController: public QObject {
 
 public:
   explicit CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view,  QObject *parent = nullptr);
+  ~CreateLevelController() override;
 
   void Redraw();
 
