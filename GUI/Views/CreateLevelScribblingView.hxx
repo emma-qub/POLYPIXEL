@@ -19,6 +19,7 @@ public:
 
   void SetModel(AbstractLevelModel* p_model) override;
   void SetSelectionModel(QItemSelectionModel* p_selectionModel);
+  inline QItemSelectionModel* GetSelectionModel() const { return m_selectionModel; }
 
   void DrawGrid();
   void DrawFromModel() override;

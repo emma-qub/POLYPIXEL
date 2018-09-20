@@ -59,6 +59,10 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   });
 }
 
+QItemSelectionModel* CreateLevelView::GetSelectionModel() const {
+  return m_treeView->selectionModel();
+}
+
 void CreateLevelView::DrawFromModel() {
   m_scribblingView->DrawFromModel();
 }

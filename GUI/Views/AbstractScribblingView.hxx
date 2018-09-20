@@ -23,6 +23,7 @@ public:
 protected:
   inline QImage& GetImage() { return m_image; }
   inline AbstractLevelModel* GetModel() const { return m_model; }
+  inline void setPenWidth(int p_width) { m_myPenWidth = p_width; }
 
   void DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);

@@ -12,6 +12,7 @@ class CreateLevelScribblingView;
 class QLabel;
 class QPushButton;
 class QTreeView;
+class QItemSelectionModel;
 
 class CreateLevelView: public QWidget {
   Q_OBJECT
@@ -20,6 +21,7 @@ public:
   explicit CreateLevelView(QWidget* parent = nullptr);
 
   void SetModel(CreateLevelModel* p_model);
+  QItemSelectionModel* GetSelectionModel() const;
 
   void DrawFromModel();
   void ClearImage();
@@ -34,9 +36,6 @@ signals:
   void VertexInserted(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void VertexRemoved(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
-
-
-public slots:
 
 private:
   QLabel* m_createLevelLabel;

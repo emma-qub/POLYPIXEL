@@ -9,10 +9,22 @@
 
 class CreateLevelModel;
 class QStandardItem;
+class QItemSelectionModel;
 
-class AddVertexCommand: public QUndoCommand {
+class UndoCommand: public QUndoCommand {
 public:
-  AddVertexCommand(CreateLevelModel* p_model, int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex,
+  UndoCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, QUndoCommand* p_parent = nullptr);
+
+  ~UndoCommand() override;
+
+protected:
+  CreateLevelModel* m_model;
+  QItemSelectionModel* m_selectionModel;
+};
+
+class AddVertexCommand: public UndoCommand {
+public:
+  AddVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex,
     int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~AddVertexCommand() override;
 
@@ -20,7 +32,6 @@ public:
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   int m_vertexRow;
   ppxl::Point m_vertex;
@@ -30,17 +41,16 @@ private:
 
 
 
-class RemoveVertexCommand: public QUndoCommand {
+class RemoveVertexCommand: public UndoCommand {
 public:
-  RemoveVertexCommand(CreateLevelModel* p_model, int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex,
-    int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
+  RemoveVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
+    ppxl::Point const& p_vertex, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~RemoveVertexCommand() override;
 
   void undo() override;
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   int m_vertexRow;
   ppxl::Point m_vertex;
@@ -50,17 +60,16 @@ private:
 
 
 
-class MoveVertexCommand: public QUndoCommand {
+class MoveVertexCommand: public UndoCommand {
 public:
-  MoveVertexCommand(CreateLevelModel* p_model, int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction,
-     int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
+  MoveVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
+    ppxl::Vector const& p_direction, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~MoveVertexCommand() override;
 
   void undo() override;
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   int m_vertexRow;
   ppxl::Vector m_direction;
@@ -70,17 +79,16 @@ private:
 
 
 
-class AddPolygonCommand: public QUndoCommand {
+class AddPolygonCommand: public UndoCommand {
 public:
-  AddPolygonCommand(CreateLevelModel* p_model, int p_polygonRow, ppxl::Polygon const& p_polygon,
-    int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
+  AddPolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+    ppxl::Polygon const& p_polygon, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~AddPolygonCommand() override;
 
   void undo() override;
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   ppxl::Polygon m_polygon;
   int m_selectionPolygonRow;
@@ -89,17 +97,16 @@ private:
 
 
 
-class RemovePolygonCommand: public QUndoCommand {
+class RemovePolygonCommand: public UndoCommand {
 public:
-  RemovePolygonCommand(CreateLevelModel* p_model, int p_polygonRow, ppxl::Polygon const& p_polygon,
-    int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
+  RemovePolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+    ppxl::Polygon const& p_polygon, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~RemovePolygonCommand() override;
 
   void undo() override;
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   ppxl::Polygon m_polygon;
   int m_selectionPolygonRow;
@@ -108,17 +115,16 @@ private:
 
 
 
-class MovePolygonCommand: public QUndoCommand {
+class MovePolygonCommand: public UndoCommand {
 public:
-  MovePolygonCommand(CreateLevelModel* p_model, int p_polygonRow, ppxl::Vector const& p_direction,
-    int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
+  MovePolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+    ppxl::Vector const& p_direction, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent = nullptr);
   ~MovePolygonCommand() override;
 
   void undo() override;
   void redo() override;
 
 private:
-  CreateLevelModel* m_model;
   int m_polygonRow;
   ppxl::Vector m_direction;
   int m_selectionPolygonRow;

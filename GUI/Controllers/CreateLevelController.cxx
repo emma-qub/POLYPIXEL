@@ -5,6 +5,7 @@
 #include "GUI/Commands/Commands.hxx"
 
 #include <QUndoStack>
+#include <QAction>
 
 CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view, QObject* p_parent):
   QObject(p_parent),
@@ -13,6 +14,7 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   m_undoStack(new QUndoStack(this)) {
 
   m_view->SetModel(m_model);
+  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
 
   connect(m_view, &CreateLevelView::PolygonInserted, this, &CreateLevelController::InsertPolygon);
   connect(m_view, &CreateLevelView::PolygonRemoved, this, &CreateLevelController::RemovePolygon);
@@ -22,6 +24,13 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
   connect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+
+  auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
+  undoAction->setShortcut(QKeySequence::Undo);
+  m_view->addAction(undoAction);
+  auto redoAction = m_undoStack->createRedoAction(m_view, tr("Redo"));
+  redoAction->setShortcut(QKeySequence::Redo);
+  m_view->addAction(redoAction);
 }
 
 CreateLevelController::~CreateLevelController() {
@@ -31,11 +40,12 @@ CreateLevelController::~CreateLevelController() {
 }
 
 void CreateLevelController::Redraw() {
+  qDebug() << "REDRAW";
   m_view->Redraw();
 }
 
 void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
-  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, p_polygonRow, p_polygon, p_polygonRow, 0);
+  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, 0);
   m_undoStack->push(addPolygonCommand);
 }
 
@@ -53,13 +63,13 @@ void CreateLevelController::RemovePolygon(int p_polygonRow, ppxl::Polygon const&
     }
   }
 
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, p_polygonRow, p_polygon, newPolygonRow, 0);
+  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, newPolygonRow, 0);
   m_undoStack->push(removePolygonCommand);
 }
 
 void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, p_polygonRow, p_direction, p_polygonRow, -1);
+    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
     m_undoStack->push(movePolygonCommand);
   } else {
     ppxl::Polygon polygon;
@@ -68,7 +78,7 @@ void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_
 }
 
 void CreateLevelController::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* addVertexCommand = new AddVertexCommand(m_model, p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
+  QUndoCommand* addVertexCommand = new AddVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
   m_undoStack->push(addVertexCommand);
 }
 
@@ -77,13 +87,13 @@ void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_
 }
 
 void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, 0);
+  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, 0);
   m_undoStack->push(removeVertexCommand);
 }
 
 void CreateLevelController::MoveVertex(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
+    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
     m_undoStack->push(moverVertexCommand);
   } else {
     m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
