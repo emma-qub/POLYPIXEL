@@ -12,6 +12,11 @@ class QPushButton;
 class GameModel;
 class GameScribblingView;
 
+
+
+class QTreeView;
+
+
 class GameView: public QWidget {
   Q_OBJECT
 
@@ -22,6 +27,7 @@ public:
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawFromModel();
+  void DrawAreas(QList<double> const& p_areas);
   void ClearImage();
 
   void UpdateLinesCount(int p_linesCount, int p_linesGoal = -1);
@@ -46,6 +52,8 @@ private:
   int m_partsCount;
   int m_partsGoal;
   QLabel* m_partsCountLabel;
+
+  QTreeView* m_tv;
 };
 
 #endif

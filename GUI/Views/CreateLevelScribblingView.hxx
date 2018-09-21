@@ -34,7 +34,6 @@ signals:
 
 protected:
   void DrawPoint(QPoint const& p_point, QColor const& p_color);
-  void DrawText(ppxl::Point p_position, const QString& p_text, const ppxl::Vector& shiftVector, int p_weight);
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;

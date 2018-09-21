@@ -384,7 +384,7 @@ void GameController::CheckWinning() {
       m_gameInfo.m_stars = starsCount;
     }
 
-    /// UPDATE VIEW
+    m_view->DrawAreas(orientedAreas);
 
     //m_levelRunning = false;
   }

@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "Core/Segment.hxx"
+#include "Core/Vector.hxx"
 
 class AbstractLevelModel;
 
@@ -17,6 +18,7 @@ public:
   virtual void SetModel(AbstractLevelModel* p_model);
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
+  void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, const ppxl::Vector& shiftVector = ppxl::Vector());
   virtual void DrawFromModel();
   void ClearImage();
 

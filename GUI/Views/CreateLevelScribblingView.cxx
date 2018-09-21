@@ -62,24 +62,6 @@ void CreateLevelScribblingView::DrawPoint(const QPoint& p_point, const QColor& p
   update();
 }
 
-void CreateLevelScribblingView::DrawText(ppxl::Point p_position, const QString& p_text, ppxl::Vector const& shiftVector, int p_weight) {
-  QPainter painter(&GetImage());
-  QFont font("", 12, p_weight);
-  QFontMetrics fm(font);
-  auto vertexSize = fm.size(Qt::TextSingleLine, p_text);
-  ppxl::Point topLeft(p_position);
-  topLeft.Move(-vertexSize.width()/2., -vertexSize.height()/2.);
-  topLeft.Translated(shiftVector*10);
-  ppxl::Point bottomRight(p_position);
-  bottomRight.Move(vertexSize.width()/2., vertexSize.height()/2.);
-  bottomRight.Translated(shiftVector*10);
-  QRectF boundingRect(QPointF(topLeft.GetX(), topLeft.GetY()), QPointF(bottomRight.GetX(), bottomRight.GetY()));
-  painter.setFont(font);
-  painter.drawText(boundingRect, p_text);
-
-  update();
-}
-
 void CreateLevelScribblingView::DrawGrid() {
   QPainter painter(&GetImage());
 
@@ -138,7 +120,7 @@ void CreateLevelScribblingView::DrawFromModel() {
       ppxl::Vector shiftVector;
 
       if (polygonItem->rowCount() == 1) {
-        DrawText(A, vertexLetterA, ppxl::Vector(-1, -1), PEN_WIDTH);
+        DrawText(A, vertexLetterA, PEN_WIDTH, ppxl::Vector(-1, -1));
         return;
       }
 
@@ -158,7 +140,7 @@ void CreateLevelScribblingView::DrawFromModel() {
 
         shiftVector = ppxl::Vector(barycenter, B);
       }
-      DrawText(B, vertexLetterB, shiftVector.Normalize(), PEN_WIDTH);
+      DrawText(B, vertexLetterB, PEN_WIDTH, shiftVector.Normalize());
 
       DrawLine(A, B, color);
     }

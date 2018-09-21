@@ -23,6 +23,24 @@ void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const&
   DrawLine(startPoint, endPoint, p_color, p_penStyle);
 }
 
+void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text,  int p_weight, ppxl::Vector const& shiftVector) {
+  QPainter painter(&GetImage());
+  QFont font("", 12, p_weight);
+  QFontMetrics fm(font);
+  auto vertexSize = fm.size(Qt::TextSingleLine, p_text);
+  ppxl::Point topLeft(p_position);
+  topLeft.Move(-vertexSize.width()/2., -vertexSize.height()/2.);
+  topLeft.Translated(shiftVector*10);
+  ppxl::Point bottomRight(p_position);
+  bottomRight.Move(vertexSize.width()/2., vertexSize.height()/2.);
+  bottomRight.Translated(shiftVector*10);
+  QRectF boundingRect(QPointF(topLeft.GetX(), topLeft.GetY()), QPointF(bottomRight.GetX(), bottomRight.GetY()));
+  painter.setFont(font);
+  painter.drawText(boundingRect, p_text);
+
+  update();
+}
+
 void AbstractScribblingView::DrawFromModel() {
   if (!m_model)
   {
@@ -36,10 +54,10 @@ void AbstractScribblingView::DrawFromModel() {
     for (int row = 0; row < polygonItem->rowCount(); ++row) {
       int indexA = row;
       int indexB =(row+1)%polygonItem->rowCount();
-      ppxl::Point A(polygonItem->child(indexA, 1)->data(Qt::DisplayRole).toString().toInt(),
-                    polygonItem->child(indexA, 2)->data(Qt::DisplayRole).toString().toInt());
-      ppxl::Point B(polygonItem->child(indexB, 1)->data(Qt::DisplayRole).toString().toInt(),
-                    polygonItem->child(indexB, 2)->data(Qt::DisplayRole).toString().toInt());
+      ppxl::Point A(polygonItem->child(indexA, 1)->text().toDouble(),
+                    polygonItem->child(indexA, 2)->text().toDouble());
+      ppxl::Point B(polygonItem->child(indexB, 1)->text().toDouble(),
+                    polygonItem->child(indexB, 2)->text().toDouble());
       auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
       DrawLine(A, B, color);
     }

@@ -8,6 +8,13 @@
 #include <QPushButton>
 #include <QPoint>
 
+
+
+#include <QTreeView>
+
+
+
+
 GameView::GameView(QWidget* p_parent):
   QWidget(p_parent),
   m_gameLabel(new QLabel("Play")),
@@ -32,6 +39,9 @@ GameView::GameView(QWidget* p_parent):
   mainLayout->addWidget(m_scribblingView);
   mainLayout->setStretchFactor(menuLayout, 0);
   mainLayout->setStretchFactor(m_scribblingView, 1);
+  m_tv = new QTreeView;
+  mainLayout->addWidget(m_tv);
+
 
   setLayout(mainLayout);
 
@@ -44,6 +54,9 @@ GameView::GameView(QWidget* p_parent):
 void GameView::SetModel(GameModel* p_gameModel) {
   m_gameModel = p_gameModel;
   m_scribblingView->SetModel(p_gameModel);
+
+
+  m_tv->setModel(m_gameModel);
 }
 
 void GameView::DrawLine(const ppxl::Segment& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
@@ -52,6 +65,17 @@ void GameView::DrawLine(const ppxl::Segment& p_line, QColor const& p_color, Qt::
 
 void GameView::DrawFromModel() {
   m_scribblingView->DrawFromModel();
+}
+
+void GameView::DrawAreas(const QList<double>& p_areas) {
+  auto polygons = m_gameModel->GetPolygonsList();
+  assert(p_areas.size() == polygons.size());
+
+  for (int row = 0; row < polygons.size(); ++row) {
+    auto polygon = polygons.at(row);
+    auto area = QString::number(p_areas.at(row));
+    m_scribblingView->DrawText(polygon->Barycenter(), area, 50);
+  }
 }
 
 void GameView::ClearImage() {
