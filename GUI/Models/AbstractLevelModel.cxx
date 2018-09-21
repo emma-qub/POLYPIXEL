@@ -42,8 +42,7 @@ void AbstractLevelModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, p
   // Update vertex
   if (p_updatePolygon) {
     auto polygon = p_polygonItem->data(ePolygonRole).value<ppxl::Polygon*>();
-    //polygon->Vertices().insert(polygon->GetVertices().begin()+p_row, p_vertex);
-    polygon->Vertices().push_back(p_vertex);
+    polygon->InsertVertex(p_vertex, static_cast<unsigned int>(p_row));
   }
 }
 
@@ -63,6 +62,7 @@ void AbstractLevelModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon
   }
 
   m_polygonsItem->insertRow(p_row, polygonItem);
+  m_polygons << polygon;
 }
 
 void AbstractLevelModel::AppendPolygon(ppxl::Polygon const& p_polygon) {
@@ -80,9 +80,9 @@ void AbstractLevelModel::SetPolygonsList(const QList<ppxl::Polygon>& p_polygonsL
 }
 
 void AbstractLevelModel::RemovePolygonAt(int p_polygonRow) {
+  delete m_polygons.takeAt(p_polygonRow);
   for (auto* item: m_polygonsItem->takeRow(p_polygonRow))
   {
-    delete item->data(ePolygonRole).value<ppxl::Polygon*>();
     delete item;
   }
 }
@@ -92,4 +92,6 @@ void AbstractLevelModel::ClearPolygons() {
   {
     RemovePolygonAt(row);
   }
+  m_polygons.clear();
+  m_polygonsItem->setRowCount(0);
 }
