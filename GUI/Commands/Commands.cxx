@@ -5,13 +5,6 @@
 #include <QStandardItem>
 #include <QItemSelectionModel>
 
-
-
-#include <QDebug>
-
-
-
-
 UndoCommand::UndoCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, QUndoCommand* p_parent):
   QUndoCommand(p_parent),
   m_model(p_model),
@@ -42,7 +35,7 @@ void AddVertexCommand::undo() {
 }
 
 void AddVertexCommand::redo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
+  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
   //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
@@ -63,7 +56,7 @@ RemoveVertexCommand::RemoveVertexCommand(CreateLevelModel* p_model, QItemSelecti
 RemoveVertexCommand::~RemoveVertexCommand() = default;
 
 void RemoveVertexCommand::undo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
+  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
   //m_model->PopSelection();
 }
 
@@ -90,12 +83,12 @@ MoveVertexCommand::MoveVertexCommand(CreateLevelModel* p_model, QItemSelectionMo
 MoveVertexCommand::~MoveVertexCommand() = default;
 
 void MoveVertexCommand::undo() {
-  m_model->TranslateVertex(m_polygonRow, m_vertexRow, -m_direction);
+  m_model->TranslateVertex(m_polygonRow, m_vertexRow, -m_direction, true);
   //m_model->popSelection();
 }
 
 void MoveVertexCommand::redo() {
-  m_model->TranslateVertex(m_polygonRow, m_vertexRow, m_direction);
+  m_model->TranslateVertex(m_polygonRow, m_vertexRow, m_direction, true);
   //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
@@ -165,11 +158,11 @@ MovePolygonCommand::MovePolygonCommand(CreateLevelModel* p_model, QItemSelection
 MovePolygonCommand::~MovePolygonCommand() = default;
 
 void MovePolygonCommand::undo() {
-  m_model->TranslatePolygon(m_polygonRow, -m_direction);
+  m_model->TranslatePolygon(m_polygonRow, -m_direction, true);
   //m_model->PopSelection();
 }
 
 void MovePolygonCommand::redo() {
-  m_model->TranslatePolygon(m_polygonRow, m_direction);
+  m_model->TranslatePolygon(m_polygonRow, m_direction, true);
   //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }

@@ -21,6 +21,7 @@ public:
 
   inline bool HasEnoughVertices() const { return m_vertices.size() > 2; }
   inline std::vector<Point> GetVertices() const { return m_vertices; }
+  inline std::vector<Point>& Vertices() { return m_vertices; }
   inline void SetVertices(const std::vector<Point>& p_vertices) { m_vertices = p_vertices; }
 
   void InsertVertex(Point const& p_vertex, unsigned int p_position);

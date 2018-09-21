@@ -74,8 +74,7 @@ void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_
     QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
     m_undoStack->push(movePolygonCommand);
   } else {
-    ppxl::Polygon polygon;
-    m_model->TranslatePolygon(p_polygonRow, p_direction);
+    m_model->TranslatePolygon(p_polygonRow, p_direction, false);
   }
 }
 
@@ -85,7 +84,7 @@ void CreateLevelController::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl
 }
 
 void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_vertex) {
-  InsertVertex(p_polygonRow, m_model->GetPolygonItemsList().at(p_polygonRow)->rowCount(), p_vertex);
+  InsertVertex(p_polygonRow, m_model->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
 }
 
 void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
@@ -98,6 +97,6 @@ void CreateLevelController::MoveVertex(int p_polygonRow, int p_vertexRow, const 
     QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
     m_undoStack->push(moverVertexCommand);
   } else {
-    m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
+    m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction, false);
   }
 }

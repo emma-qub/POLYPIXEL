@@ -97,9 +97,9 @@ GameController::LineType GameController::ComputeLinesType(QList<ppxl::Segment> c
   auto polygonList = m_model->GetPolygonsList();
   for (const ppxl::Segment& line: p_lines) {
     for (auto const& polygon: polygonList) {
-      if (!polygon.IsCrossing(line) && !polygon.IsPointInside2(line.GetA())) {
+      if (!polygon->IsCrossing(line) && !polygon->IsPointInside2(line.GetA())) {
         noCrossing = true;
-      } else if (polygon.IsGoodSegment(line)) {
+      } else if (polygon->IsGoodSegment(line)) {
         goodCrossing = true;
       } else {
         badCrossing = true;
@@ -148,10 +148,10 @@ void GameController::UpdateViewFromGameInfo() {
 
 
 void GameController::ComputeNewPolygonList(QList<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const {
-  for (auto const& polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_model->GetPolygonsList()) {
     std::vector<ppxl::Point*> globalVertices;
     std::vector<ppxl::Point*> intersections;
-    GetVerticesAndIntersections(p_line, polygon, globalVertices, intersections);
+    GetVerticesAndIntersections(p_line, *polygon, globalVertices, intersections);
 
     std::vector<ppxl::Point> newVertices;
     std::vector<std::pair<ppxl::Point*, ppxl::Point*>> cuttingSegments = GetCuttingSegments(intersections);
@@ -344,8 +344,8 @@ void GameController::OpenLevel(QString const& p_levelPath) {
   m_maxGapToWin = parser.GetMaxGapToWin();
   UpdateViewFromGameInfo();
 
-  for (ppxl::Polygon const& polygon: m_model->GetPolygonsList()) {
-    m_orientedAreaTotal += polygon.OrientedArea();
+  for (auto const* polygon: m_model->GetPolygonsList()) {
+    m_orientedAreaTotal += polygon->OrientedArea();
   }
 
 //  m_levelRunning = true;
@@ -358,14 +358,14 @@ void GameController::CheckWinning() {
     double minArea = 100.;
     double maxArea = 0.;
 
-    for (ppxl::Polygon const& polygon: m_model->GetPolygonsList()) {
-      double currArea = ComputePolygonPercentageArea(polygon);
+    for (auto const* polygon: m_model->GetPolygonsList()) {
+      double currArea = ComputePolygonPercentageArea(*polygon);
 
       orientedAreas << currArea;
       minArea = std::min(currArea, minArea);
       maxArea = std::max(currArea, maxArea);
 
-      ppxl::Vector currShift(ComputeGlobalBarycenter(), polygon.Barycenter());
+      ppxl::Vector currShift(ComputeGlobalBarycenter(), polygon->Barycenter());
       double currShiftLength = currShift.Norm();
       currShift.Normalize();
       currShift *= 0.2*currShiftLength;
@@ -394,8 +394,8 @@ ppxl::Point GameController::ComputeGlobalBarycenter() const {
   ppxl::Point globalBarycenter;
   unsigned int polygonCount = 0;
 
-  for (const ppxl::Polygon& polygon: m_model->GetPolygonsList()) {
-    globalBarycenter += polygon.Barycenter();
+  for (auto const* polygon: m_model->GetPolygonsList()) {
+    globalBarycenter += polygon->Barycenter();
     ++polygonCount;
   }
 
@@ -416,8 +416,8 @@ void GameController::TranslatePolygons(QList<ppxl::Vector> const& shiftVectors) 
   assert(polygons.size() == shiftVectors.size());
 
   int index = 0;
-  for (auto const& polygon: polygons) {
-    ppxl::Polygon newPolygon(polygon);
+  for (auto const* polygon: polygons) {
+    ppxl::Polygon newPolygon(*polygon);
     newPolygon.Translate(shiftVectors.at(index));
     newPolygons << newPolygon;
     ++index;

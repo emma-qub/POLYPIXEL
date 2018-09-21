@@ -30,8 +30,9 @@ void AbstractScribblingView::DrawFromModel() {
   }
 
   // Draw every polygon in model color
-  auto polygonItems = m_model->GetPolygonItemsList();
-  for (auto polygonItem: polygonItems) {
+  auto polygonItems = m_model->GetPolygonsItem();
+  for (int polygonRow = 0; polygonRow < polygonItems->rowCount(); ++polygonRow) {
+    auto polygonItem = polygonItems->child(polygonRow, 0);
     for (int row = 0; row < polygonItem->rowCount(); ++row) {
       int indexA = row;
       int indexB =(row+1)%polygonItem->rowCount();

@@ -12,13 +12,12 @@ public:
 
   // Polygon
   void SetPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void RemovePolygonAt(int p_polygonRow);
-  void TranslatePolygon(int p_polygonRow, ppxl::Vector const& p_direction);
+  void TranslatePolygon(int p_polygonRow, ppxl::Vector const& p_direction, bool p_updatePolygon);
 
   // Vertex
-  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex, bool p_updatePolygon);
   void RemoveVertexAt(int p_polygonRow, int p_vertexRow);
-  void TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction);
+  void TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_updatePolygon);
   QModelIndex GetVertexIndex(int p_polygonRow, int p_vertexRow) const;
 };
 
