@@ -12,7 +12,7 @@
 
 namespace ppxl {
 
-Polygon::Polygon(const std::vector<Point>& p_vertices):
+Polygon::Polygon(std::vector<Point> const& p_vertices):
   m_vertices(p_vertices) {
 }
 
@@ -33,24 +33,22 @@ Polygon::Polygon(int p_xMin, int p_xMax, int p_yMin, int p_yMax, unsigned int p_
   }
 }
 
-Polygon::Polygon(Polygon const& p_polygon) {
-  m_vertices = p_polygon.m_vertices;
-}
-
-Polygon::Polygon(std::istream& p_is) {
-
-  operator<<(p_is);
-
-  if(m_vertices.size() < 3) {
-    std::cerr << "Not enough vertices inside file.";
-    m_vertices.clear();
-  }
+Polygon::Polygon(Polygon const& p_polygon):
+  m_vertices(p_polygon.m_vertices) {
 }
 
 Polygon::~Polygon() = default;
 
+void Polygon::SetVertices(std::vector<Point> const& p_vertices) {
+  m_vertices = p_vertices;
+}
+
 void Polygon::InsertVertex(Point const& p_vertex, unsigned int p_position) {
   m_vertices.insert(m_vertices.begin()+p_position, p_vertex);
+}
+
+void Polygon::AppendVertex(Point const& p_vertex) {
+  m_vertices.push_back(p_vertex);
 }
 
 void Polygon::RemoveVertex(unsigned int p_position) {
@@ -58,8 +56,7 @@ void Polygon::RemoveVertex(unsigned int p_position) {
 }
 
 void Polygon::ReplaceVertex(unsigned int p_position, Point const& p_newVertex) {
-  RemoveVertex(p_position);
-  InsertVertex(p_newVertex, p_position);
+  m_vertices[p_position] = p_newVertex;
 }
 
 void Polygon::Translate(Vector const& p_direction) {
@@ -78,7 +75,7 @@ void Polygon::Translate(double p_x, double p_y) {
 }
 
 void Polygon::Homothetie(Point const& p_origin, double p_scale) {
-  for (Point& vertex: m_vertices) {
+  for (auto& vertex: m_vertices) {
     vertex.Homothetie(p_origin, p_scale);
   }
 }
@@ -101,7 +98,7 @@ bool Polygon::NewPointIsGood(Point const& p_vertex) const {
   return true;
 }
 
-bool Polygon::IsPointInside2(Point const& P) const {
+bool Polygon::IsPointInside(Point const& P) const {
   auto countVertices = m_vertices.size();
   double theta = 0.;
 
@@ -162,7 +159,7 @@ bool Polygon::IsCrossing(Segment const& p_line) const {
 }
 
 bool Polygon::IsGoodSegment(Segment const& p_line) const {
-  return (!IsPointInside2(p_line.GetA()) && IsCrossing(p_line) && !IsPointInside2(p_line.GetB()));
+  return (!IsPointInside(p_line.GetA()) && IsCrossing(p_line) && !IsPointInside(p_line.GetB()));
 }
 
 double Polygon::OrientedArea() const {
@@ -208,7 +205,7 @@ Point Polygon::Barycenter() const {
   bary.SetX(std::abs(baryX));
   bary.SetY(std::abs(baryY));
 
-  /// 6 again?
+  /// 6?
   bary /= (6*OrientedArea());
 
   return bary;
@@ -245,47 +242,29 @@ bool operator==(Polygon const& p_polygon1, Polygon const& p_polygon2) {
 
 Polygon& operator<<(Polygon& p_polygon, Point const& p_vertex) {
   bool isNotAlreadyThere = true;
-  for (Point const& currVertex: p_polygon.m_vertices) {
+  for (auto const& currVertex: p_polygon.m_vertices) {
     if (currVertex == p_vertex) {
       isNotAlreadyThere = false;
       break;
     }
   }
 
-  if (isNotAlreadyThere)
-    p_polygon.m_vertices.push_back(p_vertex);
+  if (isNotAlreadyThere) {
+    p_polygon.AppendVertex(p_vertex);
+  }
 
   return p_polygon;
 }
 
-Polygon& operator<<(Polygon& p_polygon, const std::vector<Point>& p_vertices) {
+Polygon& operator<<(Polygon& p_polygon, std::vector<Point> const& p_vertices) {
   for (unsigned int k = 0; k < p_vertices.size(); k++) {
     p_polygon << p_vertices.at(k);
   }
   return p_polygon;
 }
 
-std::istream& Polygon::operator<<(std::istream& p_is) {
-  unsigned size, s, t;
-  p_is >> size;
-  assert(p_is.get()==';');
-  m_vertices.resize(size);
-  for (unsigned int k = 0; k < size; k++) {
-    p_is >> s;
-    assert(p_is.get() == ',');
-    p_is >> t;
-    m_vertices.at(k) = Point(s, t);
-    assert(p_is.get()==';');
-  }
-  return p_is;
-}
-
-std::istream& operator>>(std::istream& p_is, Polygon& p_polygon) {
-  return p_polygon << p_is;
-}
-
 std::ostream& operator<<(std::ostream& p_os, Polygon const& p_polygon) {
-  std::vector<Point> vertices = p_polygon.m_vertices;
+  auto const& vertices = p_polygon.m_vertices;
 
   p_os << vertices.size() << ";";
   for (unsigned k = 0; k < vertices.size(); k++) {
@@ -295,7 +274,7 @@ std::ostream& operator<<(std::ostream& p_os, Polygon const& p_polygon) {
 }
 
 QDebug operator<<(QDebug p_debug, Polygon const& p_polygon) {
-  std::vector<Point> vertices = p_polygon.m_vertices;
+  auto const& vertices = p_polygon.m_vertices;
 
   p_debug.nospace() << vertices.size() << ";";
   for (unsigned k = 0; k < vertices.size(); k++) {

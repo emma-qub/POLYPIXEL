@@ -9,13 +9,8 @@
 
 class QLabel;
 class QPushButton;
-class GameModel;
+class PolygonModel;
 class GameScribblingView;
-
-
-
-class QTreeView;
-
 
 class GameView: public QWidget {
   Q_OBJECT
@@ -23,7 +18,7 @@ class GameView: public QWidget {
 public:
   explicit GameView(QWidget* parent = nullptr);
 
-  void SetModel(GameModel* p_gameModel);
+  void SetModel(PolygonModel* p_gameModel);
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawFromModel();
@@ -44,7 +39,7 @@ public slots:
 private:
   QLabel* m_gameLabel;
   QPushButton* m_pauseButton;
-  GameModel* m_gameModel;
+  PolygonModel* m_polygonModel;
   GameScribblingView* m_scribblingView;
   int m_linesCount;
   int m_linesGoal;
@@ -52,8 +47,6 @@ private:
   int m_partsCount;
   int m_partsGoal;
   QLabel* m_partsCountLabel;
-
-  QTreeView* m_tv;
 };
 
 #endif

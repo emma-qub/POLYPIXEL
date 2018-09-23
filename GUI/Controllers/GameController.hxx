@@ -7,7 +7,7 @@
 #include "Core/Polygon.hxx"
 
 class GameView;
-class GameModel;
+class PolygonModel;
 
 namespace ppxl {
 class Point;
@@ -41,7 +41,7 @@ public:
     eUnknownCrossing
   };
 
-  GameController(GameModel* p_model, GameView* p_view, QObject* p_parent = nullptr);
+  GameController(PolygonModel* p_model, GameView* p_view, QObject* p_parent = nullptr);
   ~GameController() override;
 
   void PlayLevel(QString const& p_levelPath);
@@ -79,7 +79,7 @@ protected:
 
 
 private:
-  GameModel* m_model;
+  PolygonModel* m_model;
   GameView* m_view;
   double m_orientedAreaTotal;
   int m_maxGapToWin;

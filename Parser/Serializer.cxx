@@ -99,7 +99,7 @@ void Serializer::AppendPolygon(ppxl::Polygon const& p_polygon, int p_id) {
   QDomElement element(m_doc.createElement("polygon"));
   element.setAttribute("id", p_id);
 
-  for (ppxl::Point const& vertex: p_polygon.GetVertices()) {
+  for (auto const& vertex: p_polygon.GetVertices()) {
     element.appendChild(PointToNode(vertex, "vertex"));
   }
 

@@ -3,7 +3,7 @@
 
 #include "GUI/Views/AbstractScribblingView.hxx"
 
-class GameModel;
+class PolygonModel;
 
 class GameScribblingView: public AbstractScribblingView {
   Q_OBJECT

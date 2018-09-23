@@ -1,6 +1,6 @@
 #include "AbstractScribblingView.hxx"
 
-#include "GUI/Models/GameModel.hxx"
+#include "GUI/Models/PolygonModel.hxx"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -13,7 +13,7 @@ AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
 
 AbstractScribblingView::~AbstractScribblingView() = default;
 
-void AbstractScribblingView::SetModel(AbstractLevelModel* p_model) {
+void AbstractScribblingView::SetModel(PolygonModel* p_model) {
   m_model = p_model;
 }
 

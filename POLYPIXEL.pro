@@ -32,7 +32,6 @@ SOURCES += \
     Core/Segment.cxx \
     Core/Vector.cxx \
     GUI/Controllers/GameController.cxx \
-    GUI/Models/GameModel.cxx \
     GUI/Models/WorldsModel.cxx \
     GUI/Controllers/WorldsController.cxx \
     GUI/Controllers/LevelsController.cxx \
@@ -48,7 +47,7 @@ SOURCES += \
     Objects/Tape.cxx \
     Objects/Diode.cxx \
     GUI/Controllers/CreateLevelController.cxx \
-    GUI/Models/AbstractLevelModel.cxx \
+    GUI/Models/PolygonModel.cxx \
     GUI/Views/GameScribblingView.cxx \
     GUI/Views/CreateLevelScribblingView.cxx \
     GUI/Views/AbstractScribblingView.cxx \
@@ -73,7 +72,6 @@ HEADERS += \
     Core/Segment.hxx \
     Core/Vector.hxx \
     GUI/Controllers/GameController.hxx \
-    GUI/Models/GameModel.hxx \
     GUI/Models/WorldsModel.hxx \
     GUI/Controllers/WorldsController.hxx \
     GUI/Controllers/LevelsController.hxx \
@@ -89,7 +87,7 @@ HEADERS += \
     Objects/Tape.hxx \
     Objects/Diode.hxx \
     GUI/Controllers/CreateLevelController.hxx \
-    GUI/Models/AbstractLevelModel.hxx \
+    GUI/Models/PolygonModel.hxx \
     GUI/Views/GameScribblingView.hxx \
     GUI/Views/CreateLevelScribblingView.hxx \
     GUI/Views/AbstractScribblingView.hxx \

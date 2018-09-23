@@ -1,7 +1,7 @@
 #include "Core/Vector.hxx"
 #include "GameController.hxx"
 #include "GUI/Views/GameView.hxx"
-#include "GUI/Models/GameModel.hxx"
+#include "GUI/Models/PolygonModel.hxx"
 #include "Parser/Parser.hxx"
 #include "Parser/Serializer.hxx"
 
@@ -14,7 +14,7 @@
 #include <cmath>
 #include <cassert>
 
-GameController::GameController(GameModel* p_model, GameView* p_view, QObject* p_parent):
+GameController::GameController(PolygonModel* p_model, GameView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_model(p_model),
   m_view(p_view),
@@ -24,7 +24,7 @@ GameController::GameController(GameModel* p_model, GameView* p_view, QObject* p_
   m_gameInfo() {
 
   m_view->SetModel(m_model);
-  connect(m_model, &GameModel::PolygonListChanged, this, &GameController::Redraw);
+  connect(m_model, &PolygonModel::PolygonListChanged, this, &GameController::Redraw);
   connect(m_view, &GameView::Scribbling, this, &GameController::SetStartPoint);
   connect(m_view, &GameView::Moving, this, &GameController::ComputeSlicingLines);
   connect(m_view, &GameView::Slicing, this, &GameController::SliceIt);
@@ -97,7 +97,7 @@ GameController::LineType GameController::ComputeLinesType(QList<ppxl::Segment> c
   auto polygonList = m_model->GetPolygonsList();
   for (const ppxl::Segment& line: p_lines) {
     for (auto const& polygon: polygonList) {
-      if (!polygon->IsCrossing(line) && !polygon->IsPointInside2(line.GetA())) {
+      if (!polygon->IsCrossing(line) && !polygon->IsPointInside(line.GetA())) {
         noCrossing = true;
       } else if (polygon->IsGoodSegment(line)) {
         goodCrossing = true;
@@ -255,12 +255,12 @@ void GameController::CleanIntersections(ppxl::Polygon const& polygon, std::vecto
 
   for (unsigned int k = 0; k < intersections.size()-1; ++k) {
     ppxl::Segment AB(*intersections.at(k), *intersections.at(k+1));
-    if (polygon.IsPointInside2(AB.GetCenter())) {
+    if (polygon.IsPointInside(AB.GetCenter())) {
       if (!inside) {
         realIntersection.push_back(intersections.at(k));
         inside = true;
       }
-    } else if (!polygon.IsPointInside2(AB.GetCenter())) {
+    } else if (!polygon.IsPointInside(AB.GetCenter())) {
       if (inside) {
         realIntersection.push_back(intersections.at(k));
         inside = false;
@@ -319,8 +319,7 @@ void GameController::OpenLevel(QString const& p_levelPath) {
   m_view->ClearImage();
 
   Parser parser(p_levelPath);
-  PolygonList polygonList(parser.GetPolygonList());
-  m_model->SetPolygonsList(polygonList);
+  m_model->SetPolygonsList(parser.GetPolygonList());
 
 //  TapeList tapeList(parser.createTapeList());
 //  m_model->setTapeList(tapeList);

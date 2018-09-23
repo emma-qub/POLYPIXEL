@@ -1,6 +1,6 @@
 #include "GameView.hxx"
 
-#include "GUI/Models/GameModel.hxx"
+#include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Views/GameScribblingView.hxx"
 
 #include <QVBoxLayout>
@@ -8,18 +8,11 @@
 #include <QPushButton>
 #include <QPoint>
 
-
-
-#include <QTreeView>
-
-
-
-
 GameView::GameView(QWidget* p_parent):
   QWidget(p_parent),
   m_gameLabel(new QLabel("Play")),
   m_pauseButton(new QPushButton("Pause")),
-  m_gameModel(nullptr),
+  m_polygonModel(nullptr),
   m_scribblingView(new GameScribblingView),
   m_linesCount(-1),
   m_linesGoal(-1),
@@ -39,10 +32,6 @@ GameView::GameView(QWidget* p_parent):
   mainLayout->addWidget(m_scribblingView);
   mainLayout->setStretchFactor(menuLayout, 0);
   mainLayout->setStretchFactor(m_scribblingView, 1);
-  m_tv = new QTreeView;
-  mainLayout->addWidget(m_tv);
-
-
   setLayout(mainLayout);
 
   connect(m_pauseButton, &QPushButton::clicked, this, &GameView::PauseRequested);
@@ -51,12 +40,9 @@ GameView::GameView(QWidget* p_parent):
   connect(m_scribblingView, &GameScribblingView::Slicing, this, &GameView::Slicing);
 }
 
-void GameView::SetModel(GameModel* p_gameModel) {
-  m_gameModel = p_gameModel;
+void GameView::SetModel(PolygonModel* p_gameModel) {
+  m_polygonModel = p_gameModel;
   m_scribblingView->SetModel(p_gameModel);
-
-
-  m_tv->setModel(m_gameModel);
 }
 
 void GameView::DrawLine(const ppxl::Segment& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
@@ -68,7 +54,7 @@ void GameView::DrawFromModel() {
 }
 
 void GameView::DrawAreas(const QList<double>& p_areas) {
-  auto polygons = m_gameModel->GetPolygonsList();
+  auto polygons = m_polygonModel->GetPolygonsList();
   assert(p_areas.size() == polygons.size());
 
   for (int row = 0; row < polygons.size(); ++row) {

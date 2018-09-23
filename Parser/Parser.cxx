@@ -127,8 +127,9 @@ QDomElement Parser::GetPolygonById(int p_id) const {
 
 PolygonList Parser::GetPolygonList() const {
   PolygonList polygonList;
-  for (int k = 0; k < m_polygonNodesCount; ++k)
+  for (int k = 0; k < m_polygonNodesCount; ++k) {
     polygonList << GetPolygon(GetPolygonById(k));
+  }
 
   return polygonList;
 }

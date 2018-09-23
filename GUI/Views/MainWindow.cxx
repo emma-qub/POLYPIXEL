@@ -13,7 +13,7 @@
 #include "WorldsView.hxx"
 
 #include "GUI/Models/CreateLevelModel.hxx"
-#include "GUI/Models/GameModel.hxx"
+#include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/LevelsModel.hxx"
 #include "GUI/Models/WorldsModel.hxx"
 
@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_createLevelView(new CreateLevelView),
   m_createLevelController(new CreateLevelController(m_createLevelModel, m_createLevelView, this)),
   m_gameView(new GameView),
-  m_gameModel(new GameModel(this)),
-  m_gameController(new GameController(m_gameModel, m_gameView, this)),
+  m_polygonModel(new PolygonModel(this)),
+  m_gameController(new GameController(m_polygonModel, m_gameView, this)),
   m_levelsView(new LevelsView),
   m_levelsModel(new LevelsModel),
   m_levelsController(new LevelsController(m_levelsView, m_levelsModel, this)),

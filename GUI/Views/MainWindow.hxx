@@ -9,7 +9,7 @@ class CreateLevelModel;
 class CreateLevelView;
 class CreateLevelController;
 class GameView;
-class GameModel;
+class PolygonModel;
 class GameController;
 class LevelsView;
 class LevelsModel;
@@ -42,7 +42,7 @@ private:
   CreateLevelView* m_createLevelView;
   CreateLevelController* m_createLevelController;
   GameView* m_gameView;
-  GameModel* m_gameModel;
+  PolygonModel* m_polygonModel;
   GameController* m_gameController;
   LevelsView* m_levelsView;
   LevelsModel* m_levelsModel;

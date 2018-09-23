@@ -17,7 +17,7 @@ public:
   CreateLevelScribblingView(QWidget* parent = nullptr);
   ~CreateLevelScribblingView() override;
 
-  void SetModel(AbstractLevelModel* p_model) override;
+  void SetModel(PolygonModel* p_model) override;
   void SetSelectionModel(QItemSelectionModel* p_selectionModel);
   inline QItemSelectionModel* GetSelectionModel() const { return m_selectionModel; }
 

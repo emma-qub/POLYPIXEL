@@ -3,7 +3,7 @@
 #include "Core/Vector.hxx"
 
 CreateLevelModel::CreateLevelModel(QObject* p_parent):
-  AbstractLevelModel(p_parent) {
+  PolygonModel(p_parent) {
 }
 
 CreateLevelModel::~CreateLevelModel() = default;
@@ -14,49 +14,43 @@ void CreateLevelModel::SetPolygon(int p_polygonRow, ppxl::Polygon const& p_polyg
   polygon->SetVertices(p_polygon.GetVertices());
 }
 
-void CreateLevelModel::TranslatePolygon(int p_polygonRow, const ppxl::Vector& p_direction, bool p_updatePolygon) {
+void CreateLevelModel::TranslatePolygon(int p_polygonRow, const ppxl::Vector& p_direction) {
   // Update polygon AND polygon item
   auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
   for (int row = 0; row < polygonItem->rowCount(); ++row) {
-    TranslateVertex(p_polygonRow, row, p_direction, p_updatePolygon);
+    TranslateVertex(p_polygonRow, row, p_direction);
   }
 }
 
 void CreateLevelModel::InsertVertex(int p_polygonRow, int p_vertexRow, const ppxl::Point& p_vertex, bool p_updatePolygon) {
   auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
-  AbstractLevelModel::InsertVertex(p_vertexRow, polygonItem, p_vertex, p_updatePolygon);
+  PolygonModel::InsertVertex(p_vertexRow, polygonItem, p_vertex, p_updatePolygon);
 }
 
 void CreateLevelModel::RemoveVertexAt(int p_polygonRow, int p_vertexRow) {
   // Update vertex
   auto* polygon = GetPolygonsList().at(p_polygonRow);
-  polygon->Vertices().erase(polygon->GetVertices().begin());
+  polygon->GetVertices().erase(polygon->GetVertices().begin());
 
   // Update vertex item
   GetPolygonsItem()->child(p_polygonRow)->removeRow(p_vertexRow);
 }
 
-void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_updatePolygon) {
-  if (p_updatePolygon) {
-    // Update polygon
-    auto* polygon = GetPolygonsList().at(p_polygonRow);
-    auto translatedVertex = polygon->Vertices().at(static_cast<unsigned long>(p_vertexRow)).Translated(p_direction);
+void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction) {
+  // Update polygon
+  auto* polygon = GetPolygonsList().at(p_polygonRow);
+  auto translatedVertex = polygon->GetVertices().at(static_cast<unsigned long>(p_vertexRow)).Translated(p_direction);
 
-    // Update polygon item
-    auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
-    auto vertexItemX = polygonItem->child(p_vertexRow, 1);
-    vertexItemX->setText(QString::number(translatedVertex.GetX()));
-    auto vertexItemY = polygonItem->child(p_vertexRow, 2);
-    vertexItemY->setText(QString::number(translatedVertex.GetY()));
-  } else {
-    // Update polygon item
-    auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
-    auto vertexItemX = polygonItem->child(p_vertexRow, 1);
-    vertexItemX->setText(QString::number(vertexItemX->text().toInt()+p_direction.GetX()));
-    auto vertexItemY = polygonItem->child(p_vertexRow, 2);
-    vertexItemY->setText(QString::number(vertexItemY->text().toInt()+p_direction.GetY()));
-  }
+  // Update polygon item
+  auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
+  auto vertexItemX = static_cast<VertexXItem*>(polygonItem->child(p_vertexRow, 1));
+  vertexItemX->SetVertex(translatedVertex);
+  auto vertexItemY = static_cast<VertexYItem*>(polygonItem->child(p_vertexRow, 2));
+  vertexItemY->SetVertex(translatedVertex);
 
+  Q_EMIT(dataChanged(
+        index(p_vertexRow, 0, polygonItem->index()),
+        index(p_vertexRow, 2, polygonItem->index())));
 }
 
 QModelIndex CreateLevelModel::GetVertexIndex(int p_polygonRow, int p_vertexRow) const {
