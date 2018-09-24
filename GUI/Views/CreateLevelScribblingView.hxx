@@ -33,6 +33,7 @@ signals:
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
 
 protected:
+  void InsertPolygon();
   void DrawPoint(QPoint const& p_point, QColor const& p_color);
   void mousePressEvent(QMouseEvent* p_event) override;
   void mouseMoveEvent(QMouseEvent* p_event) override;

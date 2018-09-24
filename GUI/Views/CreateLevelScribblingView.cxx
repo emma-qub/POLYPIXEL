@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QItemSelectionModel>
 #include <QFontMetrics>
+#include <QAction>
 
 
 
@@ -38,6 +39,11 @@ CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   m_currOldX(-1),
   m_currOldY(-1) {
 
+  auto addPolygonAction = new QAction("New polygon", this);
+  addPolygonAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
+  connect(addPolygonAction, &QAction::triggered, this, &CreateLevelScribblingView::InsertPolygon);
+  addAction(addPolygonAction);
+
   setPenWidth(PEN_WIDTH);
 
   setMouseTracking(true);
@@ -53,14 +59,6 @@ void CreateLevelScribblingView::SetModel(PolygonModel* p_model) {
 void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selectionModel) {
   m_selectionModel = p_selectionModel;
   m_selectionModel->setCurrentIndex(m_model->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-}
-
-void CreateLevelScribblingView::DrawPoint(const QPoint& p_point, const QColor& p_color) {
-  QPainter painter(&GetImage());
-  painter.setPen(QPen(p_color, PEN_WIDTH*3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-  painter.drawPoint(p_point);
-
-  update();
 }
 
 void CreateLevelScribblingView::DrawGrid() {
@@ -146,6 +144,37 @@ void CreateLevelScribblingView::DrawFromModel() {
       DrawLine(A, B, color);
     }
   }
+}
+
+void CreateLevelScribblingView::InsertPolygon() {
+
+  auto index = m_selectionModel->currentIndex();
+  index = index.sibling(index.row(), 0);
+  auto itemType = index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
+  switch(itemType) {
+  case (CreateLevelModel::ePolygons): {
+    index = m_model->index(m_model->rowCount(m_model->index(0, 0)), 0);
+    break;
+  } case (CreateLevelModel::ePolygon): {
+    break;
+  } case (CreateLevelModel::eVertex): {
+    index = index.parent();
+    break;
+  }
+  default: {
+    break;
+  }
+  }
+
+  Q_EMIT(PolygonInserted(index.row()+1, ppxl::Polygon()));
+}
+
+void CreateLevelScribblingView::DrawPoint(const QPoint& p_point, const QColor& p_color) {
+  QPainter painter(&GetImage());
+  painter.setPen(QPen(p_color, PEN_WIDTH*3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+  painter.drawPoint(p_point);
+
+  update();
 }
 
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
