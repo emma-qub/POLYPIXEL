@@ -23,12 +23,12 @@ public:
 
   void InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
   void AppendPolygon(ppxl::Polygon const& p_polygon);
-  void RemovePolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
+  void RemovePolygon(int p_polygonRow);
   void MovePolygon(int p_polygonRow, const ppxl::Vector& p_direction, bool p_pushToStack = true);
 
   void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void AppendVertex(int p_polygonRow, ppxl::Point const& p_vertex);
-  void RemoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void RemoveVertex(int p_polygonRow, int p_vertexRow);
   void MoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_pushToStack = true);
 
 private:

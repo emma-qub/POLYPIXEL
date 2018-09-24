@@ -78,7 +78,7 @@ void CreateLevelController::AppendPolygon(ppxl::Polygon const& p_polygon) {
   InsertPolygon(m_model->rowCount(), p_polygon);
 }
 
-void CreateLevelController::RemovePolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
+void CreateLevelController::RemovePolygon(int p_polygonRow) {
   int newPolygonRow = p_polygonRow;
   if (m_model->rowCount() == 0) {
     newPolygonRow = -1;
@@ -88,7 +88,9 @@ void CreateLevelController::RemovePolygon(int p_polygonRow, ppxl::Polygon const&
     }
   }
 
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, newPolygonRow, -1);
+  auto* polygon = m_model->GetPolygonsList().at(p_polygonRow);
+
+  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
   m_undoStack->push(removePolygonCommand);
 }
 
@@ -110,8 +112,10 @@ void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_
   InsertVertex(p_polygonRow, m_model->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
 }
 
-void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, 0);
+void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow) {
+  auto const& vertex = m_model->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
+
+  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
   m_undoStack->push(removeVertexCommand);
 }
 

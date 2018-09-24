@@ -44,6 +44,11 @@ CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   connect(addPolygonAction, &QAction::triggered, this, &CreateLevelScribblingView::InsertPolygon);
   addAction(addPolygonAction);
 
+  auto m_removeAction = new QAction("Remove", this);
+  m_removeAction->setShortcut(QKeySequence(Qt::Key_Delete));
+  connect(m_removeAction, &QAction::triggered, this, &CreateLevelScribblingView::Remove);
+  addAction(m_removeAction);
+
   setPenWidth(PEN_WIDTH);
 
   setMouseTracking(true);
@@ -147,7 +152,6 @@ void CreateLevelScribblingView::DrawFromModel() {
 }
 
 void CreateLevelScribblingView::InsertPolygon() {
-
   auto index = m_selectionModel->currentIndex();
   index = index.sibling(index.row(), 0);
   auto itemType = index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
@@ -166,7 +170,26 @@ void CreateLevelScribblingView::InsertPolygon() {
   }
   }
 
-  Q_EMIT(PolygonInserted(index.row()+1, ppxl::Polygon()));
+  Q_EMIT(PolygonInserted(index.row(), ppxl::Polygon()));
+}
+
+void CreateLevelScribblingView::Remove() {
+  auto index = m_selectionModel->currentIndex();
+  index = index.sibling(index.row(), 0);
+  auto itemType = index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
+  switch(itemType) {
+  case (CreateLevelModel::ePolygon): {
+    Q_EMIT(PolygonRemoved(index.row()));
+    break;
+  } case (CreateLevelModel::eVertex): {
+    Q_EMIT(VertexRemoved(index.parent().row(), index.row()));
+    break;
+  }
+  case (CreateLevelModel::ePolygons):
+  default: {
+    break;
+  }
+  }
 }
 
 void CreateLevelScribblingView::DrawPoint(const QPoint& p_point, const QColor& p_color) {
