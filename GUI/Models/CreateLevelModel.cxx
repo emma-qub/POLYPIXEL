@@ -37,9 +37,6 @@ void CreateLevelModel::RemoveVertexAt(int p_polygonRow, int p_vertexRow) {
 
   // Update vertex item
   GetPolygonsItem()->child(p_polygonRow)->removeRow(p_vertexRow);
-
-  qDebug() << "\n##########\n" << GetPolygonsItem()->child(p_polygonRow)->rowCount() << "\n\n";
-
 }
 
 void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction) {

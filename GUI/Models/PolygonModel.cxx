@@ -31,16 +31,12 @@ void PolygonModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::P
 
   auto* vertexXItem = new VertexXItem(vertex);
   vertexXItem->setData(eX, eItemTypeRole);
-
   auto* vertexYItem = new VertexYItem(vertex);
   vertexYItem->setData(eY, eItemTypeRole);
-
   auto* vertexItem = new VertexLabelItem;
   vertexItem->setData(eVertex, eItemTypeRole);
 
-  QList<QStandardItem*> vertexItemsList;
-  vertexItemsList << vertexItem << vertexXItem << vertexYItem;
-  p_polygonItem->insertRow(p_row, vertexItemsList);
+  p_polygonItem->insertRow(p_row, QList<QStandardItem*>() << vertexItem << vertexXItem << vertexYItem);
 }
 
 void PolygonModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex, bool p_updatePolygon) {
@@ -48,11 +44,10 @@ void PolygonModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const&
 }
 
 void PolygonModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
-  auto polygonItem = new QStandardItem("Polygon #"+QString::number(p_row));
   auto polygon = new ppxl::Polygon(p_polygon);
+  auto polygonItem = new PolygonItem(polygon);
   polygonItem->setData(ePolygon, eItemTypeRole);
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon*>(polygon), ePolygonRole);
-  polygonItem->setData(QColor("#d64e9a"), Qt::DecorationRole);
 
   for (auto vertex: polygon->GetVertices()) {
     AppendVertex(polygonItem, vertex, false);
@@ -91,6 +86,7 @@ void PolygonModel::ClearPolygons() {
   }
   m_polygons.clear();
   m_polygonsItem->setRowCount(0);
+  m_polygonsItem->setColumnCount(0);
 }
 
 
@@ -147,8 +143,8 @@ QVariant VertexLabelItem::data(int p_role) const {
 
 
 
-PolygonItem::PolygonItem(ppxl::Polygon* p_polygon, QString const& p_text):
-  QStandardItem(p_text),
+PolygonItem::PolygonItem(ppxl::Polygon* p_polygon):
+  QStandardItem(),
   m_polygon(p_polygon) {
 
   for (auto& vertex: m_polygon->GetVertices()) {
@@ -158,11 +154,7 @@ PolygonItem::PolygonItem(ppxl::Polygon* p_polygon, QString const& p_text):
 
     appendRow(QList<QStandardItem*>() << vertexLabelItem << vertexXItem << vertexYItem);
   }
-}
 
-PolygonItem::~PolygonItem() = default;
-
-QVariant PolygonItem::data(int p_role) const {
   std::random_device rd;
   std::mt19937 rng(rd());
   std::uniform_int_distribution<> distribution(0, 255);
@@ -171,62 +163,17 @@ QVariant PolygonItem::data(int p_role) const {
   auto g = distribution(rng);
   auto b = distribution(rng);
 
+  m_color = QColor(r, g, b);
+}
+
+PolygonItem::~PolygonItem() = default;
+
+QVariant PolygonItem::data(int p_role) const {
   if (p_role == Qt::DecorationRole) {
-    return QVariant(QColor(r, g, b));
+    return m_color;
+  } else if (p_role == Qt::DisplayRole) {
+    return "Polygon " + QString::number(row());
   }
 
   return QStandardItem::data(p_role);
-}
-
-
-
-PolygonItemModel::PolygonItemModel(QObject* p_parent):
-  QStandardItemModel(p_parent) {
-}
-
-PolygonItemModel::~PolygonItemModel() = default;
-
-void PolygonItemModel::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-
-  auto* polygonItem = static_cast<PolygonItem*>(item(p_polygonRow, 0));
-  auto* polygon = polygonItem->GetPolygon();
-  polygon->InsertVertex(p_vertex, static_cast<unsigned int>(p_vertexRow));
-  auto& vertex = polygon->GetVertices()[static_cast<unsigned long>(p_vertexRow)];
-
-  auto vertexLabelItem = new VertexLabelItem;
-  auto vertexXItem = new VertexXItem(vertex);
-  auto vertexYItem = new VertexYItem(vertex);
-  polygonItem->insertRow(p_vertexRow, QList<QStandardItem*>() << vertexLabelItem << vertexXItem << vertexYItem);
-}
-
-void PolygonItemModel::AppendVertex(int p_polygonRow, ppxl::Point const& p_vertex) {
-  InsertVertex(p_polygonRow, rowCount(index(p_polygonRow, 0)), p_vertex);
-}
-
-void PolygonItemModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
-  insertRow(p_row, new PolygonItem(new ppxl::Polygon(p_polygon), "Polygon "+QString::number(p_row)));
-}
-
-void PolygonItemModel::AppendPolygon(ppxl::Polygon const& p_polygon) {
-  InsertPolygon(rowCount(), p_polygon);
-}
-
-void PolygonItemModel::RemovePolygonAt(int p_row) {
-  delete takeItem(p_row);
-}
-
-void PolygonItemModel::ClearPolygons() {
-  for (int row = rowCount()-1; row > -1; --row) {
-    RemovePolygonAt(row);
-  }
-
-  setRowCount(0);
-  setColumnCount(0);
-}
-
-void PolygonItemModel::SetPolygons(QList<ppxl::Polygon> const& p_polygons) {
-  ClearPolygons();
-  for (auto const& polygon: p_polygons) {
-    AppendPolygon(polygon);
-  }
 }

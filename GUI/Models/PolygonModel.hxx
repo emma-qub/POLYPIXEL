@@ -84,7 +84,7 @@ public:
 
 class PolygonItem: public QStandardItem {
 public:
-  explicit PolygonItem(ppxl::Polygon* p_polygon, const QString& p_text);
+  explicit PolygonItem(ppxl::Polygon* p_polygon);
   ~PolygonItem() override;
 
   QVariant data(int p_role = Qt::UserRole + 1) const override;
@@ -93,25 +93,7 @@ public:
 
 private:
   ppxl::Polygon* m_polygon;
-};
-
-class PolygonItemModel: public QStandardItemModel {
-  Q_OBJECT
-
-public:
-  explicit PolygonItemModel(QObject* p_parent = nullptr);
-  ~PolygonItemModel() override;
-
-  // Vertex
-  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
-  void AppendVertex(int p_polygonRow, ppxl::Point const& p_vertex);
-
-  // Polygon
-  void InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
-  void AppendPolygon(ppxl::Polygon const& p_polygon);
-  void RemovePolygonAt(int p_row);
-  void ClearPolygons();
-  void SetPolygons(QList<ppxl::Polygon> const& p_polygons);
+  QColor m_color;
 };
 
 Q_DECLARE_METATYPE(ppxl::Polygon*)

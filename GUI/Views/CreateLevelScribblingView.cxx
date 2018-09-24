@@ -108,7 +108,6 @@ void CreateLevelScribblingView::DrawFromModel() {
   auto polygonsItem = m_model->GetPolygonsItem();
   for (int row = 0; row < polygonsItem->rowCount(); ++row) {
     auto polygonItem = polygonsItem->child(row, 0);
-    qDebug() <<  "--" << polygonItem->rowCount();
     auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
     auto const* polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
 
