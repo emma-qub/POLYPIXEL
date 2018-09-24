@@ -6,6 +6,7 @@
 
 #include <QUndoStack>
 #include <QAction>
+#include <QItemSelectionModel>
 
 CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view, QObject* p_parent):
   QObject(p_parent),
@@ -25,7 +26,7 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
-  connect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+  connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
 
   auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
   undoAction->setShortcut(QKeySequence::Undo);
@@ -42,12 +43,34 @@ CreateLevelController::~CreateLevelController() {
 }
 
 void CreateLevelController::Redraw() {
-  qDebug() << "REDRAW";
+  m_view->ClearImage();
+  m_view->Redraw();
+}
+
+void CreateLevelController::UndoRedo() {
+  m_view->ClearImage();
+  auto selectionModel = m_view->GetSelectionModel();
+  auto selection = m_model->GetSelection();
+  auto polygonRow = selection.last().first;
+  auto vertexRow = selection.last().second;
+
+  auto polygonsIndex = m_model->index(0, 0);
+  if (polygonRow == -1 && vertexRow == -1) {
+    selectionModel->setCurrentIndex(polygonsIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+  } else {
+    auto polygonIndex = m_model->index(polygonRow, 0, polygonsIndex);
+    if (vertexRow == -1) {
+      selectionModel->setCurrentIndex(polygonIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    } else {
+      auto vertexIndex = m_model->index(vertexRow, 0, polygonIndex);
+      selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
+  }
   m_view->Redraw();
 }
 
 void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
-  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, 0);
+  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
   m_undoStack->push(addPolygonCommand);
 }
 
@@ -65,7 +88,7 @@ void CreateLevelController::RemovePolygon(int p_polygonRow, ppxl::Polygon const&
     }
   }
 
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, newPolygonRow, 0);
+  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, newPolygonRow, -1);
   m_undoStack->push(removePolygonCommand);
 }
 

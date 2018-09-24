@@ -37,8 +37,6 @@ void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_t
   QRectF boundingRect(QPointF(topLeft.GetX(), topLeft.GetY()), QPointF(bottomRight.GetX(), bottomRight.GetY()));
   painter.setFont(font);
   painter.drawText(boundingRect, p_text);
-
-  update();
 }
 
 void AbstractScribblingView::DrawFromModel() {
@@ -66,6 +64,7 @@ void AbstractScribblingView::DrawFromModel() {
 
 void AbstractScribblingView::ClearImage() {
   m_image.fill(Qt::white);
+  update();
 }
 
 void AbstractScribblingView::DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle) {
@@ -78,8 +77,6 @@ void AbstractScribblingView::DrawLine(QPoint const& p_startPoint, QPoint const& 
   QPainter painter(&m_image);
   painter.setPen(QPen(p_color, m_myPenWidth, p_penStyle, Qt::RoundCap, Qt::BevelJoin));
   painter.drawLine(p_startPoint, p_endPoint);
-
-  update();
 }
 
 void AbstractScribblingView::ResizeImage(QImage* p_image, const QSize& p_newSize) {

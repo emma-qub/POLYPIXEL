@@ -34,10 +34,10 @@ signals:
 
 protected:
   void DrawPoint(QPoint const& p_point, QColor const& p_color);
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseMoveEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
-  void paintEvent(QPaintEvent* event) override;
+  void mousePressEvent(QMouseEvent* p_event) override;
+  void mouseMoveEvent(QMouseEvent* p_event) override;
+  void mouseReleaseEvent(QMouseEvent* p_event) override;
+  void paintEvent(QPaintEvent* p_event) override;
 
 private:
   CreateLevelModel* m_model;

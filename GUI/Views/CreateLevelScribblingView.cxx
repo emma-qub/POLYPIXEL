@@ -108,6 +108,7 @@ void CreateLevelScribblingView::DrawFromModel() {
   auto polygonsItem = m_model->GetPolygonsItem();
   for (int row = 0; row < polygonsItem->rowCount(); ++row) {
     auto polygonItem = polygonsItem->child(row, 0);
+    qDebug() <<  "--" << polygonItem->rowCount();
     auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
     auto const* polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
 
@@ -282,23 +283,10 @@ void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
 void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
   ppxl::Point point(p_event->pos().x(), p_event->pos().y());
 
-  if (m_nearToVertex || m_nearToBarycenter) {
-    if (m_nearToVertex && !m_nearToBarycenter) {
-      m_beforeMovingVertexX = p_event->pos().x();
-      m_beforeMovingVertexY = p_event->pos().y();
-    } else if (m_nearToBarycenter) {
-      m_beforeMovingPolygonX = p_event->pos().x();
-      m_beforeMovingPolygonY = p_event->pos().y();
-    }
-    setCursor(Qt::OpenHandCursor);
-  }
-
   if (!m_movingPolygon && !m_movingVertex) {
     if (m_model->GetPolygonsCount() == 0) {
       Q_EMIT(PolygonInserted(0, ppxl::Polygon()));
       Q_EMIT(VertexInserted(0, 0, point));
-      auto vertexIndex = m_model->GetVertexIndex(0, 0);
-      m_selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
     } else {
       auto index = m_selectionModel->currentIndex();
       int polygonRow;
@@ -328,13 +316,43 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
       }
       }
       Q_EMIT(VertexInserted(polygonRow, vertexRow, point));
-      auto vertexIndex = m_model->GetVertexIndex(polygonRow, vertexRow);
-      m_selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+    }
+  }
+
+  if (m_movingVertex) {
+    if (m_beforeMovingVertexX != p_event->pos().x() || p_event->pos().y() != m_beforeMovingVertexY) {
+      Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, ppxl::Vector(ppxl::Point(p_event->pos().x(), p_event->pos().y()), ppxl::Point(m_beforeMovingVertexX, m_beforeMovingVertexY)), false));
+      Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, ppxl::Vector(ppxl::Point(m_beforeMovingVertexX, m_beforeMovingVertexY), ppxl::Point(p_event->pos().x(), p_event->pos().y())), true));
+    }
+  } else if (m_movingPolygon) {
+    auto const* polygon = m_model->GetPolygonsList().at(m_currPolygonRow);
+    //auto const* polygon2 = m_model->GetPolygonsItem()->child(m_currPolygonRow, 0)->data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+
+    auto barycenter = polygon->Barycenter();
+    auto barycenterX = static_cast<int>(barycenter.GetX());
+    auto barycenterY = static_cast<int>(barycenter.GetY());
+    if (barycenterX != m_beforeMovingPolygonX || barycenterY != m_beforeMovingPolygonY) {
+      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(barycenterX, barycenterY), ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY)), false));
+      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY), ppxl::Point(barycenterX, barycenterY)), true));
     }
   }
 
   m_movingVertex = false;
   m_movingPolygon = false;
+  m_beforeMovingPolygonX = -1;
+  m_beforeMovingPolygonY = -1;
+
+  if (m_nearToVertex || m_nearToBarycenter) {
+    if (m_nearToVertex && !m_nearToBarycenter) {
+      m_beforeMovingVertexX = p_event->pos().x();
+      m_beforeMovingVertexY = p_event->pos().y();
+    } else if (m_nearToBarycenter) {
+      m_beforeMovingPolygonX = p_event->pos().x();
+      m_beforeMovingPolygonY = p_event->pos().y();
+    }
+    setCursor(Qt::OpenHandCursor);
+  }
+
 
 //  QModelIndex polygonIndex;
 //  QModelIndex vertexIndex;
@@ -372,27 +390,6 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
 //    return;
 //  }
 
-//  if (m_movingVertex) {
-//    if (m_beforeMovingVertexX != p_event->pos().x() || p_event->pos().y() != m_beforeMovingVertexY) {
-//      Q_EMIT(VertexMoved(m_currPolygonRow, m_currVertexRow, ppxl::Vector(ppxl::Point(m_beforeMovingVertexX, m_beforeMovingVertexY), ppxl::Point(p_event->pos().x(), p_event->pos().y())), true));
-//    }
-//    m_beforeMovingVertexX = -1;
-//    m_beforeMovingVertexY = -1;
-//    return;
-//  } else if (m_movingPolygon) {
-//    auto const* polygon = m_model->GetPolygonsItemList().at(m_currPolygonRow)->data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
-//    //        qDebug() << "Compute polygon barycenter from LevelDesignerScribbleView::mouseReleaseEvent";
-//    ppxl::Point barycenter = polygon.Barycenter();
-//    if (barycenter.GetX() != m_beforeMovingPolygonX || barycenter.GetY() != m_beforeMovingPolygonY) {
-//      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(barycenter.GetX(), barycenter.GetY()), ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY)), false));
-//      Q_EMIT(PolygonMoved(m_currPolygonRow, ppxl::Vector(ppxl::Point(m_beforeMovingPolygonX, m_beforeMovingPolygonY), ppxl::Point(barycenter.GetX(), barycenter.GetY())), true));
-//    }
-//    m_beforeMovingPolygonX = -1;
-//    m_beforeMovingPolygonY = -1;
-//    return;
-//  } else {
-//    Q_EMIT(VertexInserted(m_currPolygonRow, m_currVertexRow, ppxl::Point(p_event->pos().x(), p_event->pos().y())));
-//  }
 }
 
 void CreateLevelScribblingView::paintEvent(QPaintEvent* p_event) {

@@ -3,7 +3,10 @@
 #include "Core/Vector.hxx"
 
 CreateLevelModel::CreateLevelModel(QObject* p_parent):
-  PolygonModel(p_parent) {
+  PolygonModel(p_parent),
+  m_selections() {
+
+  m_selections << QPair<int, int>(-1, -1);
 }
 
 CreateLevelModel::~CreateLevelModel() = default;
@@ -34,6 +37,9 @@ void CreateLevelModel::RemoveVertexAt(int p_polygonRow, int p_vertexRow) {
 
   // Update vertex item
   GetPolygonsItem()->child(p_polygonRow)->removeRow(p_vertexRow);
+
+  qDebug() << "\n##########\n" << GetPolygonsItem()->child(p_polygonRow)->rowCount() << "\n\n";
+
 }
 
 void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction) {

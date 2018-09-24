@@ -31,12 +31,12 @@ AddVertexCommand::~AddVertexCommand() = default;
 
 void AddVertexCommand::undo() {
   m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
-  //m_model->PopSelection();
+  m_model->PopSelection();
 }
 
 void AddVertexCommand::redo() {
   m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
@@ -57,12 +57,12 @@ RemoveVertexCommand::~RemoveVertexCommand() = default;
 
 void RemoveVertexCommand::undo() {
   m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
-  //m_model->PopSelection();
+  m_model->PopSelection();
 }
 
 void RemoveVertexCommand::redo() {
   m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
@@ -84,12 +84,12 @@ MoveVertexCommand::~MoveVertexCommand() = default;
 
 void MoveVertexCommand::undo() {
   m_model->TranslateVertex(m_polygonRow, m_vertexRow, -m_direction);
-  //m_model->popSelection();
+  m_model->PopSelection();
 }
 
 void MoveVertexCommand::redo() {
   m_model->TranslateVertex(m_polygonRow, m_vertexRow, m_direction);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
@@ -109,12 +109,12 @@ AddPolygonCommand::~AddPolygonCommand() = default;
 
 void AddPolygonCommand::undo() {
   m_model->RemovePolygonAt(m_polygonRow);
-  //m_model->PopSelection();
+  m_model->PopSelection();
 }
 
 void AddPolygonCommand::redo() {
   m_model->InsertPolygon(m_polygonRow, m_polygon);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
@@ -134,12 +134,12 @@ RemovePolygonCommand::~RemovePolygonCommand() = default;
 
 void RemovePolygonCommand::undo() {
   m_model->InsertPolygon(m_polygonRow, m_polygon);
-  //m_model->PopSelection();
+  m_model->PopSelection();
 }
 
 void RemovePolygonCommand::redo() {
   m_model->RemovePolygonAt(m_polygonRow);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
@@ -159,10 +159,10 @@ MovePolygonCommand::~MovePolygonCommand() = default;
 
 void MovePolygonCommand::undo() {
   m_model->TranslatePolygon(m_polygonRow, -m_direction);
-  //m_model->PopSelection();
+  m_model->PopSelection();
 }
 
 void MovePolygonCommand::redo() {
   m_model->TranslatePolygon(m_polygonRow, m_direction);
-  //m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }

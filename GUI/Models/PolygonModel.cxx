@@ -58,7 +58,7 @@ void PolygonModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
     AppendVertex(polygonItem, vertex, false);
   }
 
-  m_polygonsItem->insertRow(p_row, polygonItem);
+  m_polygonsItem->insertRow(p_row, QList<QStandardItem*>() << polygonItem << new QStandardItem << new QStandardItem);
   m_polygons << polygon;
 }
 

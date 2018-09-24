@@ -46,7 +46,7 @@ void LoadingView::paintEvent(QPaintEvent* p_event)
  QPainter p(this);
  QPainter painter(this);
  QRect drawingRect(0, 0, width(), height());
- painter.drawPixmap(drawingRect, QPixmap("../POLYPIXEL/resources/MenuBackground.png"));
+ painter.drawPixmap(drawingRect, QPixmap("../POLYPIXEL/resources/loading.png"));
 
  QWidget::paintEvent(p_event);
 }

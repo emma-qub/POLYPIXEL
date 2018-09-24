@@ -19,9 +19,10 @@ public:
   ~CreateLevelController() override;
 
   void Redraw();
+  void UndoRedo();
 
   void InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void AppendPolygon(const ppxl::Polygon& p_polygon);
+  void AppendPolygon(ppxl::Polygon const& p_polygon);
   void RemovePolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
   void MovePolygon(int p_polygonRow, const ppxl::Vector& p_direction, bool p_pushToStack = true);
 
