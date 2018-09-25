@@ -9,6 +9,7 @@
 
 class CreateLevelModel;
 class QItemSelectionModel;
+class QStandardItem;
 
 class CreateLevelScribblingView: public AbstractScribblingView {
   Q_OBJECT
@@ -23,7 +24,7 @@ public:
 
   void DrawGrid();
   void DrawFromModel() override;
-  void DrawFromPolygons();
+  void DrawFromCore();
 
 signals:
   void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);
@@ -43,6 +44,11 @@ protected:
   void mouseMoveEvent(QMouseEvent* p_event) override;
   void mouseReleaseEvent(QMouseEvent* p_event) override;
   void paintEvent(QPaintEvent* p_event) override;
+
+  void DrawPolygonsFromCore();
+  void DrawPolygonFromCore(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
+  void DrawPolygonsFromModel();
+  void DrawPolygonFromModel(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
 
 private:
   CreateLevelModel* m_model;

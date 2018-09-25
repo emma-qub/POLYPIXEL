@@ -92,7 +92,7 @@ void CreateLevelView::ClearImage() {
 }
 
 void CreateLevelView::RedrawFromPolygons() {
-  m_scribblingView->DrawFromPolygons();
+  m_scribblingView->DrawFromCore();
 }
 
 void CreateLevelView::Redraw() {
