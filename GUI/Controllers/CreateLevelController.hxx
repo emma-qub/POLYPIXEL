@@ -31,6 +31,9 @@ public:
   void RemoveVertex(int p_polygonRow, int p_vertexRow);
   void MoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_pushToStack = true);
 
+protected:
+  void UpdateXVertex(int p_value, const QModelIndex& p_index);
+
 private:
   CreateLevelModel* m_model;
   CreateLevelView* m_view;

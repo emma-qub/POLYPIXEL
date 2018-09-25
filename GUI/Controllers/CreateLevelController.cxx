@@ -26,6 +26,9 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
+  connect(m_view, &CreateLevelView::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
+  //connect(m_view, &CreateLevelView::ValueYChanged, this, &CreateLevelController::UpdateVertex);
+
   connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
@@ -42,6 +45,12 @@ CreateLevelController::~CreateLevelController() {
   // When QUndoStack is deleted, it emits a last indexChanged, calling Redraw
   // from the scribbling view, whose model is already deleted, so disconnect.
   disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+}
+
+void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
+  auto polygon = p_index.parent().data(PolygonModel::ePolygon).value<ppxl::Polygon*>();
+  auto& vertex = polygon->GetVertices().at(p_index.row());
+  vertex.SetX(p_value);
 }
 
 void CreateLevelController::Redraw() {

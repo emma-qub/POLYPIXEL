@@ -52,7 +52,8 @@ SOURCES += \
     GUI/Views/CreateLevelScribblingView.cxx \
     GUI/Views/AbstractScribblingView.cxx \
     GUI/Models/CreateLevelModel.cxx \
-    GUI/Commands/Commands.cxx
+    GUI/Commands/Commands.cxx \
+    GUI/Delegates/PolygonItemDelegate.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -92,7 +93,8 @@ HEADERS += \
     GUI/Views/CreateLevelScribblingView.hxx \
     GUI/Views/AbstractScribblingView.hxx \
     GUI/Models/CreateLevelModel.hxx \
-    GUI/Commands/Commands.hxx
+    GUI/Commands/Commands.hxx \
+    GUI/Delegates/PolygonItemDelegate.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

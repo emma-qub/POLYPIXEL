@@ -40,6 +40,7 @@ signals:
   void VertexRemoved(int p_polygonRow, int p_vertexRow);
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
   void PolygonSelected();
+  void ValueXChanged(int p_value, QModelIndex const& p_index);
 
 private:
   QLabel* m_createLevelLabel;

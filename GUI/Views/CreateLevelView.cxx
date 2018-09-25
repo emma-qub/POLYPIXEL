@@ -1,6 +1,7 @@
 #include "CreateLevelView.hxx"
 #include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Views/CreateLevelScribblingView.hxx"
+#include "GUI/Delegates/PolygonItemDelegate.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -50,6 +51,10 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelView::VertexRemoved);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
   connect(m_scribblingView, &CreateLevelScribblingView::PolygonSelected, this, &CreateLevelView::PolygonSelected);
+
+  auto itemDelegate = new PolygonItemDelegate(m_treeView);
+  m_treeView->setItemDelegate(itemDelegate);
+  connect(itemDelegate, &PolygonItemDelegate::ValueXChanged, this, &CreateLevelView::ValueXChanged);
 }
 
 void CreateLevelView::SetModel(CreateLevelModel* p_model) {
