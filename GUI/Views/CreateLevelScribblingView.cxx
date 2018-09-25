@@ -64,6 +64,10 @@ void CreateLevelScribblingView::SetModel(PolygonModel* p_model) {
 void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selectionModel) {
   m_selectionModel = p_selectionModel;
   m_selectionModel->setCurrentIndex(m_model->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+
+  connect(m_selectionModel, &QItemSelectionModel::currentChanged, this, [this] () {
+    Q_EMIT(PolygonSelected());
+  });
 }
 
 void CreateLevelScribblingView::DrawGrid() {
@@ -107,12 +111,39 @@ void CreateLevelScribblingView::DrawFromModel() {
     return;
   }
 
-  // Draw every polygon in model color
+  ppxl::Polygon* currentPolygon = nullptr;
+  auto currentIndex = m_selectionModel->currentIndex();
+  currentIndex = currentIndex.sibling(currentIndex.row(), 0);
+  auto itemType = currentIndex.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
+  switch(itemType) {
+  case (CreateLevelModel::ePolygons): {
+    currentIndex = QModelIndex();
+    break;
+  } case (CreateLevelModel::ePolygon): {
+    break;
+  } case (CreateLevelModel::eVertex): {
+    currentIndex = currentIndex.parent();
+    break;
+  }
+  default: {
+    currentIndex = QModelIndex();
+    break;
+  }
+  }
+  if (currentIndex.isValid()) {
+    currentPolygon = currentIndex.data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+  }
+
+  // Draw current polygon in model color and other on grey
   auto polygonsItem = m_model->GetPolygonsItem();
-  for (int row = 0; row < polygonsItem->rowCount(); ++row) {
-    auto polygonItem = polygonsItem->child(row, 0);
-    auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
+  for (int rowPolygon = 0; rowPolygon < polygonsItem->rowCount(); ++rowPolygon) {
+    auto polygonItem = polygonsItem->child(rowPolygon, 0);
     auto const* polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+
+    QColor color(NOT_SELECTED_COLOR);
+    if (currentPolygon == polygon) {
+      color = polygonItem->data(Qt::DecorationRole).value<QColor>();
+    }
 
     for (int row = 0; row < polygonItem->rowCount(); ++row) {
       auto indexA = row;
@@ -125,7 +156,7 @@ void CreateLevelScribblingView::DrawFromModel() {
 
       if (polygonItem->rowCount() == 1) {
         DrawText(A, vertexLetterA, PEN_WIDTH, ppxl::Vector(-1, -1));
-        return;
+        continue;
       }
 
       int indexB = (row+1)%polygonItem->rowCount();
@@ -170,7 +201,7 @@ void CreateLevelScribblingView::InsertPolygon() {
   }
   }
 
-  Q_EMIT(PolygonInserted(index.row(), ppxl::Polygon()));
+  Q_EMIT(PolygonInserted(index.row()+1, ppxl::Polygon()));
 }
 
 void CreateLevelScribblingView::Remove() {
@@ -218,6 +249,7 @@ void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
 void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
   // Condition is wrong, must take every polygon into acount
   if (m_model->rowCount(m_model->index(0, 0)) < 1) {
+    QWidget::mouseMoveEvent(p_event);
     return;
   }
 

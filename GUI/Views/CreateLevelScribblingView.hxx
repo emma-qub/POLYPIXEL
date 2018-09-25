@@ -31,6 +31,7 @@ signals:
   void VertexInserted(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void VertexRemoved(int p_polygonRow, int p_vertexRow);
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
+  void PolygonSelected();
 
 protected:
   void InsertPolygon();

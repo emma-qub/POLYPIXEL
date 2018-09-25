@@ -26,6 +26,8 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
+  connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
+
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
 
   auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
@@ -48,7 +50,6 @@ void CreateLevelController::Redraw() {
 }
 
 void CreateLevelController::UndoRedo() {
-  m_view->ClearImage();
   auto selectionModel = m_view->GetSelectionModel();
   auto selection = m_model->GetSelection();
   auto polygonRow = selection.last().first;
@@ -66,7 +67,7 @@ void CreateLevelController::UndoRedo() {
       selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
   }
-  m_view->Redraw();
+  Redraw();
 }
 
 void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {

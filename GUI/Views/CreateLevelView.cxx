@@ -49,6 +49,7 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::VertexInserted, this, &CreateLevelView::VertexInserted);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelView::VertexRemoved);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::PolygonSelected, this, &CreateLevelView::PolygonSelected);
 }
 
 void CreateLevelView::SetModel(CreateLevelModel* p_model) {
@@ -57,8 +58,8 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   m_treeView->setModel(p_model);
   m_scribblingView->SetSelectionModel(m_treeView->selectionModel());
 
-  connect(m_model, &CreateLevelModel::rowsInserted, m_treeView, &QTreeView::expandAll);
   connect(m_model, &CreateLevelModel::rowsInserted, this, [this]() {
+    m_treeView->expandAll();
     for (int column = m_model->columnCount()-1; column > -1; --column) {
       m_treeView->resizeColumnToContents(column);
     }
