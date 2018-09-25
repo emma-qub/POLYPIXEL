@@ -104,16 +104,12 @@ void CreateLevelScribblingView::DrawGrid() {
   }
 }
 
-void CreateLevelScribblingView::DrawFromModel() {
-  DrawGrid();
-  if (!m_model)
-  {
-    return;
-  }
-
+ppxl::Polygon* CreateLevelScribblingView::GetCurrentPolygon() const {
   ppxl::Polygon* currentPolygon = nullptr;
+
   auto currentIndex = m_selectionModel->currentIndex();
   currentIndex = currentIndex.sibling(currentIndex.row(), 0);
+
   auto itemType = currentIndex.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
   switch(itemType) {
   case (CreateLevelModel::ePolygons): {
@@ -133,6 +129,18 @@ void CreateLevelScribblingView::DrawFromModel() {
   if (currentIndex.isValid()) {
     currentPolygon = currentIndex.data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
   }
+
+  return currentPolygon;
+}
+
+void CreateLevelScribblingView::DrawFromModel() {
+  DrawGrid();
+  if (!m_model)
+  {
+    return;
+  }
+
+  ppxl::Polygon* currentPolygon = GetCurrentPolygon();
 
   // Draw current polygon in model color and other on grey
   auto polygonsItem = m_model->GetPolygonsItem();
@@ -166,6 +174,53 @@ void CreateLevelScribblingView::DrawFromModel() {
       ppxl::Point B(xb, yb);
       auto vertexLocation = QPoint(xb, yb);
       DrawPoint(vertexLocation, color);
+
+      if (polygonItem->rowCount() > 2) {
+        auto barycenter = polygon->Barycenter();
+        auto barycenterX = static_cast<int>(barycenter.GetX());
+        auto barycenterY = static_cast<int>(barycenter.GetY());
+        DrawPoint(QPoint(barycenterX, barycenterY), color);
+
+        shiftVector = ppxl::Vector(barycenter, B);
+      }
+      DrawText(B, vertexLetterB, PEN_WIDTH, shiftVector.Normalize());
+
+      DrawLine(A, B, color);
+    }
+  }
+}
+
+void CreateLevelScribblingView::DrawFromPolygons() {
+  DrawGrid();
+
+  ppxl::Polygon* currentPolygon = GetCurrentPolygon();
+
+  auto polygonsItem = m_model->GetPolygonsItem();
+  for (int polygonRow = 0; polygonRow < m_model->rowCount(); ++polygonRow) {
+    auto polygonItem = polygonsItem->child(polygonRow, 0);
+    auto polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+
+    QColor color(NOT_SELECTED_COLOR);
+    if (currentPolygon == polygon) {
+      color = polygonItem->data(Qt::DecorationRole).value<QColor>();
+    }
+
+    auto vertices = polygon->GetVertices();
+    for (unsigned int vertexRow = 0; vertexRow < vertices.size(); ++vertexRow) {
+      auto vertexLetterA = polygonItem->child(static_cast<int>(vertexRow), 0)->text();
+      ppxl::Point A = vertices.at(vertexRow);
+      DrawPoint(QPoint(static_cast<int>(A.GetX()), static_cast<int>(A.GetY())), color);
+      ppxl::Vector shiftVector;
+
+      if (vertices.size() == 1) {
+        DrawText(A, vertexLetterA, PEN_WIDTH, ppxl::Vector(-1, -1));
+        continue;
+      }
+
+      unsigned int indexB = (vertexRow+1)%vertices.size();
+      auto vertexLetterB = polygonItem->child(static_cast<int>(indexB), 0)->text();
+      ppxl::Point B = vertices.at(indexB);
+      DrawPoint(QPoint(static_cast<int>(B.GetX()), static_cast<int>(B.GetY())), color);
 
       if (polygonItem->rowCount() > 2) {
         auto barycenter = polygon->Barycenter();

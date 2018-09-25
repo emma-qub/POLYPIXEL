@@ -18,6 +18,7 @@ public:
   explicit CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
 
+  void RedrawFromPolygons();
   void Redraw();
   void UndoRedo();
 
@@ -33,6 +34,9 @@ public:
 
 protected:
   void UpdateXVertex(int p_value, const QModelIndex& p_index);
+  void UpdateYVertex(int p_value, const QModelIndex& p_index);
+  void TranslateXVertex(int p_value, const QModelIndex& p_index);
+  void TranslateYVertex(int p_value, const QModelIndex& p_index);
 
 private:
   CreateLevelModel* m_model;

@@ -52,8 +52,8 @@ void CreateLevelModel::TranslateVertex(int p_polygonRow, int p_vertexRow, ppxl::
   vertexItemY->SetVertex(translatedVertex);
 
   Q_EMIT(dataChanged(
-        index(p_vertexRow, 0, polygonItem->index()),
-        index(p_vertexRow, 2, polygonItem->index())));
+    index(p_vertexRow, 0, polygonItem->index()),
+    index(p_vertexRow, 2, polygonItem->index())));
 }
 
 QModelIndex CreateLevelModel::GetVertexIndex(int p_polygonRow, int p_vertexRow) const {

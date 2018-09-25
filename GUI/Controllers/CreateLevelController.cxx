@@ -27,7 +27,9 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
   connect(m_view, &CreateLevelView::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
-  //connect(m_view, &CreateLevelView::ValueYChanged, this, &CreateLevelController::UpdateVertex);
+  connect(m_view, &CreateLevelView::ValueYChanged, this, &CreateLevelController::UpdateYVertex);
+  connect(m_view, &CreateLevelView::EditionXDone, this, &CreateLevelController::TranslateXVertex);
+  connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
 
   connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
@@ -48,9 +50,36 @@ CreateLevelController::~CreateLevelController() {
 }
 
 void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
-  auto polygon = p_index.parent().data(PolygonModel::ePolygon).value<ppxl::Polygon*>();
-  auto& vertex = polygon->GetVertices().at(p_index.row());
+  auto* polygon = p_index.parent().data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
   vertex.SetX(p_value);
+
+  RedrawFromPolygons();
+}
+
+void CreateLevelController::UpdateYVertex(int p_value, QModelIndex const& p_index) {
+  auto* polygon = p_index.parent().data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
+  vertex.SetY(p_value);
+
+  RedrawFromPolygons();
+}
+
+void CreateLevelController::TranslateXVertex(int p_value, QModelIndex const& p_index) {
+  auto shiftX = static_cast<double>(p_value - p_index.data().toInt());
+  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(-shiftX, 0.), false);
+  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(shiftX, 0.), true);
+}
+
+void CreateLevelController::TranslateYVertex(int p_value, QModelIndex const& p_index) {
+  auto shiftY = static_cast<double>(p_value - p_index.data().toInt());
+  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., -shiftY), false);
+  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., shiftY), true);
+}
+
+void CreateLevelController::RedrawFromPolygons() {
+  m_view->ClearImage();
+  m_view->RedrawFromPolygons();
 }
 
 void CreateLevelController::Redraw() {

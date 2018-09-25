@@ -55,6 +55,9 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   auto itemDelegate = new PolygonItemDelegate(m_treeView);
   m_treeView->setItemDelegate(itemDelegate);
   connect(itemDelegate, &PolygonItemDelegate::ValueXChanged, this, &CreateLevelView::ValueXChanged);
+  connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelView::ValueYChanged);
+  connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
+  connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
 }
 
 void CreateLevelView::SetModel(CreateLevelModel* p_model) {
@@ -86,6 +89,10 @@ void CreateLevelView::DrawFromModel() {
 
 void CreateLevelView::ClearImage() {
   m_scribblingView->ClearImage();
+}
+
+void CreateLevelView::RedrawFromPolygons() {
+  m_scribblingView->DrawFromPolygons();
 }
 
 void CreateLevelView::Redraw() {

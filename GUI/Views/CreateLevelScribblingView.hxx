@@ -23,6 +23,7 @@ public:
 
   void DrawGrid();
   void DrawFromModel() override;
+  void DrawFromPolygons();
 
 signals:
   void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);
@@ -34,6 +35,7 @@ signals:
   void PolygonSelected();
 
 protected:
+  ppxl::Polygon* GetCurrentPolygon() const;
   void InsertPolygon();
   void Remove();
   void DrawPoint(QPoint const& p_point, QColor const& p_color);
