@@ -346,6 +346,8 @@ void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
       QCursor::setPos(pos);
     } else if (m_nextToBarycenter) {
       m_movingPolygon = true;
+      m_startShiftX = m_beforeMovingPolygonX - p_event->pos().x();
+      m_startShiftY = m_beforeMovingPolygonX - p_event->pos().y();
       QPoint pos = mapToGlobal(QPoint(m_beforeMovingPolygonX, m_beforeMovingPolygonY));
       QCursor::setPos(pos);
     }
