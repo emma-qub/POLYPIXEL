@@ -9,6 +9,7 @@
 #include <QTreeView>
 #include <QUndoView>
 #include <QUndoStack>
+#include <QHeaderView>
 
 CreateLevelView::CreateLevelView(QWidget* parent):
   QWidget(parent),
@@ -51,6 +52,7 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelView::VertexRemoved);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
   connect(m_scribblingView, &CreateLevelScribblingView::PolygonSelected, this, &CreateLevelView::PolygonSelected);
+  connect(m_scribblingView, &CreateLevelScribblingView::SnappedToGrid, this, &CreateLevelView::SnappedToGrid);
 
   auto itemDelegate = new PolygonItemDelegate(m_treeView);
   m_treeView->setItemDelegate(itemDelegate);
@@ -64,6 +66,7 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   m_model = p_model;
   m_scribblingView->SetModel(p_model);
   m_treeView->setModel(p_model);
+  m_treeView->header()->setMinimumSectionSize(50);
   m_scribblingView->SetSelectionModel(m_treeView->selectionModel());
 
   connect(m_model, &CreateLevelModel::rowsInserted, this, [this]() {

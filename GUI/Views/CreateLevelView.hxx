@@ -45,6 +45,7 @@ signals:
   void ValueYChanged(int p_value, QModelIndex const& p_index);
   void EditionXDone(int p_value, QModelIndex const& p_index);
   void EditionYDone(int p_value, QModelIndex const& p_index);
+  void SnappedToGrid();
 
 private:
   QLabel* m_createLevelLabel;

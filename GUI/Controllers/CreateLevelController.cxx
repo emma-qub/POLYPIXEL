@@ -33,6 +33,8 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
 
   connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
+  connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
+
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
 
   auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
@@ -75,6 +77,61 @@ void CreateLevelController::TranslateYVertex(int p_value, QModelIndex const& p_i
   auto shiftY = static_cast<double>(p_value - p_index.data().toInt());
   MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., -shiftY), false);
   MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., shiftY), true);
+}
+
+void CreateLevelController::SnapToGrid() {
+  auto currentIndex = m_view->GetSelectionModel()->currentIndex();
+
+  auto itemType = currentIndex.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
+  switch(itemType) {
+  case (CreateLevelModel::ePolygons): {
+    currentIndex = QModelIndex();
+    break;
+  } case (CreateLevelModel::ePolygon): {
+    break;
+  } case (CreateLevelModel::eVertex): {
+    currentIndex = currentIndex.parent();
+    break;
+  }
+  default: {
+    currentIndex = QModelIndex();
+    break;
+  }
+  }
+
+  if (currentIndex.isValid()) {
+    SnapCurrentPolygonToGrid(currentIndex);
+  }
+}
+
+void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex) {
+  auto* polygonItem = m_model->itemFromIndex(p_currentIndex);
+
+  for (int row = 0; row < polygonItem->rowCount(); ++row) {
+    auto oldX = polygonItem->child(row, 1)->data(Qt::DisplayRole).toInt();
+    auto oldY = polygonItem->child(row, 2)->data(Qt::DisplayRole).toInt();
+
+    int caseSide = 50;
+    int nearestX = static_cast<int>(oldX)%50;
+    int nearestY = static_cast<int>(oldY)%50;
+    int newX = oldX;
+    int newY = oldY;
+
+    int threshold = 20;
+    if (nearestY < threshold)
+      newY = oldY - nearestY;
+    else if (nearestY > caseSide - threshold)
+      newY = oldY + (caseSide - nearestY);
+
+    if (nearestX < threshold)
+      newX = oldX - nearestX;
+    else if (nearestX > caseSide - threshold)
+      newX = oldX + (caseSide - nearestX);
+
+    if (oldX != newX || oldY != newY) {
+      MoveVertex(polygonItem->row(), row, ppxl::Vector(newX-oldX, newY-oldY), true);
+    }
+  }
 }
 
 void CreateLevelController::RedrawFromPolygons() {

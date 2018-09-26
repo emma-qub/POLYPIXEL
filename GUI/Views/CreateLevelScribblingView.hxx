@@ -34,6 +34,7 @@ signals:
   void VertexRemoved(int p_polygonRow, int p_vertexRow);
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
   void PolygonSelected();
+  void SnappedToGrid();
 
 protected:
   ppxl::Polygon* GetCurrentPolygon() const;
@@ -53,10 +54,9 @@ protected:
 private:
   CreateLevelModel* m_model;
   QItemSelectionModel* m_selectionModel;
-  bool m_isMagnetic;
   bool m_isStuck;
-  bool m_nearToVertex;
-  bool m_nearToBarycenter;
+  bool m_nextToVertex;
+  bool m_nextToBarycenter;
   bool m_movingVertex;
   bool m_movingPolygon;
   bool m_lengthOn;
@@ -69,6 +69,8 @@ private:
   int m_beforeMovingPolygonY;
   int m_currOldX;
   int m_currOldY;
+  int m_startShiftX;
+  int m_startShiftY;
 
   static const int PEN_WIDTH;
   static const QColor NOT_SELECTED_COLOR;

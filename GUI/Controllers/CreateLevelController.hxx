@@ -37,6 +37,8 @@ protected:
   void UpdateYVertex(int p_value, const QModelIndex& p_index);
   void TranslateXVertex(int p_value, const QModelIndex& p_index);
   void TranslateYVertex(int p_value, const QModelIndex& p_index);
+  void SnapToGrid();
+  void SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex);
 
 private:
   CreateLevelModel* m_model;
