@@ -18,40 +18,11 @@ PolygonModel::~PolygonModel() {
   }
 }
 
-void PolygonModel::InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex, bool p_updatePolygon) {
-  auto polygon = p_polygonItem->data(ePolygonRole).value<ppxl::Polygon*>();
-
-  // Insert vertex
-  if (p_updatePolygon) {
-    polygon->InsertVertex(p_vertex, static_cast<unsigned int>(p_row));
-  }
-
-  // Insert vertex row
-  auto& vertex = polygon->GetVertices()[static_cast<unsigned long>(p_row)];
-
-  auto* vertexXItem = new VertexXItem(vertex);
-  vertexXItem->setData(eX, eItemTypeRole);
-  auto* vertexYItem = new VertexYItem(vertex);
-  vertexYItem->setData(eY, eItemTypeRole);
-  auto* vertexItem = new VertexLabelItem;
-  vertexItem->setData(eVertex, eItemTypeRole);
-
-  p_polygonItem->insertRow(p_row, QList<QStandardItem*>() << vertexItem << vertexXItem << vertexYItem);
-}
-
-void PolygonModel::AppendVertex(QStandardItem* p_polygonItem, ppxl::Point const& p_vertex, bool p_updatePolygon) {
-  InsertVertex(p_polygonItem->rowCount(), p_polygonItem, p_vertex, p_updatePolygon);
-}
-
 void PolygonModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
   auto polygon = new ppxl::Polygon(p_polygon);
   auto polygonItem = new PolygonItem(polygon);
   polygonItem->setData(ePolygon, eItemTypeRole);
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon*>(polygon), ePolygonRole);
-
-  for (auto vertex: polygon->GetVertices()) {
-    AppendVertex(polygonItem, vertex, false);
-  }
 
   m_polygonsItem->insertRow(p_row, QList<QStandardItem*>() << polygonItem << new QStandardItem << new QStandardItem);
   m_polygons << polygon;

@@ -24,11 +24,6 @@ public:
   PolygonModel(QObject* p_parent = nullptr);
   ~PolygonModel() override;
 
-  // Vertex
-  void InsertVertex(int p_row, QStandardItem* p_polygonItem, ppxl::Point const& p_vertex, bool p_updatePolygon);
-  void AppendVertex(QStandardItem* p_polygonItem, const ppxl::Point& p_vertex, bool p_updatePolygon);
-
-  // Polygon
   void InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
   void AppendPolygon(const ppxl::Polygon& p_polygon);
   inline int GetPolygonsCount() const { return m_polygonsItem->rowCount(); }

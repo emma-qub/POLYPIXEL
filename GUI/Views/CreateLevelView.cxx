@@ -10,6 +10,7 @@
 #include <QUndoView>
 #include <QUndoStack>
 #include <QHeaderView>
+#include <QSpinBox>
 
 CreateLevelView::CreateLevelView(QWidget* parent):
   QWidget(parent),
@@ -18,13 +19,20 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_menuButton(new QPushButton("Menu")),
   m_scribblingView(new CreateLevelScribblingView),
   m_treeView(new QTreeView),
-  m_undoView(new QUndoView) {
+  m_undoView(new QUndoView),
+  m_linesGoalLineEdit(new QSpinBox),
+  m_partsGoalLineEdit(new QSpinBox) {
 
   m_treeView->setHeaderHidden(true);
+  m_linesGoalLineEdit->setFixedWidth(80);
+  m_linesGoalLineEdit->setSuffix(" lines");
+  m_partsGoalLineEdit->setFixedWidth(80);
+  m_partsGoalLineEdit->setSuffix(" parts");
 
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
-  menuLayout->addWidget(m_createLevelLabel);
+  menuLayout->addWidget(m_linesGoalLineEdit);
+  menuLayout->addWidget(m_partsGoalLineEdit);
   menuLayout->addWidget(m_testLevelButton);
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
@@ -60,6 +68,9 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelView::ValueYChanged);
   connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
   connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
+
+  // Get back focus from spin box when playing on scribble view
+  m_scribblingView->setFocusPolicy(Qt::StrongFocus);
 }
 
 void CreateLevelView::SetModel(CreateLevelModel* p_model) {

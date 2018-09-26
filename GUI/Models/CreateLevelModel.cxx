@@ -25,9 +25,24 @@ void CreateLevelModel::TranslatePolygon(int p_polygonRow, const ppxl::Vector& p_
   }
 }
 
-void CreateLevelModel::InsertVertex(int p_polygonRow, int p_vertexRow, const ppxl::Point& p_vertex, bool p_updatePolygon) {
+void CreateLevelModel::InsertVertex(int p_polygonRow, int p_vertexRow, const ppxl::Point& p_vertex) {
   auto polygonItem = GetPolygonsItem()->child(p_polygonRow, 0);
-  PolygonModel::InsertVertex(p_vertexRow, polygonItem, p_vertex, p_updatePolygon);
+  auto polygon = polygonItem->data(ePolygonRole).value<ppxl::Polygon*>();
+
+  // Insert vertex
+  polygon->InsertVertex(p_vertex, static_cast<unsigned int>(p_vertexRow));
+
+  // Insert vertex row
+  auto& vertex = polygon->GetVertices()[static_cast<unsigned long>(p_vertexRow)];
+
+  auto* vertexXItem = new VertexXItem(vertex);
+  vertexXItem->setData(eX, eItemTypeRole);
+  auto* vertexYItem = new VertexYItem(vertex);
+  vertexYItem->setData(eY, eItemTypeRole);
+  auto* vertexItem = new VertexLabelItem;
+  vertexItem->setData(eVertex, eItemTypeRole);
+
+  polygonItem->insertRow(p_vertexRow, QList<QStandardItem*>() << vertexItem << vertexXItem << vertexYItem);
 }
 
 void CreateLevelModel::RemoveVertexAt(int p_polygonRow, int p_vertexRow) {

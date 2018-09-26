@@ -35,7 +35,7 @@ void AddVertexCommand::undo() {
 }
 
 void AddVertexCommand::redo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
+  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
   m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
@@ -56,7 +56,7 @@ RemoveVertexCommand::RemoveVertexCommand(CreateLevelModel* p_model, QItemSelecti
 RemoveVertexCommand::~RemoveVertexCommand() = default;
 
 void RemoveVertexCommand::undo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex, true);
+  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
   m_model->PopSelection();
 }
 

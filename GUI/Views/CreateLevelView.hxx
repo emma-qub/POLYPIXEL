@@ -15,6 +15,7 @@ class QTreeView;
 class QItemSelectionModel;
 class QUndoView;
 class QUndoStack;
+class QSpinBox;
 
 class CreateLevelView: public QWidget {
   Q_OBJECT
@@ -55,6 +56,8 @@ private:
   CreateLevelScribblingView* m_scribblingView;
   QTreeView* m_treeView;
   QUndoView* m_undoView;
+  QSpinBox* m_linesGoalLineEdit;
+  QSpinBox* m_partsGoalLineEdit;
 };
 
 #endif

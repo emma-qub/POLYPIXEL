@@ -71,7 +71,7 @@ void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selecti
   m_selectionModel = p_selectionModel;
   m_selectionModel->setCurrentIndex(m_model->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 
-  connect(m_selectionModel, &QItemSelectionModel::currentChanged, this, [this] () {
+  connect(m_selectionModel, &QItemSelectionModel::selectionChanged, this, [this] () {
     Q_EMIT(PolygonSelected());
   });
 }
