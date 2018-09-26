@@ -20,6 +20,7 @@ LevelsView::LevelsView(QWidget* parent):
   menuLayout->addWidget(m_selectWorldButton);
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
+  mainLayout->addLayout(menuLayout);
   mainLayout->addWidget(m_levelsListView);
   mainLayout->setStretchFactor(menuLayout, 0);
   mainLayout->setStretchFactor(m_levelsListView, 1);
