@@ -476,6 +476,7 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
       Q_EMIT(VertexInserted(0, 0, point));
     } else {
       auto index = m_selectionModel->currentIndex();
+      index = index.sibling(index.row(), 0);
       int polygonRow;
       int vertexRow;
       auto itemType = index.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
