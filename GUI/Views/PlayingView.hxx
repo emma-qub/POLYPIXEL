@@ -34,8 +34,10 @@ signals:
   void Moving(QPoint const& p_currentPoint);
   void Slicing(QPoint const& p_endPoint);
 
-private:
+protected:
   PlayingScribblingView* m_scribblingView;
+
+private:
   int m_linesCount;
   int m_linesGoal;
   QLabel* m_linesCountLabel;

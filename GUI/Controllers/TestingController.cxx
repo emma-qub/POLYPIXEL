@@ -50,11 +50,36 @@ void TestingController::PlayLevel() {
   Redraw();
 
   connect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
+
+  connect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
 }
 
 void TestingController::Redraw() {
   m_view->ClearImage();
   m_view->DrawFromModel();
+}
+
+void TestingController::DisplayAreas(QPoint const& p_endPoint) {
+  auto lines = ComputeSlicingLines(p_endPoint);
+
+  if (ComputeLinesType(lines) == eGoodCrossing) {
+    QList<ppxl::Polygon> newPolygonList;
+
+    for (ppxl::Segment const& line: lines) {
+      // Browse every polygon and slice it!
+      ComputeNewPolygonList(newPolygonList, line);
+    }
+
+    double orientedAreaTotal = 0.;
+    for (auto polygon: newPolygonList) {
+      orientedAreaTotal += polygon.OrientedArea();
+    }
+
+    for (auto polygon: newPolygonList) {
+      double currArea = qRound(10.*polygon.OrientedArea() * 100. / orientedAreaTotal) / 10.;
+      m_view->DrawText(polygon.Barycenter(), QString::number(currArea), 50);
+    }
+  }
 }
 
 void TestingController::CheckWinning() {

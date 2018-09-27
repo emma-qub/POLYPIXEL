@@ -19,9 +19,12 @@ public:
   void SetTolerance(int p_tolerance);
 
   void PlayLevel();
-  void CheckWinning() override;
 
+protected:
+  void CheckWinning() override;
   void Redraw();
+  void DisplayAreas(const QPoint& p_endPoint);
+
 private:
   TestingView* m_view;
 };

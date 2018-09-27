@@ -34,7 +34,7 @@ void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const&
   }
 }
 
-void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text,  int p_weight, ppxl::Vector const& shiftVector) {
+void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, ppxl::Vector const& shiftVector) {
   QPainter painter(&GetImage());
   QFont font("", 12, p_weight);
   QFontMetrics fm(font);
