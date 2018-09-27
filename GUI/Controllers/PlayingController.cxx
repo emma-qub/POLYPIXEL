@@ -11,52 +11,27 @@
 PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_model(new PolygonModel(this)),
-  m_view(p_view),
-  m_orientedAreaTotal(0.0),
+  m_gameInfo(),
   m_levelPath(""),
-  m_gameInfo() {
+  m_orientedAreaTotal(0.0),
+  m_view(p_view) {
 
   m_view->SetModel(m_model);
 
-  connect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
   connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
   connect(m_view, &PlayingView::Moving, this, &PlayingController::ComputeSlicingLines);
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
 }
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
+  m_view->StartLevel();
   m_levelPath = p_levelPath;
   OpenLevel(p_levelPath);
 }
 
 void PlayingController::RestartLevel() {
+  m_view->StartLevel();
   OpenLevel(m_levelPath);
-}
-
-void PlayingController::SetPolygonsItem(PolygonModel* p_model) {
-  QList<ppxl::Polygon> polygonsList;
-
-  for (auto* polygon: p_model->GetPolygonsList()) {
-    polygonsList << ppxl::Polygon(*polygon);
-  }
-
-  m_model->SetPolygonsList(polygonsList);
-}
-
-void PlayingController::SetLinesGoal(int p_linesGoal) {
-  m_gameInfo.m_linesGoal = p_linesGoal;
-}
-
-void PlayingController::SetPartsGoal(int p_partsGoal) {
-  m_gameInfo.m_partsGoal = p_partsGoal;;
-}
-
-void PlayingController::SetMaxGapToWin(int p_maxGapToWin) {
-  m_gameInfo.m_maxGapToWin = p_maxGapToWin;
-}
-
-void PlayingController::SetTolerance(int p_tolerance) {
-  m_gameInfo.m_tolerance = p_tolerance;;
 }
 
 void PlayingController::Redraw() {
@@ -343,76 +318,81 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
       0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerances());
   }
 
-//  TapeList tapeList(parser.createTapeList());
-//  m_model->setTapeList(tapeList);
-
-//  MirrorList mirrorList(parser.createMirrorList());
-//  PortalList portalList(parser.createPortalList());
-//  RefractorList refractorList(parser.createRefractorList());
-//  DeviationList deviationsList;
-//  for (const Mirror& mirror: mirrorList) {
-//    deviationsList.push_back(new Mirror(mirror));
-//  }
-//  for (const Portal& portal: portalList) {
-//    deviationsList.push_back(new Portal(portal));
-//  }
-//  for (const Refractor& refractor: refractorList) {
-//    deviationsList.push_back(new Refractor(refractor));
-//  }
-//  m_model->setDeviationList(deviationsList);
-
   UpdateViewFromGameInfo();
 
   for (auto const* polygon: m_model->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
   }
 
-//  m_levelRunning = true;
+  Redraw();
+
+  connect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
+}
+
+QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxArea) {
+  QList<double> orientedAreas;
+  p_minArea = 100.;
+  p_maxArea = 0.;
+
+  for (auto const* polygon: m_model->GetPolygonsList()) {
+    double currArea = ComputePolygonPercentageArea(*polygon);
+
+    orientedAreas << currArea;
+    p_minArea = std::min(currArea, p_minArea);
+    p_maxArea = std::max(currArea, p_maxArea);
+  }
+
+  return orientedAreas;
+}
+
+QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList() {
+  QList<ppxl::Vector> shiftVectors;
+
+  for (auto const* polygon: m_model->GetPolygonsList()) {
+    ppxl::Vector currShift(ComputeGlobalBarycenter(), polygon->Barycenter());
+    double currShiftLength = currShift.Norm();
+    currShift.Normalize();
+    currShift *= 0.2*currShiftLength;
+    shiftVectors << currShift;
+  }
+
+  return shiftVectors;
+}
+
+int PlayingController::ComputeStarsCount(double p_gap) {
+  int starsCount = 0;
+
+  if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal && p_gap <= m_gameInfo.m_maxGapToWin/10.) {
+    auto gapRatio = 10. * p_gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
+    starsCount = 3 - static_cast<int>(std::ceil(gapRatio * 2.));
+    if (gapRatio < static_cast<double>(m_gameInfo.m_tolerance) / 100.) {
+      starsCount = 4;
+    }
+  } else {
+    starsCount = 0;
+  }
+
+  return starsCount;
 }
 
 void PlayingController::CheckWinning() {
   if (m_gameInfo.m_linesCount >= m_gameInfo.m_linesGoal || m_gameInfo.m_partsCount >= m_gameInfo.m_partsGoal) {
-    QList<double> orientedAreas;
-    QList<ppxl::Vector> shiftVectors;
-    double minArea = 100.;
-    double maxArea = 0.;
-
-    for (auto const* polygon: m_model->GetPolygonsList()) {
-      double currArea = ComputePolygonPercentageArea(*polygon);
-
-      orientedAreas << currArea;
-      minArea = std::min(currArea, minArea);
-      maxArea = std::max(currArea, maxArea);
-
-      ppxl::Vector currShift(ComputeGlobalBarycenter(), polygon->Barycenter());
-      double currShiftLength = currShift.Norm();
-      currShift.Normalize();
-      currShift *= 0.2*currShiftLength;
-      shiftVectors << currShift;
-    }
-
-    TranslatePolygons(shiftVectors);
-
+    double minArea;
+    double maxArea;
+    auto areasList = ComputeAreas(minArea, maxArea);
     double gap = std::abs(maxArea - minArea);
 
-    int starsCount = 0;
-    m_gameInfo.m_stars = starsCount;
-    if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal && gap <= m_gameInfo.m_maxGapToWin/10.) {
-      auto gapRatio = 10. * gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
-      starsCount = 3 - static_cast<int>(std::ceil(gapRatio * 2.));
-      if (gapRatio < static_cast<double>(m_gameInfo.m_tolerance) / 100.) {
-        starsCount = 4;
-      }
-    } else {
-      starsCount = 0;
-    }
+    auto shiftVectorsList = ComputeShiftVectorsList();
+    TranslatePolygons(shiftVectorsList);
 
+    auto starsCount = ComputeStarsCount(gap);
+    m_gameInfo.m_stars = starsCount;
     UpdateStarsMax(starsCount);
-    m_gameInfo.m_stars = starsCount;
 
-    m_view->DrawAreas(orientedAreas);
+    m_view->DrawAreas(areasList);
+    m_view->EndLevel();
 
-    //m_levelRunning = false;
+    disconnect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
   }
 }
 
@@ -465,10 +445,6 @@ void PlayingController::UpdateStarsMax(int starsMaxCount) {
 
 
 /*
-
-
-
-
 void PlayingController::undoSliceIt() {
   if (m_polygonListPerTurn.size() > 1) {
     m_polygonListPerTurn.pop_back();

@@ -2,7 +2,8 @@
 
 #include "GUI/Views/PlayingView.hxx"
 #include "GUI/Models/PolygonModel.hxx"
-#include "GUI/Controllers/PlayingController.hxx"
+#include "GUI/Controllers/TestingController.hxx"
+#include "GUI/Views/TestingView.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -14,8 +15,8 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   m_menuButton(new QPushButton("Menu")),
   m_amendLevelButton(new QPushButton("Amend level")),
   m_saveLevelButton(new QPushButton("Save level")),
-  m_playingView(new PlayingView),
-  m_playingController(new PlayingController(m_playingView, this))
+  m_view(new TestingView),
+  m_controller(new TestingController(m_view, this))
 {
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
@@ -25,9 +26,9 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
   mainLayout->addLayout(menuLayout);
-  mainLayout->addWidget(m_playingView);
+  mainLayout->addWidget(m_view);
   mainLayout->setStretchFactor(menuLayout, 0);
-  mainLayout->setStretchFactor(m_playingView, 1);
+  mainLayout->setStretchFactor(m_view, 1);
   setLayout(mainLayout);
 
   connect(m_menuButton, &QPushButton::clicked, this, &TestLevelView::Done);
@@ -36,23 +37,25 @@ TestLevelView::TestLevelView(QWidget* p_parent):
 }
 
 void TestLevelView::SetModel(PolygonModel* p_model) {
-  m_playingView->SetModel(p_model);
-  m_playingController->SetPolygonsItem(p_model);
-  m_playingController->PlayLevel();
+  m_controller->SetPolygonsItem(p_model);
 }
 
 void TestLevelView::SetLinesGoal(int p_linesGoal) {
-  m_playingController->SetLinesGoal(p_linesGoal);
+  m_controller->SetLinesGoal(p_linesGoal);
 }
 
 void TestLevelView::SetPartsGoal(int p_partsGoal) {
-  m_playingController->SetPartsGoal(p_partsGoal);
+  m_controller->SetPartsGoal(p_partsGoal);
 }
 
 void TestLevelView::SetMaxGapToWin(int p_maxGapToWin) {
-  m_playingController->SetMaxGapToWin(p_maxGapToWin);
+  m_controller->SetMaxGapToWin(p_maxGapToWin);
 }
 
 void TestLevelView::SetTolerance(int p_tolerance) {
-  m_playingController->SetTolerance(p_tolerance);
+  m_controller->SetTolerance(p_tolerance);
+}
+
+void TestLevelView::PlayLevel() {
+  m_controller->PlayLevel();
 }

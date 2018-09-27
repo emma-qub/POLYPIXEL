@@ -8,7 +8,7 @@
 
 class QLabel;
 class PolygonModel;
-class GameScribblingView;
+class PlayingScribblingView;
 
 class PlayingView: public QWidget {
   Q_OBJECT
@@ -26,14 +26,16 @@ public:
   void UpdateLinesCount(int p_linesCount, int p_linesGoal = -1);
   void UpdatePartsCount(int p_partsCount, int p_partsGoal = -1);
 
+  void StartLevel();
+  void EndLevel();
+
 signals:
   void Scribbling(QPoint const& p_startPoint);
   void Moving(QPoint const& p_currentPoint);
   void Slicing(QPoint const& p_endPoint);
 
 private:
-  PolygonModel* m_polygonModel;
-  GameScribblingView* m_scribblingView;
+  PlayingScribblingView* m_scribblingView;
   int m_linesCount;
   int m_linesGoal;
   QLabel* m_linesCountLabel;

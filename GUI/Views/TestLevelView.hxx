@@ -6,8 +6,8 @@
 class QLabel;
 class QPushButton;
 class PolygonModel;
-class PlayingView;
-class PlayingController;
+class TestingView;
+class TestingController;
 
 class TestLevelView: public QWidget
 {
@@ -20,6 +20,7 @@ public:
   void SetPartsGoal(int p_partsGoal);
   void SetMaxGapToWin(int p_maxGapToWin);
   void SetTolerance(int p_tolerance);
+  void PlayLevel();
 
 signals:
   void Done();
@@ -33,8 +34,8 @@ private:
   QPushButton* m_menuButton;
   QPushButton* m_amendLevelButton;
   QPushButton* m_saveLevelButton;
-  PlayingView* m_playingView;
-  PlayingController* m_playingController;
+  TestingView* m_view;
+  TestingController* m_controller;
 };
 
 #endif

@@ -77,7 +77,7 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_linesGoalSpinBox->setRange(1, 25);
   m_linesGoalSpinBox->setFixedWidth(80);
   m_linesGoalSpinBox->setSuffix(" lines");
-  m_partsGoalSpinBox->setRange(1, 50);
+  m_partsGoalSpinBox->setRange(2, 50);
   m_partsGoalSpinBox->setFixedWidth(80);
   m_partsGoalSpinBox->setSuffix(" parts");
   m_maxGapToWinSpinBox->setRange(1, 50);

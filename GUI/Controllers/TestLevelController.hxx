@@ -19,6 +19,7 @@ public:
   void SetPartsGoal(int p_partsGoal);
   void SetMaxGapToWin(int p_maxGapToWin);
   void SetTolerance(int p_tolerance);
+  void PlayLevel();
 
 private:
   TestLevelView* m_view;

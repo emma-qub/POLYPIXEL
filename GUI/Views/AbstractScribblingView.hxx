@@ -16,6 +16,8 @@ public:
   ~AbstractScribblingView() override;
 
   virtual void SetModel(PolygonModel* p_model);
+  void SetCanScribble(bool p_value);
+  bool GetCanScribble() const;
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, const ppxl::Vector& shiftVector = ppxl::Vector());
@@ -42,6 +44,7 @@ private:
   int m_myPenWidth;
   QColor m_myPenColor;
   QImage m_image;
+  bool m_canScribble;
 };
 
 #endif

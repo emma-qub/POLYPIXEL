@@ -27,3 +27,7 @@ void TestLevelController::SetMaxGapToWin(int p_maxGapToWin) {
 void TestLevelController::SetTolerance(int p_tolerance) {
   m_view->SetTolerance(p_tolerance);
 }
+
+void TestLevelController::PlayLevel() {
+  m_view->PlayLevel();
+}

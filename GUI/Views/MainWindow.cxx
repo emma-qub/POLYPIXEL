@@ -132,12 +132,9 @@ MainWindow::MainWindow(QWidget* p_parent):
   saveLevelState->addTransition(m_saveLevelView, &SaveLevelView::Done, mainMenuState);
   optionsState->addTransition(m_optionsView, &OptionsView::Done, mainMenuState);
 
-  m_stateMachine.setInitialState(loadingState);
-  m_stateMachine.start();
-
+  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
   connect(m_worldsController, &WorldsController::LevelsPathChanged, m_levelsController, &LevelsController::SetLevelsPath);
   connect(m_levelsController, &LevelsController::PlayLevelRequested, m_gameController, &GameController::PlayLevel);
-  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
   connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
     if (m_centralWidget->currentWidget() == m_createLevelView) {
@@ -145,15 +142,21 @@ MainWindow::MainWindow(QWidget* p_parent):
     }
   });
 
+  m_stateMachine.setInitialState(loadingState);
+  m_stateMachine.start();
+
   showFullScreen();
 }
 
 MainWindow::~MainWindow() = default;
 
 void MainWindow::SetModelsToTestController() {
+  m_centralWidget->setCurrentWidget(m_testLevelView);
+
   m_testLevelController->SetLinesGoal(m_createLevelController->GetLinesGoal());
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
   m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
   m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
   m_testLevelController->SetModel(m_createLevelController->GetModel());
+  m_testLevelController->PlayLevel();
 }

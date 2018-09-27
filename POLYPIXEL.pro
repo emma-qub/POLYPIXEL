@@ -56,7 +56,9 @@ SOURCES += \
     GUI/Delegates/PolygonItemDelegate.cxx \
     GUI/Controllers/TestLevelController.cxx \
     GUI/Views/PlayingView.cxx \
-    GUI/Controllers/PlayingController.cxx
+    GUI/Controllers/PlayingController.cxx \
+    GUI/Controllers/TestingController.cxx \
+    GUI/Views/TestingView.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -100,7 +102,9 @@ HEADERS += \
     GUI/Delegates/PolygonItemDelegate.hxx \
     GUI/Controllers/TestLevelController.hxx \
     GUI/Views/PlayingView.hxx \
-    GUI/Controllers/PlayingController.hxx
+    GUI/Controllers/PlayingController.hxx \
+    GUI/Controllers/TestingController.hxx \
+    GUI/Views/TestingView.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -5,12 +5,12 @@
 
 class PolygonModel;
 
-class GameScribblingView: public AbstractScribblingView {
+class PlayingScribblingView: public AbstractScribblingView {
   Q_OBJECT
 
 public:
-  GameScribblingView(QWidget* parent = nullptr);
-  ~GameScribblingView() override;
+  PlayingScribblingView(QWidget* parent = nullptr);
+  ~PlayingScribblingView() override;
 
   void DrawAreas(QList<double> const& p_areas);
 

@@ -44,17 +44,11 @@ public:
 
   PlayingController(PlayingView* p_view, QObject* p_parent = nullptr);
 
-  void PlayLevel(QString const& p_levelPath = "");
+  void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
-  void SetPolygonsItem(PolygonModel* p_model);
-
-  void SetLinesGoal(int p_linesGoal);
-  void SetPartsGoal(int p_partsGoal);
-  void SetMaxGapToWin(int p_maxGapToWin);
-  void SetTolerance(int p_tolerance);
+  void Redraw();
 
 protected:
-  void Redraw();
   void UpdateViewFromGameInfo();
   void SetStartPoint(QPoint const& p_startPoint);
   QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
@@ -68,9 +62,11 @@ protected:
   std::vector<std::pair<ppxl::Point*, ppxl::Point*>> GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const;
   bool StillHasBaseVertices(std::vector<ppxl::Point*> const& verticesGlobal, std::vector<ppxl::Point*> const& intersections) const;
   ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
-  void OpenLevel(const QString& p_levelPath = "");
-  void OpenLevel();
-  void CheckWinning();
+  void OpenLevel(const QString& p_levelPath);
+  QList<ppxl::Vector> ComputeShiftVectorsList();
+  QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
+  int ComputeStarsCount(double p_gap);
+  virtual void CheckWinning();
   double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
   ppxl::Point ComputeGlobalBarycenter() const;
   void TranslatePolygons(const QList<ppxl::Vector>& shiftVectors);
@@ -83,13 +79,15 @@ protected:
   //  void undoSliceIt();
   //  void clearGame();
 
-private:
+protected:
   PolygonModel* m_model;
-  PlayingView* m_view;
-  double m_orientedAreaTotal;
-  QString m_levelPath;
-  ppxl::Point m_startPoint;
   GameInfo m_gameInfo;
+  QString m_levelPath;
+  double m_orientedAreaTotal;
+
+private:
+  PlayingView* m_view;
+  ppxl::Point m_startPoint;
 };
 
 bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B);

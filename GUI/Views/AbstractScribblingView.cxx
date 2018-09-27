@@ -8,7 +8,8 @@
 AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
   QWidget(p_parent),
   m_model(nullptr),
-  m_myPenWidth(1) {
+  m_myPenWidth(5),
+  m_canScribble(false) {
 }
 
 AbstractScribblingView::~AbstractScribblingView() = default;
@@ -17,10 +18,20 @@ void AbstractScribblingView::SetModel(PolygonModel* p_model) {
   m_model = p_model;
 }
 
+void AbstractScribblingView::SetCanScribble(bool p_value) {
+  m_canScribble = p_value;
+}
+
+bool AbstractScribblingView::GetCanScribble() const {
+  return m_canScribble;
+}
+
 void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
-  ppxl::Point startPoint(p_line.GetA());
-  ppxl::Point endPoint(p_line.GetB());
-  DrawLine(startPoint, endPoint, p_color, p_penStyle);
+  if (m_canScribble) {
+    ppxl::Point startPoint(p_line.GetA());
+    ppxl::Point endPoint(p_line.GetB());
+    DrawLine(startPoint, endPoint, p_color, p_penStyle);
+  }
 }
 
 void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text,  int p_weight, ppxl::Vector const& shiftVector) {
@@ -40,7 +51,7 @@ void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_t
 }
 
 void AbstractScribblingView::DrawFromModel() {
-  if (!m_model)
+  if (!m_model || !m_canScribble)
   {
     return;
   }

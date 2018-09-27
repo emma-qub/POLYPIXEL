@@ -9,8 +9,7 @@
 
 PlayingView::PlayingView(QWidget* p_parent):
   QWidget(p_parent),
-  m_polygonModel(nullptr),
-  m_scribblingView(new GameScribblingView),
+  m_scribblingView(new PlayingScribblingView),
   m_linesCount(-1),
   m_linesGoal(-1),
   m_linesCountLabel(new QLabel),
@@ -30,9 +29,9 @@ PlayingView::PlayingView(QWidget* p_parent):
   mainLayout->setStretchFactor(m_scribblingView, 1);
   setLayout(mainLayout);
 
-  connect(m_scribblingView, &GameScribblingView::Scribbling, this, &PlayingView::Scribbling);
-  connect(m_scribblingView, &GameScribblingView::Moving, this, &PlayingView::Moving);
-  connect(m_scribblingView, &GameScribblingView::Slicing, this, &PlayingView::Slicing);
+  connect(m_scribblingView, &PlayingScribblingView::Scribbling, this, &PlayingView::Scribbling);
+  connect(m_scribblingView, &PlayingScribblingView::Moving, this, &PlayingView::Moving);
+  connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
 }
 
 void PlayingView::SetModel(PolygonModel* p_playingModel) {
@@ -73,4 +72,12 @@ void PlayingView::UpdatePartsCount(int p_partsCount, int p_partsGoal) {
 
   m_partsCount = p_partsCount;
   m_partsCountLabel->setText(tr("Parts: %1/%2").arg(m_partsCount).arg(m_partsGoal));
+}
+
+void PlayingView::StartLevel() {
+  m_scribblingView->SetCanScribble(true);
+}
+
+void PlayingView::EndLevel() {
+  m_scribblingView->SetCanScribble(false);
 }
