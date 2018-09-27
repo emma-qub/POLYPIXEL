@@ -26,6 +26,7 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_toleranceSpinBox(new QSpinBox) {
 
   m_treeView->setHeaderHidden(true);
+  m_testLevelButton->setEnabled(false);
 
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
