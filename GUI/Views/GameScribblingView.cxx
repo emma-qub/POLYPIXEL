@@ -1,11 +1,25 @@
 #include "GameScribblingView.hxx"
 
+#include "GUI/Models/PolygonModel.hxx"
+
 #include <QPainter>
 #include <QMouseEvent>
 
 GameScribblingView::GameScribblingView(QWidget* p_parent):
   AbstractScribblingView(p_parent),
   m_scribbling(false) {
+}
+
+void GameScribblingView::DrawAreas(const QList<double>& p_areas)
+{
+  auto polygons = GetModel()->GetPolygonsList();
+  assert(p_areas.size() == polygons.size());
+
+  for (int row = 0; row < polygons.size(); ++row) {
+    auto polygon = polygons.at(row);
+    auto area = QString::number(p_areas.at(row));
+    DrawText(polygon->Barycenter(), area, 50);
+  }
 }
 
 GameScribblingView::~GameScribblingView() = default;

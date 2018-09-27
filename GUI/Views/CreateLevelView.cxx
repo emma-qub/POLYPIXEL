@@ -20,19 +20,20 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_scribblingView(new CreateLevelScribblingView),
   m_treeView(new QTreeView),
   m_undoView(new QUndoView),
-  m_linesGoalLineEdit(new QSpinBox),
-  m_partsGoalLineEdit(new QSpinBox) {
+  m_linesGoalSpinBox(new QSpinBox),
+  m_partsGoalSpinBox(new QSpinBox),
+  m_maxGapToWinSpinBox(new QSpinBox),
+  m_toleranceSpinBox(new QSpinBox)
+{
 
   m_treeView->setHeaderHidden(true);
-  m_linesGoalLineEdit->setFixedWidth(80);
-  m_linesGoalLineEdit->setSuffix(" lines");
-  m_partsGoalLineEdit->setFixedWidth(80);
-  m_partsGoalLineEdit->setSuffix(" parts");
 
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
-  menuLayout->addWidget(m_linesGoalLineEdit);
-  menuLayout->addWidget(m_partsGoalLineEdit);
+  menuLayout->addWidget(m_linesGoalSpinBox);
+  menuLayout->addWidget(m_partsGoalSpinBox);
+  menuLayout->addWidget(m_maxGapToWinSpinBox);
+  menuLayout->addWidget(m_toleranceSpinBox);
   menuLayout->addWidget(m_testLevelButton);
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
@@ -69,8 +70,63 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
   connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
 
+  // Game info
+  connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateMaxGapToWinPrefix);
+  connect(m_toleranceSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateTolerancePrefix);
+
+  m_linesGoalSpinBox->setRange(1, 25);
+  m_linesGoalSpinBox->setFixedWidth(80);
+  m_linesGoalSpinBox->setSuffix(" lines");
+  m_partsGoalSpinBox->setRange(1, 50);
+  m_partsGoalSpinBox->setFixedWidth(80);
+  m_partsGoalSpinBox->setSuffix(" parts");
+  m_maxGapToWinSpinBox->setRange(1, 50);
+  m_maxGapToWinSpinBox->setFixedWidth(150);
+  m_maxGapToWinSpinBox->setPrefix("dificulty ");
+  m_maxGapToWinSpinBox->setValue(5);
+  m_toleranceSpinBox->setRange(1, 20);
+  m_toleranceSpinBox->setFixedWidth(150);
+  m_toleranceSpinBox->setPrefix("perfect ");
+  m_toleranceSpinBox->setValue(10);
+
   // Get back focus from spin box when playing on scribble view
   m_scribblingView->setFocusPolicy(Qt::StrongFocus);
+}
+
+int CreateLevelView::GetLinesGoal() const {
+  return m_linesGoalSpinBox->value();
+}
+
+int CreateLevelView::GetPartsGoal() const {
+  return m_partsGoalSpinBox->value();
+}
+
+int CreateLevelView::GetMaxGapToWin() const {
+  return m_maxGapToWinSpinBox->value();
+}
+
+int CreateLevelView::GetTolerance() const {
+  return m_toleranceSpinBox->value();
+}
+
+void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
+  if (1 <= p_value && p_value < 5) {
+    m_maxGapToWinSpinBox->setSuffix(" (hard)");
+  } else if (5 <= p_value && p_value < 20) {
+    m_maxGapToWinSpinBox->setSuffix(" (normal)");
+  } else {
+    m_maxGapToWinSpinBox->setSuffix(" (easy)");
+  }
+}
+
+void CreateLevelView::UpdateTolerancePrefix(int p_value) {
+  if (1 <= p_value && p_value < 5) {
+    m_toleranceSpinBox->setSuffix(" (insane)");
+  } else if (5 <= p_value && p_value < 10) {
+    m_toleranceSpinBox->setSuffix(" (very hard)");
+  } else {
+    m_toleranceSpinBox->setSuffix(" (hard)");
+  }
 }
 
 void CreateLevelView::SetModel(CreateLevelModel* p_model) {

@@ -20,6 +20,7 @@
 #include "GUI/Controllers/CreateLevelController.hxx"
 #include "GUI/Controllers/GameController.hxx"
 #include "GUI/Controllers/LevelsController.hxx"
+#include "GUI/Controllers/TestLevelController.hxx"
 #include "GUI/Controllers/WorldsController.hxx"
 
 #include <QStackedWidget>
@@ -33,19 +34,19 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_createLevelView(new CreateLevelView),
   m_createLevelController(new CreateLevelController(m_createLevelModel, m_createLevelView, this)),
   m_gameView(new GameView),
-  m_polygonModel(new PolygonModel(this)),
-  m_gameController(new GameController(m_polygonModel, m_gameView, this)),
+  m_gameController(new GameController(m_gameView, this)),
+  m_levelsModel(new LevelsModel(this)),
   m_levelsView(new LevelsView),
-  m_levelsModel(new LevelsModel),
   m_levelsController(new LevelsController(m_levelsView, m_levelsModel, this)),
   m_loadingView(new LoadingView),
   m_mainMenuView(new MainMenuView),
   m_optionsView(new OptionsView),
   m_pauseView(new PauseView),
-  m_saveLevelView(new SaveLevelView),
   m_testLevelView(new TestLevelView),
+  m_testLevelController(new TestLevelController(m_testLevelView, this)),
+  m_saveLevelView(new SaveLevelView),
   m_worldsView(new WorldsView),
-  m_worldsModel(new WorldsModel),
+  m_worldsModel(new WorldsModel(this)),
   m_worldsController(new WorldsController(m_worldsView, m_worldsModel, this))
 {
   m_centralWidget->addWidget(m_achievementsView);
@@ -136,6 +137,7 @@ MainWindow::MainWindow(QWidget* p_parent):
 
   connect(m_worldsController, &WorldsController::LevelsPathChanged, m_levelsController, &LevelsController::SetLevelsPath);
   connect(m_levelsController, &LevelsController::PlayLevelRequested, m_gameController, &GameController::PlayLevel);
+  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
   connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
     if (m_centralWidget->currentWidget() == m_createLevelView) {
@@ -147,3 +149,11 @@ MainWindow::MainWindow(QWidget* p_parent):
 }
 
 MainWindow::~MainWindow() = default;
+
+void MainWindow::SetModelsToTestController() {
+  m_testLevelController->SetLinesGoal(m_createLevelController->GetLinesGoal());
+  m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
+  m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
+  m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
+  m_testLevelController->SetModel(m_createLevelController->GetModel());
+}

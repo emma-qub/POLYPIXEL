@@ -18,6 +18,12 @@ public:
   explicit CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
 
+  inline CreateLevelModel* GetModel() const { return m_model; }
+  int GetLinesGoal() const;
+  int GetPartsGoal() const;
+  int GetMaxGapToWin() const;
+  int GetTolerance() const;
+
   void RedrawFromPolygons();
   void Redraw();
   void UndoRedo();

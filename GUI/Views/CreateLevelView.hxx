@@ -23,6 +23,11 @@ class CreateLevelView: public QWidget {
 public:
   explicit CreateLevelView(QWidget* parent = nullptr);
 
+  int GetLinesGoal() const;
+  int GetPartsGoal() const;
+  int GetMaxGapToWin() const;
+  int GetTolerance() const;
+
   void SetModel(CreateLevelModel* p_model);
   void SetUndoStack(QUndoStack* p_undoStack);
   QItemSelectionModel* GetSelectionModel() const;
@@ -48,6 +53,10 @@ signals:
   void EditionYDone(int p_value, QModelIndex const& p_index);
   void SnappedToGrid();
 
+protected:
+  void UpdateMaxGapToWinPrefix(int p_value);
+  void UpdateTolerancePrefix(int p_value);
+
 private:
   QLabel* m_createLevelLabel;
   QPushButton* m_testLevelButton;
@@ -56,8 +65,10 @@ private:
   CreateLevelScribblingView* m_scribblingView;
   QTreeView* m_treeView;
   QUndoView* m_undoView;
-  QSpinBox* m_linesGoalLineEdit;
-  QSpinBox* m_partsGoalLineEdit;
+  QSpinBox* m_linesGoalSpinBox;
+  QSpinBox* m_partsGoalSpinBox;
+  QSpinBox* m_maxGapToWinSpinBox;
+  QSpinBox* m_toleranceSpinBox;
 };
 
 #endif

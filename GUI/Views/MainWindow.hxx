@@ -20,6 +20,7 @@ class OptionsView;
 class PauseView;
 class SaveLevelView;
 class TestLevelView;
+class TestLevelController;
 class WorldsView;
 class WorldsModel;
 class WorldsController;
@@ -33,6 +34,9 @@ public:
   MainWindow(QWidget* p_parent = nullptr);
   ~MainWindow() override;
 
+protected:
+  void SetModelsToTestController();
+
 private:
   QStateMachine m_stateMachine;
 
@@ -42,17 +46,17 @@ private:
   CreateLevelView* m_createLevelView;
   CreateLevelController* m_createLevelController;
   GameView* m_gameView;
-  PolygonModel* m_polygonModel;
   GameController* m_gameController;
-  LevelsView* m_levelsView;
   LevelsModel* m_levelsModel;
+  LevelsView* m_levelsView;
   LevelsController* m_levelsController;
   LoadingView* m_loadingView;
   MainMenuView* m_mainMenuView;
   OptionsView* m_optionsView;
   PauseView* m_pauseView;
-  SaveLevelView* m_saveLevelView;
   TestLevelView* m_testLevelView;
+  TestLevelController* m_testLevelController;
+  SaveLevelView* m_saveLevelView;
   WorldsView* m_worldsView;
   WorldsModel* m_worldsModel;
   WorldsController* m_worldsController;

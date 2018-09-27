@@ -51,6 +51,22 @@ CreateLevelController::~CreateLevelController() {
   disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
 }
 
+int CreateLevelController::GetLinesGoal() const {
+  return m_view->GetLinesGoal();
+}
+
+int CreateLevelController::GetPartsGoal() const {
+  return m_view->GetPartsGoal();
+}
+
+int CreateLevelController::GetMaxGapToWin() const {
+  return m_view->GetMaxGapToWin();
+}
+
+int CreateLevelController::GetTolerance() const {
+  return m_view->GetTolerance();
+}
+
 void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
   auto* polygon = p_index.parent().data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
   auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
