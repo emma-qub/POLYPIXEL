@@ -48,7 +48,6 @@ SOURCES += \
     Objects/Diode.cxx \
     GUI/Controllers/CreateLevelController.cxx \
     GUI/Models/PolygonModel.cxx \
-    GUI/Views/GameScribblingView.cxx \
     GUI/Views/CreateLevelScribblingView.cxx \
     GUI/Views/AbstractScribblingView.cxx \
     GUI/Models/CreateLevelModel.cxx \
@@ -58,7 +57,8 @@ SOURCES += \
     GUI/Views/PlayingView.cxx \
     GUI/Controllers/PlayingController.cxx \
     GUI/Controllers/TestingController.cxx \
-    GUI/Views/TestingView.cxx
+    GUI/Views/TestingView.cxx \
+    GUI/Views/PlayingScribblingView.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -94,7 +94,6 @@ HEADERS += \
     Objects/Diode.hxx \
     GUI/Controllers/CreateLevelController.hxx \
     GUI/Models/PolygonModel.hxx \
-    GUI/Views/GameScribblingView.hxx \
     GUI/Views/CreateLevelScribblingView.hxx \
     GUI/Views/AbstractScribblingView.hxx \
     GUI/Models/CreateLevelModel.hxx \
@@ -104,7 +103,8 @@ HEADERS += \
     GUI/Views/PlayingView.hxx \
     GUI/Controllers/PlayingController.hxx \
     GUI/Controllers/TestingController.hxx \
-    GUI/Views/TestingView.hxx
+    GUI/Views/TestingView.hxx \
+    GUI/Views/PlayingScribblingView.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

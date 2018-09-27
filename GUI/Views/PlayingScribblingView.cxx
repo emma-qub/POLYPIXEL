@@ -1,4 +1,4 @@
-#include "GameScribblingView.hxx"
+#include "PlayingScribblingView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
 

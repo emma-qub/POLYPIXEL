@@ -1,6 +1,6 @@
 #include "TestingView.hxx"
 
-#include "GUI/Views/GameScribblingView.hxx"
+#include "GUI/Views/PlayingScribblingView.hxx"
 
 TestingView::TestingView(QWidget* p_parent):
   PlayingView(p_parent) {

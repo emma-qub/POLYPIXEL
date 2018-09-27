@@ -1,7 +1,7 @@
 #include "PlayingView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
-#include "GUI/Views/GameScribblingView.hxx"
+#include "GUI/Views/PlayingScribblingView.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>

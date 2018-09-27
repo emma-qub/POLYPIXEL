@@ -1,7 +1,7 @@
 #include "GameView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
-#include "GUI/Views/GameScribblingView.hxx"
+#include "GUI/Views/PlayingScribblingView.hxx"
 #include "GUI/Views/PlayingView.hxx"
 #include "GUI/Controllers/PlayingController.hxx"
 
