@@ -167,10 +167,28 @@ bool Polygon::IsGoodPolygon() const {
   for (unsigned int k = 0; k < countVertices; k++) {
     Point A(m_vertices.at(k));
     Point B(m_vertices.at((k+1)%countVertices));
-    Segment edge(A, B);
-
-    if (IsCrossing(edge)) {
+    Point C(m_vertices.at((k+2)%countVertices));
+    if (A == B) {
       return false;
+    }
+
+    Vector vAB(A, B);
+    Vector vAC(A, C);
+    if (Vector::AreColinear(vAB, vAC)) {
+      return false;
+    }
+
+    Segment AB(A, B);
+    for (unsigned int i = 0; i < countVertices; ++i) {
+      if (i == k || (i-1)%countVertices == k || (i+1)%countVertices == k) {
+        continue;
+      }
+      Point C(m_vertices.at(i));
+      Point D(m_vertices.at((i+1)%countVertices));
+      Segment CD(C, D);
+      if (AB.ComputeIntersection(CD) == Segment::Regular) {
+        return false;
+      }
     }
   }
   return true;

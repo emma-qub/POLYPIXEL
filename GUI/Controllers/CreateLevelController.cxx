@@ -152,12 +152,34 @@ void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_curren
 }
 
 void CreateLevelController::CheckTestAvailable() {
-
+  // Check if a polygon has less than 3 vertices
   for (auto* polygon: m_model->GetPolygonsList()) {
-    if (!polygon->IsGoodPolygon()) {
-      qDebug() << "'_'";
+    if (!polygon->HasEnoughVertices()) {
       m_view->SetTestAvailable(false);
       return;
+    }
+  }
+
+  // Check polygon one by one
+  for (auto* polygon: m_model->GetPolygonsList()) {
+    if (!polygon->IsGoodPolygon()) {
+      m_view->SetTestAvailable(false);
+      return;
+    }
+  }
+
+  // Check intersections between polygons
+  for (auto* polygon1: m_model->GetPolygonsList()) {
+    for (auto* polygon2: m_model->GetPolygonsList()) {
+      if (polygon1 == polygon2) {
+        continue;
+      }
+      for (auto const& vertex: polygon2->GetVertices()) {
+        if (polygon1->IsPointInside(vertex)) {
+          m_view->SetTestAvailable(false);
+          return;
+        }
+      }
     }
   }
 

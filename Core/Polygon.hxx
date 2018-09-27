@@ -23,6 +23,7 @@ public:
   inline std::vector<Point>& GetVertices() { return m_vertices; }
   inline std::vector<Point> const& GetVertices() const { return m_vertices; }
   void SetVertices(std::vector<Point> const& p_vertices);
+  inline unsigned long GetVerticesCount() const { return m_vertices.size(); }
 
   void InsertVertex(Point const& p_vertex, unsigned int p_position);
   void AppendVertex(Point const& p_vertex);
