@@ -16,8 +16,8 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   m_amendLevelButton(new QPushButton("Amend level")),
   m_saveLevelButton(new QPushButton("Save level")),
   m_view(new TestingView),
-  m_controller(new TestingController(m_view, this))
-{
+  m_controller(new TestingController(m_view, this)) {
+
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
   menuLayout->addWidget(m_testLevelLabel);

@@ -89,7 +89,7 @@ PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segm
   bool badCrossing = false;
 
   auto polygonList = m_model->GetPolygonsList();
-  for (const ppxl::Segment& line: p_lines) {
+  for (ppxl::Segment const& line: p_lines) {
     for (auto const& polygon: polygonList) {
       if (!polygon->IsCrossing(line) && !polygon->IsPointInside(line.GetA())) {
         noCrossing = true;
@@ -298,7 +298,7 @@ bool PlayingController::StillHasBaseVertices(std::vector<ppxl::Point*> const& gl
 }
 
 ppxl::Point* PlayingController::GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const {
-  for (const std::pair<ppxl::Point*, ppxl::Point*>& cuttingSegment: cuttingSegments) {
+  for (std::pair<ppxl::Point*, ppxl::Point*> const& cuttingSegment: cuttingSegments) {
     if (cuttingSegment.first == intersection) {
       return cuttingSegment.second;
     } else if (cuttingSegment.second == intersection) {
@@ -478,7 +478,7 @@ void PlayingController::clearGame() {
   emit update();
 }
 
-Deviation* PlayingController::getNearestDeviation(const ppxl::Segment& line) const {
+Deviation* PlayingController::getNearestDeviation(ppxl::Segment const& line) const {
   DeviationList deviations = m_model->getDeviationList();
 
   double minDist = -1.;

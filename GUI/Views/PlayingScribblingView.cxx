@@ -10,8 +10,7 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   m_scribbling(false) {
 }
 
-void PlayingScribblingView::DrawAreas(const QList<double>& p_areas)
-{
+void PlayingScribblingView::DrawAreas(QList<double> const& p_areas) {
   auto polygons = GetModel()->GetPolygonsList();
   assert(p_areas.size() == polygons.size());
 

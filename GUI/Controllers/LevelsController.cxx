@@ -13,10 +13,9 @@
 LevelsController::LevelsController(LevelsView* p_view, LevelsModel* p_model, QObject* p_parent):
   QObject(p_parent),
   m_view(p_view),
-  m_model(p_model)
-{
-  m_view->SetModel(m_model);
+  m_model(p_model) {
 
+  m_view->SetModel(m_model);
   connect(m_view->GetSelectionModel(), &QItemSelectionModel::selectionChanged, this, &LevelsController::LevelSelected);
 }
 

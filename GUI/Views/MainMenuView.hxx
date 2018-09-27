@@ -6,9 +6,9 @@
 class QLabel;
 class QPushButton;
 
-class MainMenuView : public QWidget
-{
+class MainMenuView : public QWidget {
   Q_OBJECT
+
 public:
   explicit MainMenuView(QWidget* parent = nullptr);
 
@@ -16,8 +16,6 @@ signals:
   void PlayRequested();
   void CreateLevelRequested();
   void OptionsRequested();
-
-public slots:
 
 protected:
   void paintEvent(QPaintEvent* p_event) override;

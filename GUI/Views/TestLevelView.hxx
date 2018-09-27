@@ -9,9 +9,9 @@ class PolygonModel;
 class TestingView;
 class TestingController;
 
-class TestLevelView: public QWidget
-{
+class TestLevelView: public QWidget {
   Q_OBJECT
+
 public:
   explicit TestLevelView(QWidget* p_parent = nullptr);
 
@@ -26,8 +26,6 @@ signals:
   void Done();
   void AmendLevelRequested();
   void SaveLevelRequested();
-
-public slots:
 
 private:
   QLabel* m_testLevelLabel;

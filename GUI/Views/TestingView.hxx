@@ -3,8 +3,7 @@
 
 #include "GUI/Views/PlayingView.hxx"
 
-class TestingView : public PlayingView
-{
+class TestingView : public PlayingView {
 public:
   TestingView(QWidget* p_parent = nullptr);
 

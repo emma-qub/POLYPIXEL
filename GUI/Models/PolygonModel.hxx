@@ -28,7 +28,7 @@ public:
   void InitColor();
 
   void InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
-  void AppendPolygon(const ppxl::Polygon& p_polygon);
+  void AppendPolygon(ppxl::Polygon const& p_polygon);
   inline int GetPolygonsCount() const { return m_polygonsItem->rowCount(); }
   inline QStandardItem* GetPolygonsItem() const { return m_polygonsItem; }
   inline QList<ppxl::Polygon*> GetPolygonsList() const { return m_polygons; }

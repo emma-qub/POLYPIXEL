@@ -15,8 +15,7 @@ PlayingView::PlayingView(QWidget* p_parent):
   m_linesCountLabel(new QLabel),
   m_partsCount(-1),
   m_partsGoal(-1),
-  m_partsCountLabel(new QLabel)
-{
+  m_partsCountLabel(new QLabel) {
 
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
@@ -38,7 +37,7 @@ void PlayingView::SetModel(PolygonModel* p_playingModel) {
   m_scribblingView->SetModel(p_playingModel);
 }
 
-void PlayingView::DrawLine(const ppxl::Segment& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
+void PlayingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   m_scribblingView->DrawLine(p_line, p_color, p_penStyle);
 }
 

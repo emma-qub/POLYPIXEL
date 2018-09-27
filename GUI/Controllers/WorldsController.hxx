@@ -7,9 +7,9 @@ class WorldsView;
 class WorldsModel;
 class QItemSelection;
 
-class WorldsController : public QObject
-{
+class WorldsController: public QObject {
   Q_OBJECT
+
 public:
   explicit WorldsController(WorldsView* p_view, WorldsModel* p_model, QObject* p_parent = nullptr);
 

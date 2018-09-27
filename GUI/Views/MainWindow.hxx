@@ -26,8 +26,7 @@ class WorldsModel;
 class WorldsController;
 class QStackedWidget;
 
-class MainWindow: public QMainWindow
-{
+class MainWindow: public QMainWindow {
   Q_OBJECT
 
 public:

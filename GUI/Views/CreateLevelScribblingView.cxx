@@ -328,7 +328,7 @@ void CreateLevelScribblingView::Remove() {
   }
 }
 
-void CreateLevelScribblingView::DrawPoint(const QPoint& p_point, const QColor& p_color) {
+void CreateLevelScribblingView::DrawPoint(QPoint const& p_point, QColor const& p_color) {
   QPainter painter(&GetImage());
   painter.setPen(QPen(p_color, PEN_WIDTH*3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
   painter.drawPoint(p_point);

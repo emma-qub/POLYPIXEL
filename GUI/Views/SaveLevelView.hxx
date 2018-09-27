@@ -6,17 +6,15 @@
 class QLabel;
 class QPushButton;
 
-class SaveLevelView : public QWidget
-{
+class SaveLevelView: public QWidget {
   Q_OBJECT
+
 public:
   explicit SaveLevelView(QWidget* parent = nullptr);
 
 signals:
   void Done();
   void CreateNewLevelRequested();
-
-public slots:
 
 private:
   QLabel* m_saveLevelLabel;

@@ -14,8 +14,8 @@
 LoadingView::LoadingView(QWidget* parent):
   QWidget(parent),
   m_progressBar(new QProgressBar),
-  m_loadingLabel(new QLabel("Laoding..."))
-{
+  m_loadingLabel(new QLabel("Laoding...")) {
+
   m_progressBar->setRange(0, 100);
   m_progressBar->setValue(0);
   m_progressBar->setFixedWidth(100);
@@ -41,8 +41,7 @@ LoadingView::LoadingView(QWidget* parent):
   timer->start();
 }
 
-void LoadingView::paintEvent(QPaintEvent* p_event)
-{
+void LoadingView::paintEvent(QPaintEvent* p_event) {
  QPainter p(this);
  QPainter painter(this);
  QRect drawingRect(0, 0, width(), height());

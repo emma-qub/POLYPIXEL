@@ -9,8 +9,8 @@ PauseView::PauseView(QWidget* parent):
   m_pauseLabel(new QLabel("Pause")),
   m_resumeButton(new QPushButton("Resume")),
   m_restartButton(new QPushButton("Restart")),
-  m_levelsButton(new QPushButton("Levels"))
-{
+  m_levelsButton(new QPushButton("Levels")) {
+
   auto mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_pauseLabel);
   mainLayout->addWidget(m_resumeButton);

@@ -51,7 +51,7 @@ Point Point::Translate(Vector const& p_vector) const {
   return Point(m_x + p_vector.GetX(), m_y + p_vector.GetY());
 }
 
-Point& Point::Translated(const Vector& p_vector) {
+Point& Point::Translated(Vector const& p_vector) {
   m_x += p_vector.GetX();
   m_y += p_vector.GetY();
   return *this;

@@ -23,8 +23,7 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_linesGoalSpinBox(new QSpinBox),
   m_partsGoalSpinBox(new QSpinBox),
   m_maxGapToWinSpinBox(new QSpinBox),
-  m_toleranceSpinBox(new QSpinBox)
-{
+  m_toleranceSpinBox(new QSpinBox) {
 
   m_treeView->setHeaderHidden(true);
 
@@ -144,8 +143,7 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   });
 }
 
-void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack)
-{
+void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack) {
   m_undoView->setStack(p_undoStack);
 }
 

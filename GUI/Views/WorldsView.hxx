@@ -16,15 +16,12 @@ public:
   explicit WorldsView(QWidget* parent = nullptr);
 
   void SetModel(WorldsModel* p_model);
-
   QItemSelectionModel* GetSelectionModel() const;
 
 signals:
   void Done();
   void SelectLevelsRequested();
   void AchievementsRequested();
-
-public slots:
 
 private:
   QLabel* m_worldsLevelLabel;

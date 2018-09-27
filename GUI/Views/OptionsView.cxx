@@ -7,8 +7,8 @@
 OptionsView::OptionsView(QWidget* parent):
   QWidget(parent),
   m_optionsLabel(new QLabel("Options")),
-  m_menuButton(new QPushButton("Menu"))
-{
+  m_menuButton(new QPushButton("Menu")) {
+
   auto mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_optionsLabel);
   mainLayout->addWidget(m_menuButton);

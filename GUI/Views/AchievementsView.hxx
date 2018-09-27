@@ -6,16 +6,14 @@
 class QLabel;
 class QPushButton;
 
-class AchievementsView: public QWidget
-{
+class AchievementsView: public QWidget {
   Q_OBJECT
+
 public:
   explicit AchievementsView(QWidget* parent = nullptr);
 
 signals:
   void Done();
-
-public slots:
 
 private:
   QLabel* m_achievementsLabel;

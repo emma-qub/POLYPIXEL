@@ -62,19 +62,19 @@ protected:
   std::vector<std::pair<ppxl::Point*, ppxl::Point*>> GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const;
   bool StillHasBaseVertices(std::vector<ppxl::Point*> const& verticesGlobal, std::vector<ppxl::Point*> const& intersections) const;
   ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
-  void OpenLevel(const QString& p_levelPath);
+  void OpenLevel(QString const& p_levelPath);
   QList<ppxl::Vector> ComputeShiftVectorsList();
   QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
   int ComputeStarsCount(double p_gap);
   virtual void CheckWinning();
   double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
   ppxl::Point ComputeGlobalBarycenter() const;
-  void TranslatePolygons(const QList<ppxl::Vector>& shiftVectors);
+  void TranslatePolygons(QList<ppxl::Vector> const& shiftVectors);
   void UpdateStarsMax(int starsMaxCount);
 
-  //  Deviation* getNearestDeviation(const ppxl::Segment& line) const;
+  //  Deviation* getNearestDeviation(ppxl::Segment const& line) const;
   //  void computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const;
-  //  virtual void saveLevel(const QString& fileName) { Q_UNUSED(fileName) }
+  //  virtual void saveLevel(QString const& fileName) { Q_UNUSED(fileName) }
   //  void replay();
   //  void undoSliceIt();
   //  void clearGame();

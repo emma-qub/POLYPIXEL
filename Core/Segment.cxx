@@ -45,8 +45,7 @@ std::vector<Point> Segment::GetVertices() const {
   return vertices;
 }
 
-std::string Segment::GetIntersectionName(Segment::Intersection const& p_intersection)
-{
+std::string Segment::GetIntersectionName(Segment::Intersection const& p_intersection) {
   switch (p_intersection) {
   case Edge:
   {

@@ -45,8 +45,7 @@ void PolygonModel::AppendPolygon(ppxl::Polygon const& p_polygon) {
   InsertPolygon(m_polygonsItem->rowCount(), p_polygon);
 }
 
-void PolygonModel::SetPolygonsList(const QList<ppxl::Polygon>& p_polygonsList)
-{
+void PolygonModel::SetPolygonsList(QList<ppxl::Polygon> const& p_polygonsList) {
   ClearPolygons();
   for (auto const& polygon: p_polygonsList) {
     AppendPolygon(polygon);

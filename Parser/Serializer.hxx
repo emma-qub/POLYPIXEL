@@ -10,8 +10,7 @@
 #include "Objects/Mirror.hxx"
 #include "Objects/Portal.hxx"
 
-class Serializer
-{
+class Serializer {
 public:
 //  Serializer();
   Serializer(QString const& p_xmlFileName);

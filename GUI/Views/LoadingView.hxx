@@ -6,16 +6,14 @@
 class QProgressBar;
 class QLabel;
 
-class LoadingView: public QWidget
-{
+class LoadingView: public QWidget {
   Q_OBJECT
+
 public:
   explicit LoadingView(QWidget* parent = nullptr);
 
 signals:
   void LoadingDone();
-
-public slots:
 
 protected:
   void paintEvent(QPaintEvent* p_event) override;

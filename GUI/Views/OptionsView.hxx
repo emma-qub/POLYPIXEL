@@ -6,16 +6,14 @@
 class QLabel;
 class QPushButton;
 
-class OptionsView : public QWidget
-{
+class OptionsView : public QWidget {
   Q_OBJECT
+
 public:
   explicit OptionsView(QWidget* parent = nullptr);
 
 signals:
   void Done();
-
-public slots:
 
 private:
   QLabel* m_optionsLabel;

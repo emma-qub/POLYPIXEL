@@ -24,8 +24,6 @@ signals:
   void WorldsSelectionRequested();
   void Done();
 
-public slots:
-
 private:
   QLabel* m_levelsLabel;
   QListView* m_levelsListView;

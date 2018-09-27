@@ -47,8 +47,8 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_saveLevelView(new SaveLevelView),
   m_worldsView(new WorldsView),
   m_worldsModel(new WorldsModel(this)),
-  m_worldsController(new WorldsController(m_worldsView, m_worldsModel, this))
-{
+  m_worldsController(new WorldsController(m_worldsView, m_worldsModel, this)) {
+
   m_centralWidget->addWidget(m_achievementsView);
   m_centralWidget->addWidget(m_createLevelView);
   m_centralWidget->addWidget(m_gameView);

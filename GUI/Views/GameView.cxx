@@ -14,8 +14,8 @@ GameView::GameView(QWidget* p_parent):
   m_gameLabel(new QLabel("Play")),
   m_pauseButton(new QPushButton("Pause")),
   m_playingView(new PlayingView),
-  m_playingController(new PlayingController(m_playingView, this))
-{
+  m_playingController(new PlayingController(m_playingView, this)) {
+
   auto mainLayout = new QVBoxLayout;
   auto menuLayout = new QHBoxLayout;
   menuLayout->addWidget(m_gameLabel);

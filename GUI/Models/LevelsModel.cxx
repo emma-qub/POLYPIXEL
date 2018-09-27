@@ -4,8 +4,7 @@ LevelsModel::LevelsModel(QObject* p_parent):
   QStandardItemModel(p_parent) {
 }
 
-void LevelsModel::InsertLevel(int p_row, QFileInfo const& p_entry)
-{
+void LevelsModel::InsertLevel(int p_row, QFileInfo const& p_entry) {
   auto levelName = p_entry.baseName();
   auto imagePath = p_entry.absoluteFilePath()+"/preview.png";
   auto levelsPath = p_entry.absoluteFilePath()+"/level.xml";
@@ -14,7 +13,6 @@ void LevelsModel::InsertLevel(int p_row, QFileInfo const& p_entry)
   insertRow(p_row, item);
 }
 
-void LevelsModel::AppendLevel(QFileInfo const& p_entry)
-{
+void LevelsModel::AppendLevel(QFileInfo const& p_entry) {
   InsertLevel(rowCount(), p_entry);
 }
