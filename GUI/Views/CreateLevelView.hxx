@@ -37,6 +37,8 @@ public:
   void Redraw();
   void RedrawFromPolygons();
 
+  void SetTestAvailable(bool p_enable);
+
 signals:
   void TestLevelRequested();
   void Done();

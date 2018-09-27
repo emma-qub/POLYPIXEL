@@ -39,6 +39,7 @@ public:
 
   bool IsCrossing(Segment const& p_line) const;
   bool IsGoodSegment(Segment const& p_line) const;
+  bool IsGoodPolygon() const;
 
   inline void Clear() { m_vertices.clear(); }
 

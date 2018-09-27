@@ -162,6 +162,20 @@ bool Polygon::IsGoodSegment(Segment const& p_line) const {
   return (!IsPointInside(p_line.GetA()) && IsCrossing(p_line) && !IsPointInside(p_line.GetB()));
 }
 
+bool Polygon::IsGoodPolygon() const {
+  auto countVertices = m_vertices.size();
+  for (unsigned int k = 0; k < countVertices; k++) {
+    Point A(m_vertices.at(k));
+    Point B(m_vertices.at((k+1)%countVertices));
+    Segment edge(A, B);
+
+    if (IsCrossing(edge)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 double Polygon::OrientedArea() const {
   auto countVertices = m_vertices.size();
   double area = 0.0;

@@ -163,6 +163,11 @@ void CreateLevelView::RedrawFromPolygons() {
   m_scribblingView->DrawFromCore();
 }
 
+void CreateLevelView::SetTestAvailable(bool p_enable)
+{
+  m_testLevelButton->setEnabled(p_enable);
+}
+
 void CreateLevelView::Redraw() {
   ClearImage();
   DrawFromModel();

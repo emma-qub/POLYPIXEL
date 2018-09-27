@@ -36,6 +36,7 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
 
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
+  connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::CheckTestAvailable);
 
   auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
   undoAction->setShortcut(QKeySequence::Undo);
@@ -148,6 +149,19 @@ void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_curren
       MoveVertex(polygonItem->row(), row, ppxl::Vector(newX-oldX, newY-oldY), true);
     }
   }
+}
+
+void CreateLevelController::CheckTestAvailable() {
+
+  for (auto* polygon: m_model->GetPolygonsList()) {
+    if (!polygon->IsGoodPolygon()) {
+      qDebug() << "'_'";
+      m_view->SetTestAvailable(false);
+      return;
+    }
+  }
+
+  m_view->SetTestAvailable(true);
 }
 
 void CreateLevelController::RedrawFromPolygons() {
