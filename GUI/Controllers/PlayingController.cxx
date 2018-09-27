@@ -25,6 +25,7 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
   m_view->StartLevel();
+  m_model->InitColor();
   m_levelPath = p_levelPath;
   OpenLevel(p_levelPath);
 }

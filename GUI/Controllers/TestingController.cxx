@@ -11,6 +11,7 @@ TestingController::TestingController(TestingView* p_view, QObject* p_parent):
 
 void TestingController::SetPolygonsItem(PolygonModel* p_model) {
   QList<ppxl::Polygon> polygonsList;
+  m_model->InitColor();
 
   for (auto* polygon: p_model->GetPolygonsList()) {
     polygonsList << ppxl::Polygon(*polygon);

@@ -4,7 +4,8 @@
 
 PolygonModel::PolygonModel(QObject* p_parent):
   QStandardItemModel(p_parent),
-  m_polygonsItem(new QStandardItem("Polygons")) {
+  m_polygonsItem(new QStandardItem("Polygons")),
+  m_color() {
 
   setColumnCount(3);
 
@@ -18,9 +19,21 @@ PolygonModel::~PolygonModel() {
   }
 }
 
+void PolygonModel::InitColor() {
+  std::random_device rd;
+  std::mt19937 rng(rd());
+  std::uniform_int_distribution<> distribution(0, 255);
+
+  auto r = distribution(rng);
+  auto g = distribution(rng);
+  auto b = distribution(rng);
+
+  m_color = QColor(r, g, b);
+}
+
 void PolygonModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
   auto polygon = new ppxl::Polygon(p_polygon);
-  auto polygonItem = new PolygonItem(polygon);
+  auto polygonItem = new PolygonItem(polygon, m_color);
   polygonItem->setData(ePolygon, eItemTypeRole);
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon*>(polygon), ePolygonRole);
 
@@ -114,9 +127,10 @@ QVariant VertexLabelItem::data(int p_role) const {
 
 
 
-PolygonItem::PolygonItem(ppxl::Polygon* p_polygon):
+PolygonItem::PolygonItem(ppxl::Polygon* p_polygon, QColor const& p_color):
   QStandardItem(),
-  m_polygon(p_polygon) {
+  m_polygon(p_polygon),
+  m_color(p_color) {
 
   for (auto& vertex: m_polygon->GetVertices()) {
     auto vertexLabelItem = new VertexLabelItem;
@@ -126,15 +140,17 @@ PolygonItem::PolygonItem(ppxl::Polygon* p_polygon):
     appendRow(QList<QStandardItem*>() << vertexLabelItem << vertexXItem << vertexYItem);
   }
 
-  std::random_device rd;
-  std::mt19937 rng(rd());
-  std::uniform_int_distribution<> distribution(0, 255);
+  if (!m_color.isValid()) {
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_int_distribution<> distribution(0, 255);
 
-  auto r = distribution(rng);
-  auto g = distribution(rng);
-  auto b = distribution(rng);
+    auto r = distribution(rng);
+    auto g = distribution(rng);
+    auto b = distribution(rng);
 
-  m_color = QColor(r, g, b);
+    m_color = QColor(r, g, b);
+  }
 }
 
 PolygonItem::~PolygonItem() = default;

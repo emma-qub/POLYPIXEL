@@ -24,6 +24,9 @@ public:
   PolygonModel(QObject* p_parent = nullptr);
   ~PolygonModel() override;
 
+  inline QColor GetColor() const { return m_color; }
+  void InitColor();
+
   void InsertPolygon(int p_row, ppxl::Polygon const& p_polygon);
   void AppendPolygon(const ppxl::Polygon& p_polygon);
   inline int GetPolygonsCount() const { return m_polygonsItem->rowCount(); }
@@ -39,6 +42,7 @@ signals:
 private:
   QList<ppxl::Polygon*> m_polygons;
   QStandardItem* m_polygonsItem;
+  QColor m_color;
 };
 
 
@@ -79,7 +83,7 @@ public:
 
 class PolygonItem: public QStandardItem {
 public:
-  explicit PolygonItem(ppxl::Polygon* p_polygon);
+  explicit PolygonItem(ppxl::Polygon* p_polygon, const QColor& p_color = QColor());
   ~PolygonItem() override;
 
   QVariant data(int p_role = Qt::UserRole + 1) const override;
