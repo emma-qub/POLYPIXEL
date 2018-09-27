@@ -31,7 +31,8 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::EditionXDone, this, &CreateLevelController::TranslateXVertex);
   connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
 
-  connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
+  /// REWORK THIS PART: THE PolygonSelected SIGNAL IS EMITTED TOO SOON, LEADING TO A MISMATCH BETWEEN POLYGON ITEM AND ITS CORE POLYGON
+  //connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
 
