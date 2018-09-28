@@ -366,7 +366,7 @@ int PlayingController::ComputeStarsCount(double p_gap) {
   if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal) {
     auto gapRatio = p_gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
     starsCount = 4 - static_cast<int>(std::ceil(3. * gapRatio));
-    if (starsCount >= 3 && gapRatio <= static_cast<double>(m_gameInfo.m_tolerance) / 10.) {
+    if (starsCount >= 3 && static_cast<int>(10. * p_gap / static_cast<double>(m_gameInfo.m_partsGoal)) <= m_gameInfo.m_tolerance) {
       starsCount = 4;
     }
   }
