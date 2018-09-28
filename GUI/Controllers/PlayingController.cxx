@@ -363,14 +363,12 @@ QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList() {
 int PlayingController::ComputeStarsCount(double p_gap) {
   int starsCount = 0;
 
-  if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal && p_gap <= m_gameInfo.m_maxGapToWin/10.) {
-    auto gapRatio = 10. * p_gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
-    starsCount = 3 - static_cast<int>(std::ceil(gapRatio * 2.));
-    if (gapRatio < static_cast<double>(m_gameInfo.m_tolerance) / 100.) {
+  if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal) {
+    auto gapRatio = p_gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
+    starsCount = 4 - static_cast<int>(std::ceil(3. * gapRatio));
+    if (starsCount >= 3 && gapRatio <= static_cast<double>(m_gameInfo.m_tolerance) / 10.) {
       starsCount = 4;
     }
-  } else {
-    starsCount = 0;
   }
 
   return starsCount;

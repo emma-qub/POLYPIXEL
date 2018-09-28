@@ -80,11 +80,11 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_partsGoalSpinBox->setRange(2, 50);
   m_partsGoalSpinBox->setFixedWidth(80);
   m_partsGoalSpinBox->setSuffix(" parts");
-  m_maxGapToWinSpinBox->setRange(1, 50);
+  m_maxGapToWinSpinBox->setRange(3, 100);
   m_maxGapToWinSpinBox->setFixedWidth(150);
   m_maxGapToWinSpinBox->setPrefix("dificulty ");
-  m_maxGapToWinSpinBox->setValue(5);
-  m_toleranceSpinBox->setRange(1, 20);
+  m_maxGapToWinSpinBox->setValue(50);
+  m_toleranceSpinBox->setRange(0, 1);
   m_toleranceSpinBox->setFixedWidth(150);
   m_toleranceSpinBox->setPrefix("perfect ");
   m_toleranceSpinBox->setValue(10);
@@ -110,7 +110,7 @@ int CreateLevelView::GetTolerance() const {
 }
 
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
-  if (1 <= p_value && p_value < 5) {
+  if (3 <= p_value && p_value < 5) {
     m_maxGapToWinSpinBox->setSuffix(" (hard)");
   } else if (5 <= p_value && p_value < 20) {
     m_maxGapToWinSpinBox->setSuffix(" (normal)");
@@ -120,12 +120,10 @@ void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
 }
 
 void CreateLevelView::UpdateTolerancePrefix(int p_value) {
-  if (1 <= p_value && p_value < 5) {
+  if (p_value == 0) {
     m_toleranceSpinBox->setSuffix(" (insane)");
-  } else if (5 <= p_value && p_value < 10) {
+  } else if (p_value == 1) {
     m_toleranceSpinBox->setSuffix(" (very hard)");
-  } else {
-    m_toleranceSpinBox->setSuffix(" (hard)");
   }
 }
 

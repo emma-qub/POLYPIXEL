@@ -49,7 +49,7 @@ public:
   void Redraw();
 
 protected:
-  void UpdateViewFromGameInfo();
+  virtual void UpdateViewFromGameInfo();
   void SetStartPoint(QPoint const& p_startPoint);
   QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
   QColor GetLinesColor(QList<ppxl::Segment> const& p_lines) const;

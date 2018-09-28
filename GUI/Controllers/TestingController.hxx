@@ -24,9 +24,13 @@ protected:
   void CheckWinning() override;
   void Redraw();
   void DisplayAreas(QPoint const& p_endPoint);
+  void UpdateViewFromGameInfo() override;
+  void ResetPolygonList();
+  void Restart();
 
 private:
   TestingView* m_view;
+  QList<ppxl::Polygon> m_polygonsList;
 };
 
 #endif

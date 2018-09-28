@@ -2,7 +2,7 @@
 
 #include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
-#include "GUI/Commands/Commands.hxx"
+#include "GUI/Commands/CreateLevelCommands.hxx"
 
 #include <QUndoStack>
 #include <QAction>

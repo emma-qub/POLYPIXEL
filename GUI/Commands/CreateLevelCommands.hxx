@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HXX
-#define COMMANDS_HXX
+#ifndef CREATELEVELCOMMANDS_HXX
+#define CREATELEVELCOMMANDS_HXX
 
 #include <QUndoCommand>
 

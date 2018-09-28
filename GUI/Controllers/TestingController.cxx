@@ -7,18 +7,24 @@ TestingController::TestingController(TestingView* p_view, QObject* p_parent):
   PlayingController(p_view, p_parent) {
 
   m_view = static_cast<TestingView*>(p_view);
+
+  connect(m_view, &TestingView::RestartRequested, this, &TestingController::Restart);
 }
 
 void TestingController::SetPolygonsItem(PolygonModel* p_model) {
-  QList<ppxl::Polygon> polygonsList;
+  m_polygonsList.clear();
   m_model->InitColor();
 
   for (auto* polygon: p_model->GetPolygonsList()) {
-    polygonsList << ppxl::Polygon(*polygon);
+    m_polygonsList << ppxl::Polygon(*polygon);
   }
 
-  m_model->SetPolygonsList(polygonsList);
+  m_model->SetPolygonsList(m_polygonsList);
   m_view->SetModel(m_model);
+}
+
+void TestingController::ResetPolygonList() {
+  m_model->SetPolygonsList(m_polygonsList);
 }
 
 void TestingController::SetLinesGoal(int p_linesGoal) {
@@ -39,9 +45,18 @@ void TestingController::SetTolerance(int p_tolerance) {
   m_gameInfo.m_tolerance = p_tolerance;
 }
 
+void TestingController::Restart() {
+  ResetPolygonList();
+  PlayLevel();
+}
+
 void TestingController::PlayLevel() {
   m_levelPath = "";
   m_orientedAreaTotal = 0.;
+  m_gameInfo.m_linesCount = 0;
+  m_gameInfo.m_partsCount = m_model->GetPolygonsCount();
+  m_gameInfo.m_stars = 0;
+
   for (auto const* polygon: m_model->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
   }
@@ -50,7 +65,6 @@ void TestingController::PlayLevel() {
   Redraw();
 
   connect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
-
   connect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
 }
 
@@ -92,9 +106,18 @@ void TestingController::CheckWinning() {
     auto starsCount = ComputeStarsCount(gap);
     m_gameInfo.m_stars = starsCount;
 
+    UpdateViewFromGameInfo();
+
     m_view->DrawAreas(areasList);
     m_view->EndLevel();
 
     disconnect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
+    disconnect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
   }
+}
+
+void TestingController::UpdateViewFromGameInfo() {
+  PlayingController::UpdateViewFromGameInfo();
+  m_view->UpdateStarsCount(std::min(m_gameInfo.m_stars, 3));
+  m_view->UpdatePerfect(m_gameInfo.m_stars == 4);
 }

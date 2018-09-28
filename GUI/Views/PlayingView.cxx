@@ -3,6 +3,8 @@
 #include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Views/PlayingScribblingView.hxx"
 
+#include <cmath>
+
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPoint>
@@ -17,15 +19,14 @@ PlayingView::PlayingView(QWidget* p_parent):
   m_partsGoal(-1),
   m_partsCountLabel(new QLabel) {
 
-  auto mainLayout = new QVBoxLayout;
+  auto mainLayout = new QGridLayout;
   auto menuLayout = new QHBoxLayout;
   menuLayout->addWidget(m_linesCountLabel);
-  menuLayout->addWidget(m_partsCountLabel);
-  menuLayout->setAlignment(Qt::AlignCenter);
-  mainLayout->addLayout(menuLayout);
+  menuLayout->addWidget(m_partsCountLabel, Qt::AlignRight);
+  mainLayout->addLayout(menuLayout, 0, 0);
   mainLayout->addWidget(m_scribblingView);
-  mainLayout->setStretchFactor(menuLayout, 0);
-  mainLayout->setStretchFactor(m_scribblingView, 1);
+  mainLayout->setRowStretch(0, 0);
+  mainLayout->setRowStretch(1, 1);
   setLayout(mainLayout);
 
   connect(m_scribblingView, &PlayingScribblingView::Scribbling, this, &PlayingView::Scribbling);
@@ -60,7 +61,7 @@ void PlayingView::UpdateLinesCount(int p_linesCount, int p_linesGoal) {
   }
 
   m_linesCount = p_linesCount;
-  m_linesCountLabel->setText(tr("Lines: %1/%2").arg(m_linesCount).arg(m_linesGoal));
+  m_linesCountLabel->setText(tr("Lines: %1").arg(std::max(m_linesGoal-m_linesCount, 0)));
 }
 
 void PlayingView::UpdatePartsCount(int p_partsCount, int p_partsGoal) {

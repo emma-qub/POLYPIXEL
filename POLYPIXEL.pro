@@ -51,14 +51,16 @@ SOURCES += \
     GUI/Views/CreateLevelScribblingView.cxx \
     GUI/Views/AbstractScribblingView.cxx \
     GUI/Models/CreateLevelModel.cxx \
-    GUI/Commands/Commands.cxx \
     GUI/Delegates/PolygonItemDelegate.cxx \
     GUI/Controllers/TestLevelController.cxx \
     GUI/Views/PlayingView.cxx \
     GUI/Controllers/PlayingController.cxx \
     GUI/Controllers/TestingController.cxx \
     GUI/Views/TestingView.cxx \
-    GUI/Views/PlayingScribblingView.cxx
+    GUI/Views/PlayingScribblingView.cxx \
+    GUI/Commands/CreateLevelCommands.cxx \
+    GUI/Commands/TestLevelCommands.cxx \
+    GUI/Models/LineModel.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -97,14 +99,16 @@ HEADERS += \
     GUI/Views/CreateLevelScribblingView.hxx \
     GUI/Views/AbstractScribblingView.hxx \
     GUI/Models/CreateLevelModel.hxx \
-    GUI/Commands/Commands.hxx \
     GUI/Delegates/PolygonItemDelegate.hxx \
     GUI/Controllers/TestLevelController.hxx \
     GUI/Views/PlayingView.hxx \
     GUI/Controllers/PlayingController.hxx \
     GUI/Controllers/TestingController.hxx \
     GUI/Views/TestingView.hxx \
-    GUI/Views/PlayingScribblingView.hxx
+    GUI/Views/PlayingScribblingView.hxx \
+    GUI/Commands/CreateLevelCommands.hxx \
+    GUI/Commands/TestLevelCommands.hxx \
+    GUI/Models/LineModel.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

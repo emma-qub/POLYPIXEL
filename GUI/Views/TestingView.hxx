@@ -3,11 +3,26 @@
 
 #include "GUI/Views/PlayingView.hxx"
 
+class QPushButton;
+
 class TestingView : public PlayingView {
+  Q_OBJECT
+
 public:
   TestingView(QWidget* p_parent = nullptr);
 
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight);
+
+  void UpdateStarsCount(int p_starsCount);
+  void UpdatePerfect(bool p_perfect);
+
+signals:
+  void RestartRequested();
+
+private:
+  QLabel* m_starsCountLabel;
+  QLabel* m_perfectLabel;
+  QPushButton* m_restartButton;
 };
 
 #endif
