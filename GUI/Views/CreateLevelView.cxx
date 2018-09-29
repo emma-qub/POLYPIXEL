@@ -62,6 +62,8 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
   connect(m_scribblingView, &CreateLevelScribblingView::PolygonSelected, this, &CreateLevelView::PolygonSelected);
   connect(m_scribblingView, &CreateLevelScribblingView::SnappedToGrid, this, &CreateLevelView::SnappedToGrid);
+  connect(m_scribblingView, &CreateLevelScribblingView::NewLevelRequested, this, &CreateLevelView::NewLevelRequested);
+  connect(m_scribblingView, &CreateLevelScribblingView::OpenLevelRequested, this, &CreateLevelView::OpenLevelRequested);
 
   auto itemDelegate = new PolygonItemDelegate(m_treeView);
   m_treeView->setItemDelegate(itemDelegate);
@@ -83,11 +85,10 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_maxGapToWinSpinBox->setRange(3, 100);
   m_maxGapToWinSpinBox->setFixedWidth(150);
   m_maxGapToWinSpinBox->setPrefix("dificulty ");
-  m_maxGapToWinSpinBox->setValue(50);
   m_toleranceSpinBox->setRange(0, 1);
   m_toleranceSpinBox->setFixedWidth(150);
   m_toleranceSpinBox->setPrefix("perfect ");
-  m_toleranceSpinBox->setValue(10);
+  ResetGameInfo();
 
   // Get back focus from spin box when playing on scribble view
   m_scribblingView->setFocusPolicy(Qt::StrongFocus);
@@ -97,16 +98,39 @@ int CreateLevelView::GetLinesGoal() const {
   return m_linesGoalSpinBox->value();
 }
 
+void CreateLevelView::SetLinesGoal(int p_value) {
+  m_linesGoalSpinBox->setValue(p_value);
+}
+
 int CreateLevelView::GetPartsGoal() const {
   return m_partsGoalSpinBox->value();
+}
+
+int CreateLevelView::SetPartsGoal(int p_value) {
+  m_partsGoalSpinBox->setValue(p_value);
 }
 
 int CreateLevelView::GetMaxGapToWin() const {
   return m_maxGapToWinSpinBox->value();
 }
 
+int CreateLevelView::SetMaxGapToWin(int p_value) {
+  m_maxGapToWinSpinBox->setValue(p_value);
+}
+
 int CreateLevelView::GetTolerance() const {
   return m_toleranceSpinBox->value();
+}
+
+int CreateLevelView::SetTolerance(int p_value) {
+  m_toleranceSpinBox->setValue(p_value);
+}
+
+void CreateLevelView::ResetGameInfo() {
+  m_linesGoalSpinBox->setValue(1);
+  m_partsGoalSpinBox->setValue(2);
+  m_maxGapToWinSpinBox->setValue(50);
+  m_toleranceSpinBox->setValue(10);
 }
 
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {

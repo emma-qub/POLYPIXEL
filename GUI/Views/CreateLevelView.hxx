@@ -24,9 +24,14 @@ public:
   explicit CreateLevelView(QWidget* parent = nullptr);
 
   int GetLinesGoal() const;
+  void SetLinesGoal(int p_value);
   int GetPartsGoal() const;
+  int SetPartsGoal(int p_value);
   int GetMaxGapToWin() const;
+  int SetMaxGapToWin(int p_value);
   int GetTolerance() const;
+  int SetTolerance(int p_value);
+  void ResetGameInfo();
 
   void SetModel(CreateLevelModel* p_model);
   void SetUndoStack(QUndoStack* p_undoStack);
@@ -54,6 +59,8 @@ signals:
   void EditionXDone(int p_value, QModelIndex const& p_index);
   void EditionYDone(int p_value, QModelIndex const& p_index);
   void SnappedToGrid();
+  void NewLevelRequested();
+  void OpenLevelRequested(QString const& p_fileName);
 
 protected:
   void UpdateMaxGapToWinPrefix(int p_value);

@@ -3,6 +3,7 @@
 #include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
 #include "GUI/Commands/CreateLevelCommands.hxx"
+#include "Parser/Parser.hxx"
 
 #include <QUndoStack>
 #include <QAction>
@@ -35,6 +36,8 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   //connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
+  connect(m_view, &CreateLevelView::NewLevelRequested, this, &CreateLevelController::NewLevel);
+  connect(m_view, &CreateLevelView::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
 
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::CheckTestAvailable);
@@ -185,6 +188,26 @@ void CreateLevelController::CheckTestAvailable() {
   }
 
   m_view->SetTestAvailable(true);
+}
+
+void CreateLevelController::NewLevel() {
+  m_undoStack->clear();
+  m_model->ClearPolygons();
+  m_view->ResetGameInfo();
+  Redraw();
+}
+
+void CreateLevelController::OpenLevel(const QString& p_fileName) {
+  m_undoStack->clear();
+
+  Parser parser(p_fileName);
+  m_view->SetLinesGoal(parser.GetLinesGoal());
+  m_view->SetPartsGoal(parser.GetPartsGoal());
+  m_view->SetMaxGapToWin(parser.GetMaxGapToWin());
+  m_view->SetTolerance(parser.GetTolerance());
+  m_model->SetPolygonsList(parser.GetPolygonList());
+
+  Redraw();
 }
 
 void CreateLevelController::RedrawFromPolygons() {

@@ -6,7 +6,6 @@
 #include "Core/Vector.hxx"
 #include "Core/Polygon.hxx"
 
-
 class CreateLevelModel;
 class QItemSelectionModel;
 class QStandardItem;
@@ -35,6 +34,8 @@ signals:
   void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
   void PolygonSelected();
   void SnappedToGrid();
+  void NewLevelRequested();
+  void OpenLevelRequested(QString const& p_fileName);
 
 protected:
   ppxl::Polygon* GetCurrentPolygon() const;
@@ -45,6 +46,9 @@ protected:
   void mouseMoveEvent(QMouseEvent* p_event) override;
   void mouseReleaseEvent(QMouseEvent* p_event) override;
   void paintEvent(QPaintEvent* p_event) override;
+  bool ConfirmClear();
+  void ConfirmNewLevel();
+  void ConfirmOpenLevel();
 
   void DrawPolygonsFromCore();
   void DrawPolygonFromCore(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
@@ -76,4 +80,4 @@ private:
   static const QColor NOT_SELECTED_COLOR;
 };
 
-#endif // CREATELEVELSCRIBBLINGVIEW_HXX
+#endif

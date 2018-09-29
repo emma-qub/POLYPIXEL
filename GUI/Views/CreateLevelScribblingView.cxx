@@ -7,6 +7,8 @@
 #include <QItemSelectionModel>
 #include <QFontMetrics>
 #include <QAction>
+#include <QMessageBox>
+#include <QFileDialog>
 
 
 
@@ -55,6 +57,15 @@ CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   connect(snapToGridAction, &QAction::triggered, this, &CreateLevelScribblingView::SnappedToGrid);
   addAction(snapToGridAction);
 
+  auto newAction = new QAction("New level", this);
+  newAction->setShortcut(QKeySequence::New);
+  addAction(newAction);
+  connect(newAction, &QAction::triggered, this, &CreateLevelScribblingView::ConfirmNewLevel);
+
+  auto openAction = new QAction("Open level", this);
+  openAction->setShortcut(QKeySequence::Open);
+  addAction(openAction);
+  connect(openAction, &QAction::triggered, this, &CreateLevelScribblingView::ConfirmOpenLevel);
   setPenWidth(PEN_WIDTH);
 
   setMouseTracking(true);
@@ -163,6 +174,12 @@ void CreateLevelScribblingView::DrawPolygonsFromModel() {
   }
 
   ppxl::Polygon* currentPolygon = GetCurrentPolygon();
+  if (currentPolygon == nullptr) {
+    auto currentIndex = m_model->index(0, 0, m_model->index(0, 0));
+    m_selectionModel->setCurrentIndex(currentIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    currentPolygon = currentIndex.data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+  }
+
   QStandardItem* currentPolygonItem = nullptr;
 
   for (int rowPolygon = 0; rowPolygon < polygonsItem->rowCount(); ++rowPolygon) {
@@ -175,6 +192,7 @@ void CreateLevelScribblingView::DrawPolygonsFromModel() {
     }
     DrawPolygonFromModel(polygonItem, false);
   }
+
   DrawPolygonFromModel(currentPolygonItem, true);
 }
 
@@ -545,4 +563,23 @@ void CreateLevelScribblingView::paintEvent(QPaintEvent* p_event) {
   QPainter painter(this);
   QRect dirtyRect = p_event->rect();
   painter.drawImage(dirtyRect, GetImage(), dirtyRect);
+}
+
+bool CreateLevelScribblingView::ConfirmClear() {
+  return QMessageBox::question(this, tr("Clear"), tr("You are currently creating a level, your modifications will be lost.\nContinue?")) == QMessageBox::Yes;
+}
+
+void CreateLevelScribblingView::ConfirmNewLevel() {
+  if (ConfirmClear()) {
+    Q_EMIT(NewLevelRequested());
+  }
+}
+
+void CreateLevelScribblingView::ConfirmOpenLevel() {
+  if (ConfirmClear()) {
+    auto fileName = QFileDialog::getOpenFileName(this, "Open level", "../POLYPIXEL/worlds/0slice", "POLYPIXEL Files (*.ppxl)");
+    if (!fileName.isEmpty()) {
+      Q_EMIT(OpenLevelRequested(fileName));
+    }
+  }
 }
