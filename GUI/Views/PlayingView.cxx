@@ -32,6 +32,8 @@ PlayingView::PlayingView(QWidget* p_parent):
   connect(m_scribblingView, &PlayingScribblingView::Scribbling, this, &PlayingView::Scribbling);
   connect(m_scribblingView, &PlayingScribblingView::Moving, this, &PlayingView::Moving);
   connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
+  connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
+  connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
 }
 
 void PlayingView::SetModel(PolygonModel* p_playingModel) {

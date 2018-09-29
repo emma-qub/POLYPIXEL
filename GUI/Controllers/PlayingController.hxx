@@ -51,6 +51,7 @@ public:
 protected:
   virtual void UpdateViewFromGameInfo();
   void SetStartPoint(QPoint const& p_startPoint);
+  void InvertScribbleLine(const QPoint& p_cursorPosition);
   QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
   QColor GetLinesColor(QList<ppxl::Segment> const& p_lines) const;
   LineType ComputeLinesType(QList<ppxl::Segment> const& p_lines) const;

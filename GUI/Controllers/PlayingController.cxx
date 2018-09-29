@@ -21,6 +21,8 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
   connect(m_view, &PlayingView::Moving, this, &PlayingController::ComputeSlicingLines);
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
+  connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
+  connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
 }
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
@@ -43,6 +45,13 @@ void PlayingController::Redraw() {
 void PlayingController::SetStartPoint(QPoint const& p_startPoint) {
   m_startPoint.SetX(static_cast<double>(p_startPoint.x()));
   m_startPoint.SetY(static_cast<double>(p_startPoint.y()));
+}
+
+void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
+  QPoint endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
+  QCursor::setPos(endPoint);
+  SetStartPoint(p_cursorPosition);
+  ComputeSlicingLines(endPoint);
 }
 
 QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endPoint) {
