@@ -14,7 +14,6 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   m_testLevelLabel(new QLabel("Test your level")),
   m_menuButton(new QPushButton("Menu")),
   m_amendLevelButton(new QPushButton("Amend level")),
-  m_saveLevelButton(new QPushButton("Save level")),
   m_view(new TestingView),
   m_controller(new TestingController(m_view, this)) {
 
@@ -22,7 +21,6 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   auto menuLayout = new QHBoxLayout;
   menuLayout->addWidget(m_testLevelLabel);
   menuLayout->addWidget(m_amendLevelButton);
-  menuLayout->addWidget(m_saveLevelButton);
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
   mainLayout->addLayout(menuLayout);
@@ -33,7 +31,6 @@ TestLevelView::TestLevelView(QWidget* p_parent):
 
   connect(m_menuButton, &QPushButton::clicked, this, &TestLevelView::Done);
   connect(m_amendLevelButton, &QPushButton::clicked, this, &TestLevelView::AmendLevelRequested);
-  connect(m_saveLevelButton, &QPushButton::clicked, this, &TestLevelView::SaveLevelRequested);
 }
 
 void TestLevelView::SetModel(PolygonModel* p_model) {

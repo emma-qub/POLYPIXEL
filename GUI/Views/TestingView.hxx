@@ -16,13 +16,17 @@ public:
   void UpdateStarsCount(int p_starsCount);
   void UpdatePerfect(bool p_perfect);
 
+  void SetSaveButtonEnable(bool p_enable);
+
 signals:
   void RestartRequested();
+  void SaveLevelRequested();
 
 private:
   QLabel* m_starsCountLabel;
   QLabel* m_perfectLabel;
   QPushButton* m_restartButton;
+  QPushButton* m_saveButton;
 };
 
 #endif

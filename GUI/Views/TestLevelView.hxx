@@ -25,13 +25,11 @@ public:
 signals:
   void Done();
   void AmendLevelRequested();
-  void SaveLevelRequested();
 
 private:
   QLabel* m_testLevelLabel;
   QPushButton* m_menuButton;
   QPushButton* m_amendLevelButton;
-  QPushButton* m_saveLevelButton;
   TestingView* m_view;
   TestingController* m_controller;
 };

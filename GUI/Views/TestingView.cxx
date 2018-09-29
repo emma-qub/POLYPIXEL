@@ -10,10 +10,12 @@ TestingView::TestingView(QWidget* p_parent):
   PlayingView(p_parent),
   m_starsCountLabel(new QLabel("Stars: 0")),
   m_perfectLabel(new QLabel("Perfect: NO")),
-  m_restartButton(new QPushButton("Restart"))
-  {
+  m_restartButton(new QPushButton("Restart")),
+  m_saveButton(new QPushButton("Save")) {
 
   m_restartButton->setFixedWidth(100);
+  m_saveButton->setFixedWidth(100);
+  m_saveButton->setEnabled(false);
 
   auto mainLayout = static_cast<QGridLayout*>(layout());
 
@@ -30,6 +32,8 @@ TestingView::TestingView(QWidget* p_parent):
   newMenuLayout->addWidget(m_starsCountLabel);
   newMenuLayout->addWidget(m_perfectLabel);
   newMenuLayout->addWidget(m_restartButton);
+  newMenuLayout->addWidget(m_saveButton);
+
   newMenuLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
   auto widgetItem = mainLayout->takeAt(0);
@@ -43,6 +47,7 @@ TestingView::TestingView(QWidget* p_parent):
   mainLayout->setColumnStretch(1, 1);
 
   connect(m_restartButton, &QPushButton::clicked, this, &TestingView::RestartRequested);
+  connect(m_saveButton, &QPushButton::clicked, this, &TestingView::SaveLevelRequested);
 }
 
 void TestingView::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight) {
@@ -56,4 +61,8 @@ void TestingView::UpdateStarsCount(int p_starsCount) {
 void TestingView::UpdatePerfect(bool p_perfect) {
   QString perfect = p_perfect ? "YES": "NO";
   m_perfectLabel->setText(tr("perfect: %1").arg(perfect));
+}
+
+void TestingView::SetSaveButtonEnable(bool p_enable) {
+  m_saveButton->setEnabled(p_enable);
 }

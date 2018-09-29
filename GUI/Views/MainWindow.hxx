@@ -18,7 +18,6 @@ class LoadingView;
 class MainMenuView;
 class OptionsView;
 class PauseView;
-class SaveLevelView;
 class TestLevelView;
 class TestLevelController;
 class WorldsView;
@@ -55,7 +54,6 @@ private:
   PauseView* m_pauseView;
   TestLevelView* m_testLevelView;
   TestLevelController* m_testLevelController;
-  SaveLevelView* m_saveLevelView;
   WorldsView* m_worldsView;
   WorldsModel* m_worldsModel;
   WorldsController* m_worldsController;

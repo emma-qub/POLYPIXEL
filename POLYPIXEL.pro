@@ -23,7 +23,6 @@ SOURCES += \
     GUI/Views/MainMenuView.cxx \
     GUI/Views/MainWindow.cxx \
     GUI/Views/PauseView.cxx \
-    GUI/Views/SaveLevelView.cxx \
     GUI/Views/TestLevelView.cxx \
     GUI/Views/WorldsView.cxx \
     GUI/Views/OptionsView.cxx \
@@ -71,7 +70,6 @@ HEADERS += \
     GUI/Views/MainMenuView.hxx \
     GUI/Views/MainWindow.hxx \
     GUI/Views/PauseView.hxx \
-    GUI/Views/SaveLevelView.hxx \
     GUI/Views/TestLevelView.hxx \
     GUI/Views/WorldsView.hxx \
     GUI/Views/OptionsView.hxx \

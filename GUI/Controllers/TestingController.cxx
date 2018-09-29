@@ -2,6 +2,9 @@
 
 #include "GUI/Views/TestingView.hxx"
 #include "GUI/Models/PolygonModel.hxx"
+#include "Parser/Serializer.hxx"
+
+#include <QFileDialog>
 
 TestingController::TestingController(TestingView* p_view, QObject* p_parent):
   PlayingController(p_view, p_parent) {
@@ -9,6 +12,7 @@ TestingController::TestingController(TestingView* p_view, QObject* p_parent):
   m_view = static_cast<TestingView*>(p_view);
 
   connect(m_view, &TestingView::RestartRequested, this, &TestingController::Restart);
+  connect(m_view, &TestingView::SaveLevelRequested, this, &TestingController::SaveLevel);
 }
 
 void TestingController::SetPolygonsItem(PolygonModel* p_model) {
@@ -56,6 +60,7 @@ void TestingController::PlayLevel() {
   m_gameInfo.m_linesCount = 0;
   m_gameInfo.m_partsCount = m_model->GetPolygonsCount();
   m_gameInfo.m_stars = 0;
+  m_view->SetSaveButtonEnable(false);
 
   for (auto const* polygon: m_model->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
@@ -105,6 +110,7 @@ void TestingController::CheckWinning() {
 
     auto starsCount = ComputeStarsCount(gap);
     m_gameInfo.m_stars = starsCount;
+    m_view->SetSaveButtonEnable(starsCount == 4);
 
     UpdateViewFromGameInfo();
 
@@ -120,4 +126,22 @@ void TestingController::UpdateViewFromGameInfo() {
   PlayingController::UpdateViewFromGameInfo();
   m_view->UpdateStarsCount(std::min(m_gameInfo.m_stars, 3));
   m_view->UpdatePerfect(m_gameInfo.m_stars == 4);
+}
+
+void TestingController::SaveLevel() {
+  auto fileName = QFileDialog::getSaveFileName(m_view, tr("Save your level"), "../POLYPIXEL/worlds/0slice", "POLYPIXEL Files (*.ppxl)");
+
+  if (fileName.isEmpty()) {
+    return;
+  }
+
+  Serializer serializer(fileName);
+  serializer.SetPolygonsList(m_polygonsList);
+  serializer.SetLinesGoal(m_gameInfo.m_linesGoal);
+  serializer.SetPartsGoal(m_gameInfo.m_partsGoal);
+  serializer.SetMaxGapToWin(m_gameInfo.m_maxGapToWin);
+  serializer.SetTolerance(m_gameInfo.m_tolerance);
+  serializer.SetStarsCount(0);
+
+  serializer.WriteXML();
 }

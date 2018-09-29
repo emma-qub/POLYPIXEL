@@ -74,7 +74,6 @@ protected:
 
   //  Deviation* getNearestDeviation(ppxl::Segment const& line) const;
   //  void computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const;
-  //  virtual void saveLevel(QString const& fileName) { Q_UNUSED(fileName) }
   //  void replay();
   //  void undoSliceIt();
   //  void clearGame();

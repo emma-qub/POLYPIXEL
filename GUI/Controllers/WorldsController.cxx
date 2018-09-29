@@ -22,6 +22,9 @@ WorldsController::WorldsController(WorldsView* p_view, WorldsModel* p_model, QOb
 }
 
 void WorldsController::WorldSelected(QItemSelection const& p_selected) {
+  disconnect(m_view->GetSelectionModel(), &QItemSelectionModel::selectionChanged, this, &WorldsController::WorldSelected);
+  m_view->GetSelectionModel()->clearSelection();
+  connect(m_view->GetSelectionModel(), &QItemSelectionModel::selectionChanged, this, &WorldsController::WorldSelected);
   auto index = p_selected.indexes().first();
   Q_EMIT(LevelsPathChanged(index.data(WorldsModel::eLevelsPathRole).toString()));
   Q_EMIT(m_view->SelectLevelsRequested());

@@ -27,6 +27,7 @@ protected:
   void UpdateViewFromGameInfo() override;
   void ResetPolygonList();
   void Restart();
+  void SaveLevel();
 
 private:
   TestingView* m_view;

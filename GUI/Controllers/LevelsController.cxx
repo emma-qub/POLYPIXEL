@@ -29,6 +29,9 @@ void LevelsController::SetLevelsPath(QString const& p_levelsPath) {
 }
 
 void LevelsController::LevelSelected(QItemSelection const& p_selected) {
+  disconnect(m_view->GetSelectionModel(), &QItemSelectionModel::selectionChanged, this, &LevelsController::LevelSelected);
+  m_view->GetSelectionModel()->clearSelection();
+  connect(m_view->GetSelectionModel(), &QItemSelectionModel::selectionChanged, this, &LevelsController::LevelSelected);
   auto index = p_selected.indexes().first();
   Q_EMIT(m_view->PlayLevelRequested());
   Q_EMIT(PlayLevelRequested(index.data(LevelsModel::eLevelPathRole).toString()));

@@ -82,12 +82,12 @@ int Parser::GetMaxGapToWin() const {
   return GetIntValue("maxgaptowin");
 }
 
-int Parser::GetStarsCount() const {
-  return GetIntValue("starscount");
+int Parser::GetTolerance() const {
+  return GetIntValue("tolerance");
 }
 
-int Parser::GetTolerances() const {
-  return GetIntValue("tolerances");
+int Parser::GetStarsCount() const {
+  return GetIntValue("starscount");
 }
 
 

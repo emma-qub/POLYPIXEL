@@ -24,14 +24,14 @@ public:
   void SetPartsGoal(int p_partsGoal = 1);
   void SetLinesGoal(int p_linesGoal = 0);
   void SetMaxGapToWin(int p_maxGapToWin = 1);
+  void SetTolerance(int p_tolerance = 1);
   void SetStarsCount(int p_starscount = 0);
-  void SetTolerances(int p_tolerances = 1);
 
   // Polygon
   QDomElement PointToNode(ppxl::Point const& p_point, QString const& p_nodeName);
   QDomElement SegmentToNode(ppxl::Segment const& p_segment);
   void AppendPolygon(ppxl::Polygon const& p_polygon, int p_id);
-  void SetPolygonsList(QList<ppxl::Polygon> const& p_polygons);
+  void SetPolygonsList(const QList<ppxl::Polygon>& p_polygons);
 
   // Tape
   QDomElement TapeToNode(Tape const& tape, int id);
@@ -59,8 +59,8 @@ private:
   QDomElement m_linesGoal;
   QDomElement m_partsGoal;
   QDomElement m_maxGapToWin;
-  QDomElement m_starsCount;
   QDomElement m_tolerance;
+  QDomElement m_starsCount;
 };
 
 #endif

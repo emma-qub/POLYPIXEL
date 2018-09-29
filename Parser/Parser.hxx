@@ -32,8 +32,8 @@ public:
   int GetPartsGoal() const;
   int GetLinesGoal() const;
   int GetMaxGapToWin() const;
+  int GetTolerance() const;
   int GetStarsCount() const;
-  int GetTolerances() const;
 
   // Polygon
   ppxl::Point GetPoint(QDomElement const& p_element) const;

@@ -8,7 +8,6 @@
 #include "MainMenuView.hxx"
 #include "OptionsView.hxx"
 #include "PauseView.hxx"
-#include "SaveLevelView.hxx"
 #include "TestLevelView.hxx"
 #include "WorldsView.hxx"
 
@@ -44,7 +43,6 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_pauseView(new PauseView),
   m_testLevelView(new TestLevelView),
   m_testLevelController(new TestLevelController(m_testLevelView, this)),
-  m_saveLevelView(new SaveLevelView),
   m_worldsView(new WorldsView),
   m_worldsModel(new WorldsModel(this)),
   m_worldsController(new WorldsController(m_worldsView, m_worldsModel, this)) {
@@ -57,7 +55,6 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_centralWidget->addWidget(m_mainMenuView);
   m_centralWidget->addWidget(m_optionsView);
   m_centralWidget->addWidget(m_pauseView);
-  m_centralWidget->addWidget(m_saveLevelView);
   m_centralWidget->addWidget(m_testLevelView);
   m_centralWidget->addWidget(m_worldsView);
 
@@ -99,10 +96,6 @@ MainWindow::MainWindow(QWidget* p_parent):
   connect(testLevelState, &QState::entered, this, [this]() {
     m_centralWidget->setCurrentWidget(m_testLevelView);
   });
-  auto saveLevelState = new QState(&m_stateMachine);
-  connect(saveLevelState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_saveLevelView);
-  });
   auto optionsState = new QState(&m_stateMachine);
   connect(optionsState, &QState::entered, this, [this]() {
     m_centralWidget->setCurrentWidget(m_optionsView);
@@ -126,10 +119,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   createLevelState->addTransition(m_createLevelView, &CreateLevelView::TestLevelRequested, testLevelState);
   createLevelState->addTransition(m_createLevelView, &CreateLevelView::Done, mainMenuState);
   testLevelState->addTransition(m_testLevelView, &TestLevelView::AmendLevelRequested, createLevelState);
-  testLevelState->addTransition(m_testLevelView, &TestLevelView::SaveLevelRequested, saveLevelState);
   testLevelState->addTransition(m_testLevelView, &TestLevelView::Done, mainMenuState);
-  saveLevelState->addTransition(m_saveLevelView, &SaveLevelView::CreateNewLevelRequested, createLevelState);
-  saveLevelState->addTransition(m_saveLevelView, &SaveLevelView::Done, mainMenuState);
   optionsState->addTransition(m_optionsView, &OptionsView::Done, mainMenuState);
 
   connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
@@ -155,8 +145,8 @@ void MainWindow::SetModelsToTestController() {
 
   m_testLevelController->SetLinesGoal(m_createLevelController->GetLinesGoal());
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
-  m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
   m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
+  m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
   m_testLevelController->SetModel(m_createLevelController->GetModel());
   m_testLevelController->PlayLevel();
 }

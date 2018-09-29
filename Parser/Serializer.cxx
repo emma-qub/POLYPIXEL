@@ -7,14 +7,14 @@ Serializer::Serializer(QString const& p_xmlFileName):
   m_xmlFileName(p_xmlFileName),
   m_doc(QDomDocument("PPXLML")),
   m_polygons(m_doc.createElement("polygons")),
-  m_tapes(m_doc.createElement("tapes")),
-  m_mirrors(m_doc.createElement("mirrors")),
-  m_portals(m_doc.createElement("portals")),
+  //m_tapes(m_doc.createElement("tapes")),
+  //m_mirrors(m_doc.createElement("mirrors")),
+  //m_portals(m_doc.createElement("portals")),
   m_linesGoal(m_doc.createElement("linesgoal")),
   m_partsGoal(m_doc.createElement("partsgoal")),
   m_maxGapToWin(m_doc.createElement("maxgaptowin")),
-  m_starsCount(m_doc.createElement("starscount")),
-  m_tolerance(m_doc.createElement("tolerance")) {
+  m_tolerance(m_doc.createElement("tolerance")),
+  m_starsCount(m_doc.createElement("starscount")) {
 }
 
 Serializer::~Serializer() = default;
@@ -33,21 +33,21 @@ void Serializer::WriteXML(int p_indent) {
   m_doc.appendChild(root);
   root.appendChild(m_polygons);
 
-  auto objectsElement = m_doc.createElement("objects");
-  root.appendChild(objectsElement);
-  auto deviationsElement = m_doc.createElement("deviations");
-  objectsElement.appendChild(deviationsElement);
-  deviationsElement.appendChild(m_mirrors);
-  deviationsElement.appendChild(m_portals);
-  auto obstaclesElement = m_doc.createElement("obstacles");
-  objectsElement.appendChild(obstaclesElement);
-  objectsElement.appendChild(m_tapes);
+//  auto objectsElement = m_doc.createElement("objects");
+//  root.appendChild(objectsElement);
+//  auto deviationsElement = m_doc.createElement("deviations");
+//  objectsElement.appendChild(deviationsElement);
+//  deviationsElement.appendChild(m_mirrors);
+//  deviationsElement.appendChild(m_portals);
+//  auto obstaclesElement = m_doc.createElement("obstacles");
+//  objectsElement.appendChild(obstaclesElement);
+//  objectsElement.appendChild(m_tapes);
 
   root.appendChild(m_linesGoal);
   root.appendChild(m_partsGoal);
   root.appendChild(m_maxGapToWin);
-  root.appendChild(m_starsCount);
   root.appendChild(m_tolerance);
+  root.appendChild(m_starsCount);
 
   QTextStream inFile(&XMLDoc);
   inFile << m_doc.toString(p_indent);
@@ -70,12 +70,12 @@ void Serializer::SetMaxGapToWin(int p_maxGapToWin) {
   m_maxGapToWin.setAttribute("value", p_maxGapToWin);
 }
 
-void Serializer::SetStarsCount(int p_starscount) {
-  m_starsCount.setAttribute("value", p_starscount);
+void Serializer::SetTolerance(int p_tolerance) {
+  m_tolerance.setAttribute("value", p_tolerance);
 }
 
-void Serializer::SetTolerances(int p_tolerances) {
-  m_tolerance.setAttribute("value", p_tolerances);
+void Serializer::SetStarsCount(int p_starscount) {
+  m_starsCount.setAttribute("value", p_starscount);
 }
 
 
