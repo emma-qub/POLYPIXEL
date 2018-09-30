@@ -577,7 +577,7 @@ void CreateLevelScribblingView::ConfirmNewLevel() {
 
 void CreateLevelScribblingView::ConfirmOpenLevel() {
   if (ConfirmClear()) {
-    auto fileName = QFileDialog::getOpenFileName(this, "Open level", "../POLYPIXEL/worlds/0slice", "POLYPIXEL Files (*.ppxl)");
+    auto fileName = QFileDialog::getOpenFileName(this, "Open level", ":/world1", "POLYPIXEL Files (*.ppxl)");
     if (!fileName.isEmpty()) {
       Q_EMIT(OpenLevelRequested(fileName));
     }

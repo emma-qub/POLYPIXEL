@@ -11,18 +11,13 @@ class CreateLevelController;
 class GameView;
 class PolygonModel;
 class GameController;
-class LevelsView;
-class LevelsModel;
-class LevelsController;
 class LoadingView;
 class MainMenuView;
 class OptionsView;
 class PauseView;
 class TestLevelView;
 class TestLevelController;
-class WorldsView;
-class WorldsModel;
-class WorldsController;
+class MapView;
 class QStackedWidget;
 
 class MainWindow: public QMainWindow {
@@ -45,18 +40,13 @@ private:
   CreateLevelController* m_createLevelController;
   GameView* m_gameView;
   GameController* m_gameController;
-  LevelsModel* m_levelsModel;
-  LevelsView* m_levelsView;
-  LevelsController* m_levelsController;
   LoadingView* m_loadingView;
   MainMenuView* m_mainMenuView;
   OptionsView* m_optionsView;
   PauseView* m_pauseView;
   TestLevelView* m_testLevelView;
   TestLevelController* m_testLevelController;
-  WorldsView* m_worldsView;
-  WorldsModel* m_worldsModel;
-  WorldsController* m_worldsController;
+  MapView* m_mapView;
 };
 
 #endif

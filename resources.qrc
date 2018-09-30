@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/backgrounds">
+        <file alias="loading.png">resources/loading.png</file>
+    </qresource>
+    <qresource prefix="/world1"/>
+    <qresource prefix="/sprites">
+        <file alias="player2.png">resources/player2.png</file>
+        <file alias="player3.png">resources/player3.png</file>
+        <file alias="player4.png">resources/player4.png</file>
+        <file alias="player1.png">resources/player1.png</file>
+        <file alias="player5.png">resources/player5.png</file>
+        <file alias="player6.png">resources/player6.png</file>
+        <file alias="player7.png">resources/player7.png</file>
+        <file alias="player8.png">resources/player8.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="PICOPIXEL.ttf">resources/Picopixel.ttf</file>
+    </qresource>
+</RCC>

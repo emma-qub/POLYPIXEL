@@ -18,23 +18,17 @@ SOURCES += \
     GUI/Views/AchievementsView.cxx \
     GUI/Views/CreateLevelView.cxx \
     GUI/Views/GameView.cxx \
-    GUI/Views/LevelsView.cxx \
     GUI/Views/LoadingView.cxx \
     GUI/Views/MainMenuView.cxx \
     GUI/Views/MainWindow.cxx \
     GUI/Views/PauseView.cxx \
     GUI/Views/TestLevelView.cxx \
-    GUI/Views/WorldsView.cxx \
     GUI/Views/OptionsView.cxx \
     Core/Point.cxx \
     Core/Polygon.cxx \
     Core/Segment.cxx \
     Core/Vector.cxx \
     GUI/Controllers/GameController.cxx \
-    GUI/Models/WorldsModel.cxx \
-    GUI/Controllers/WorldsController.cxx \
-    GUI/Controllers/LevelsController.cxx \
-    GUI/Models/LevelsModel.cxx \
     Parser/Serializer.cxx \
     Parser/Parser.cxx \
     Objects/Object.cxx \
@@ -59,29 +53,26 @@ SOURCES += \
     GUI/Views/PlayingScribblingView.cxx \
     GUI/Commands/CreateLevelCommands.cxx \
     GUI/Commands/TestLevelCommands.cxx \
-    GUI/Models/LineModel.cxx
+    GUI/Models/LineModel.cxx \
+    GUI/Views/MapView.cxx \
+    GUI/GraphicsItem/Player.cxx \
+    GUI/GraphicsItem/GraphicsMessageBoxItem.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
     GUI/Views/CreateLevelView.hxx \
     GUI/Views/GameView.hxx \
-    GUI/Views/LevelsView.hxx \
     GUI/Views/LoadingView.hxx \
     GUI/Views/MainMenuView.hxx \
     GUI/Views/MainWindow.hxx \
     GUI/Views/PauseView.hxx \
     GUI/Views/TestLevelView.hxx \
-    GUI/Views/WorldsView.hxx \
     GUI/Views/OptionsView.hxx \
     Core/Point.hxx \
     Core/Polygon.hxx \
     Core/Segment.hxx \
     Core/Vector.hxx \
     GUI/Controllers/GameController.hxx \
-    GUI/Models/WorldsModel.hxx \
-    GUI/Controllers/WorldsController.hxx \
-    GUI/Controllers/LevelsController.hxx \
-    GUI/Models/LevelsModel.hxx \
     Parser/Serializer.hxx \
     Parser/Parser.hxx \
     Objects/Object.hxx \
@@ -106,9 +97,15 @@ HEADERS += \
     GUI/Views/PlayingScribblingView.hxx \
     GUI/Commands/CreateLevelCommands.hxx \
     GUI/Commands/TestLevelCommands.hxx \
-    GUI/Models/LineModel.hxx
+    GUI/Models/LineModel.hxx \
+    GUI/Views/MapView.hxx \
+    GUI/GraphicsItem/GraphicsMessageBoxItem.hxx \
+    GUI/GraphicsItem/PlayerItem.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc

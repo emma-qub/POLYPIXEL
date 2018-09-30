@@ -129,7 +129,7 @@ void TestingController::UpdateViewFromGameInfo() {
 }
 
 void TestingController::SaveLevel() {
-  auto fileName = QFileDialog::getSaveFileName(m_view, tr("Save your level"), "../POLYPIXEL/worlds/0slice", "POLYPIXEL Files (*.ppxl)");
+  auto fileName = QFileDialog::getSaveFileName(m_view, tr("Save your level"), ":/world1", "POLYPIXEL Files (*.ppxl)");
 
   if (fileName.isEmpty()) {
     return;
