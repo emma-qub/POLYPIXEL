@@ -26,11 +26,11 @@ public:
   int GetLinesGoal() const;
   void SetLinesGoal(int p_value);
   int GetPartsGoal() const;
-  int SetPartsGoal(int p_value);
+  void SetPartsGoal(int p_value);
   int GetMaxGapToWin() const;
-  int SetMaxGapToWin(int p_value);
+  void SetMaxGapToWin(int p_value);
   int GetTolerance() const;
-  int SetTolerance(int p_value);
+  void SetTolerance(int p_value);
   void ResetGameInfo();
 
   void SetModel(CreateLevelModel* p_model);

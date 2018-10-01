@@ -42,7 +42,7 @@ GraphicsMessageBoxTextItem::GraphicsMessageBoxTextItem(int p_width, int p_height
     ++count;
   }
 
-  m_pagesCount = m_messageList.size()-1;
+  m_pagesCount = m_messageList.size();
 }
 
 GraphicsMessageBoxTextItem::~GraphicsMessageBoxTextItem() = default;
@@ -62,6 +62,10 @@ int GraphicsMessageBoxTextItem::GetMessageSize() const {
 
 bool GraphicsMessageBoxTextItem::TextDisplayDone() const {
   return m_currentPage == m_pagesCount;
+}
+
+bool GraphicsMessageBoxTextItem::IsLastPage() const {
+  return m_currentPage == m_pagesCount-1;
 }
 
 void GraphicsMessageBoxTextItem::ClearText() {
@@ -185,7 +189,7 @@ void GraphicsMessageBoxItem::DisplayText() {
 }
 
 void GraphicsMessageBoxItem::UpdateTextStatus() {
-  if (m_messageItem->TextDisplayDone()) {
+  if (m_messageItem->IsLastPage()) {
     m_messageDoneIndicator->setVisible(true);
   } else {
     m_messageNotDoneIndicator->setVisible(true);
@@ -194,12 +198,13 @@ void GraphicsMessageBoxItem::UpdateTextStatus() {
 
 void GraphicsMessageBoxItem::keyPressEvent(QKeyEvent* p_event) {
   if (p_event->key() == Qt::Key_Return) {
-    if (m_messageItem->TextDisplayDone()) {
+    if (m_messageItem->IsLastPage()) {
+      m_messageItem->NextPage();
       m_messageDoneIndicator->setVisible(false);
       Close();
     } else {
-      m_messageNotDoneIndicator->setVisible(false);
       m_messageItem->NextPage();
+      m_messageNotDoneIndicator->setVisible(false);
       DisplayText();
     }
   }

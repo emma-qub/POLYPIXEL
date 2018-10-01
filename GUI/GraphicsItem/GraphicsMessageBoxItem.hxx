@@ -19,6 +19,7 @@ public:
 
   int GetMessageSize() const;
   bool TextDisplayDone() const;
+  bool IsLastPage() const;
   void NextPage();
   void ClearText();
 

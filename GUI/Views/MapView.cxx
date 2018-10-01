@@ -37,12 +37,12 @@ MapView::MapView(QWidget* p_parent):
 
 
 void MapView::OpenMessageBoxTest() {
-  auto messageBoxItem = new GraphicsMessageBoxItem(width()-100, 200,
+  auto messageBoxItem = new GraphicsMessageBoxItem(width()-200, 200,
     "BIENVENUE DANS NOTRE ROYAUME, HUMAIN. VOTRE MISSION, SI VOUS L'ACCEPTEZ,"
     " CONSISTERA A DECOUPER DES POLYGONES SELON CERTAINES REGLES, QUE JE VOUS"
-    " EXPLIQUERAI AU FUR ET A MESURE.");
+    " EXPLIQUERAI AU FUR ET A MESURE DE VOTRE AVENTURE.");
   m_scene->addItem(messageBoxItem);
-  messageBoxItem->setPos(50, 80);
+  messageBoxItem->setPos(-50, 80);
   messageBoxItem->setFocus();
   messageBoxItem->Open();
   connect(messageBoxItem, &GraphicsMessageBoxItem::Done, this, [this, messageBoxItem](){

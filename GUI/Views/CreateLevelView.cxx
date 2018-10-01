@@ -106,7 +106,7 @@ int CreateLevelView::GetPartsGoal() const {
   return m_partsGoalSpinBox->value();
 }
 
-int CreateLevelView::SetPartsGoal(int p_value) {
+void CreateLevelView::SetPartsGoal(int p_value) {
   m_partsGoalSpinBox->setValue(p_value);
 }
 
@@ -114,7 +114,7 @@ int CreateLevelView::GetMaxGapToWin() const {
   return m_maxGapToWinSpinBox->value();
 }
 
-int CreateLevelView::SetMaxGapToWin(int p_value) {
+void CreateLevelView::SetMaxGapToWin(int p_value) {
   m_maxGapToWinSpinBox->setValue(p_value);
 }
 
@@ -122,7 +122,7 @@ int CreateLevelView::GetTolerance() const {
   return m_toleranceSpinBox->value();
 }
 
-int CreateLevelView::SetTolerance(int p_value) {
+void CreateLevelView::SetTolerance(int p_value) {
   m_toleranceSpinBox->setValue(p_value);
 }
 
