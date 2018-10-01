@@ -31,21 +31,23 @@ MapView::MapView(QWidget* p_parent):
    auto openMessageAction = new QAction(this);
    addAction(openMessageAction);
    openMessageAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
-   connect(openMessageAction, &QAction::triggered, this, [this](){
-     auto messageBoxItem = new GraphicsMessageBoxItem(width()-100, 200,
-       "BIENVENUE DANS NOTRE ROYAUME HUMAIN. VOTRE MISSION SI VOUS L'ACCEPTEZ,"
-       " CONSISTERA A DECOUPER DES POLYGONES SELON CERTAINES REGLES, QUE JE VOUS"
-       " EXPLIQUERAI AU FUR ET A MESURE.");
-     m_scene->addItem(messageBoxItem);
-     messageBoxItem->setPos(50, 80);
-     messageBoxItem->setFocus();
-     messageBoxItem->Open();
-     connect(messageBoxItem, &GraphicsMessageBoxItem::Done, this, [this, messageBoxItem](){
-       m_scene->removeItem(messageBoxItem);
-       delete messageBoxItem;
-       m_player->setFocus();
-     });
-   });
+   connect(openMessageAction, &QAction::triggered, this, &MapView::OpenMessageBoxTest);
+}
 
 
+
+void MapView::OpenMessageBoxTest() {
+  auto messageBoxItem = new GraphicsMessageBoxItem(width()-100, 200,
+    "BIENVENUE DANS NOTRE ROYAUME, HUMAIN. VOTRE MISSION, SI VOUS L'ACCEPTEZ,"
+    " CONSISTERA A DECOUPER DES POLYGONES SELON CERTAINES REGLES, QUE JE VOUS"
+    " EXPLIQUERAI AU FUR ET A MESURE.");
+  m_scene->addItem(messageBoxItem);
+  messageBoxItem->setPos(50, 80);
+  messageBoxItem->setFocus();
+  messageBoxItem->Open();
+  connect(messageBoxItem, &GraphicsMessageBoxItem::Done, this, [this, messageBoxItem](){
+    m_scene->removeItem(messageBoxItem);
+    delete messageBoxItem;
+    m_player->setFocus();
+  });
 }

@@ -1,0 +1,44 @@
+<!DOCTYPE PPXLML>
+<level>
+  <polygons>
+    <polygon id="0">
+      <vertex x="438" y="188"/>
+      <vertex x="483" y="151"/>
+      <vertex x="535" y="123"/>
+      <vertex x="591" y="106"/>
+      <vertex x="650" y="100"/>
+      <vertex x="709" y="106"/>
+      <vertex x="765" y="123"/>
+      <vertex x="817" y="151"/>
+      <vertex x="862" y="188"/>
+      <vertex x="899" y="233"/>
+      <vertex x="927" y="285"/>
+      <vertex x="944" y="341"/>
+      <vertex x="950" y="400"/>
+      <vertex x="944" y="459"/>
+      <vertex x="927" y="515"/>
+      <vertex x="899" y="567"/>
+      <vertex x="862" y="612"/>
+      <vertex x="817" y="649"/>
+      <vertex x="765" y="677"/>
+      <vertex x="709" y="694"/>
+      <vertex x="651" y="700"/>
+      <vertex x="591" y="694"/>
+      <vertex x="535" y="677"/>
+      <vertex x="483" y="649"/>
+      <vertex x="438" y="612"/>
+      <vertex x="401" y="567"/>
+      <vertex x="373" y="515"/>
+      <vertex x="356" y="459"/>
+      <vertex x="350" y="400"/>
+      <vertex x="356" y="341"/>
+      <vertex x="373" y="285"/>
+      <vertex x="401" y="233"/>
+    </polygon>
+  </polygons>
+  <linesgoal value="4"/>
+  <partsgoal value="8"/>
+  <maxgaptowin value="50"/>
+  <tolerance value="1"/>
+  <starscount value="0"/>
+</level>

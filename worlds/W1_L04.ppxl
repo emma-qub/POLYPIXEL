@@ -1,0 +1,15 @@
+<!DOCTYPE PPXLML>
+<level>
+  <polygons>
+    <polygon id="0">
+      <vertex x="650" y="150"/>
+      <vertex x="350" y="650"/>
+      <vertex x="950" y="650"/>
+    </polygon>
+  </polygons>
+  <linesgoal value="3"/>
+  <partsgoal value="4"/>
+  <maxgaptowin value="50"/>
+  <tolerance value="1"/>
+  <starscount value="0"/>
+</level>
