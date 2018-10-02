@@ -15,3 +15,7 @@ void GameController::PlayLevel(QString const& p_levelPath) {
 void GameController::RestartLevel() {
   m_view->RestartLevel();
 }
+
+void GameController::Update() {
+  m_view->update();
+}

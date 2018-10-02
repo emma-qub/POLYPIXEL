@@ -10,7 +10,7 @@
 
 
 
-Player::Player(QGraphicsItem* p_parent):
+PlayerItem::PlayerItem(QGraphicsItem* p_parent):
   QGraphicsPixmapItem(p_parent),
   m_animationStep(1) {
 
@@ -27,16 +27,26 @@ Player::Player(QGraphicsItem* p_parent):
   timer->start(180);
 }
 
-Player::~Player() = default;
+PlayerItem::~PlayerItem() = default;
 
-void Player::keyPressEvent(QKeyEvent* p_event) {
-  if (p_event->key() == Qt::Key_Left) {
-    moveBy(-10, 0);
-  } else if (p_event->key() == Qt::Key_Right) {
-    moveBy(10, 0);
-  } else if (p_event->key() == Qt::Key_Up) {
-    moveBy(0, -10);
-  } else if (p_event->key() == Qt::Key_Down) {
-    moveBy(0, 10);
+void PlayerItem::keyPressEvent(QKeyEvent* p_event) {
+  switch (p_event->key()) {
+  case Qt::Key_Left: {
+    Q_EMIT(Move(eLeft));
+    break;
+  } case Qt::Key_Up: {
+    Q_EMIT(Move(eUp));
+    break;
+  } case Qt::Key_Right: {
+    Q_EMIT(Move(eRight));
+    break;
+  } case Qt::Key_Down: {
+    Q_EMIT(Move(eDown));
+    break;
+  } case Qt::Key_Return: {
+    Q_EMIT(Enter());
+    break;
+  } default:
+    break;
   }
 }

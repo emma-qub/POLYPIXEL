@@ -4,14 +4,26 @@
 #include <QObject>
 #include <QGraphicsPixmapItem>
 
-class Player: public QObject, public QGraphicsPixmapItem {
+class PlayerItem: public QObject, public QGraphicsPixmapItem {
   Q_OBJECT
+  Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
-  Player(QGraphicsItem* p_parent = nullptr);
-  ~Player() override;
+  enum Direction {
+    eRight,
+    eUp,
+    eLeft,
+    eDown
+  };
+
+  PlayerItem(QGraphicsItem* p_parent = nullptr);
+  ~PlayerItem() override;
 
   void keyPressEvent(QKeyEvent* p_event) override;
+
+signals:
+  void Move(Direction p_direction);
+  void Enter();
 
 private:
   int m_animationStep;

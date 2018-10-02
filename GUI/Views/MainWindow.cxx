@@ -99,12 +99,13 @@ MainWindow::MainWindow(QWidget* p_parent):
   mainMenuState->addTransition(m_mainMenuView, &MainMenuView::PlayRequested, mapState);
   mainMenuState->addTransition(m_mainMenuView, &MainMenuView::CreateLevelRequested, createLevelState);
   mainMenuState->addTransition(m_mainMenuView, &MainMenuView::OptionsRequested, optionsState);
+  mapState->addTransition(m_mapView, &MapView::PlayLevelRequested, gameState);
   //worldsState->addTransition(m_worldsView, &WorldsView::AchievementsRequested, achievementsState);
   //worldsState->addTransition(m_worldsView, &WorldsView::Done, mainMenuState);
   gameState->addTransition(m_gameView, &GameView::PauseRequested, pauseState);
   pauseState->addTransition(m_pauseView, &PauseView::ResumeRequested, gameState);
   pauseState->addTransition(m_pauseView, &PauseView::RestartRequested, gameState);
-  //pauseState->addTransition(m_pauseView, &PauseView::LevelsRequested, levelsState);
+  pauseState->addTransition(m_pauseView, &PauseView::LevelsRequested, mapState);
   //achievementsState->addTransition(m_achievementsView, &AchievementsView::Done, worldsState);
   createLevelState->addTransition(m_createLevelView, &CreateLevelView::TestLevelRequested, testLevelState);
   createLevelState->addTransition(m_createLevelView, &CreateLevelView::Done, mainMenuState);
@@ -112,13 +113,19 @@ MainWindow::MainWindow(QWidget* p_parent):
   testLevelState->addTransition(m_testLevelView, &TestLevelView::Done, mainMenuState);
   optionsState->addTransition(m_optionsView, &OptionsView::Done, mainMenuState);
 
-  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
-  connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
     if (m_centralWidget->currentWidget() == m_createLevelView) {
       m_createLevelController->Redraw();
+    } else if (m_centralWidget->currentWidget() == m_gameView) {
+      m_gameController->Update();
+    } else if (m_centralWidget->currentWidget() == m_mapView) {
+      m_mapView->InitView();
     }
   });
+
+  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
+  connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
+  connect(m_mapView, &MapView::PlayLevelRequested, m_gameView, &GameView::PlayLevel);
 
   m_stateMachine.setInitialState(loadingState);
   m_stateMachine.start();

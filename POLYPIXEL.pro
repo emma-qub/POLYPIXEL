@@ -55,8 +55,8 @@ SOURCES += \
     GUI/Commands/TestLevelCommands.cxx \
     GUI/Models/LineModel.cxx \
     GUI/Views/MapView.cxx \
-    GUI/GraphicsItem/Player.cxx \
-    GUI/GraphicsItem/GraphicsMessageBoxItem.cxx
+    GUI/GraphicsItem/GraphicsMessageBoxItem.cxx \
+    GUI/GraphicsItem/PlayerItem.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \

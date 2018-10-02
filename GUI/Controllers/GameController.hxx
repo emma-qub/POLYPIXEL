@@ -14,6 +14,7 @@ public:
 
   void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
+  void Update();
 
 private:
   GameView* m_view;

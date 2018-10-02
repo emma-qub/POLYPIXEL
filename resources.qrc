@@ -2,7 +2,18 @@
     <qresource prefix="/backgrounds">
         <file alias="loading.png">resources/loading.png</file>
     </qresource>
-    <qresource prefix="/world1"/>
+    <qresource prefix="/levels">
+        <file alias="W1_L01.ppxl">worlds/W1_L01.ppxl</file>
+        <file alias="W1_L02.ppxl">worlds/W1_L02.ppxl</file>
+        <file alias="W1_L03.ppxl">worlds/W1_L03.ppxl</file>
+        <file alias="W1_L04.ppxl">worlds/W1_L04.ppxl</file>
+        <file alias="W1_L05.ppxl">worlds/W1_L05.ppxl</file>
+        <file alias="W1_L06.ppxl">worlds/W1_L06.ppxl</file>
+        <file alias="W1_L07.ppxl">worlds/W1_L07.ppxl</file>
+        <file alias="W1_L08.ppxl">worlds/W1_L08.ppxl</file>
+        <file alias="W1_L09.ppxl">worlds/W1_L09.ppxl</file>
+        <file alias="W1_L10.ppxl">worlds/W1_L10.ppxl</file>
+    </qresource>
     <qresource prefix="/sprites">
         <file alias="player2.png">resources/player2.png</file>
         <file alias="player3.png">resources/player3.png</file>
