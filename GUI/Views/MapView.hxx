@@ -29,21 +29,21 @@ struct Path {
   };
 
   Path(Level* p_levelStart, QList<Directions> const& p_stepsList, Level* p_levelEnd):
-    m_levelStart(p_levelStart),
+    m_startLevel(p_levelStart),
     m_directionsList(p_stepsList),
     m_endLevel(p_levelEnd) {}
 
   Level* FindDestination(Level* p_level) {
-    if (p_level == m_levelStart) {
+    if (p_level == m_startLevel) {
       return m_endLevel;
     } else if (p_level == m_endLevel) {
-      return m_levelStart;
+      return m_startLevel;
     } else {
       return nullptr;
     }
   }
 
-Level* m_levelStart;
+Level* m_startLevel;
 QList<Directions> m_directionsList;
 Level* m_endLevel;
 };
@@ -52,8 +52,9 @@ struct World {
   World(int p_worldNumber, QString const& p_worldName);
   virtual ~World();
 
-  void AppendLevel(QPointF const& p_position, QString const& p_levelName, QList<Path::Directions> const& p_stepsList = QList<Path::Directions>());
-  Path GetPathFromStartLevel(Level* p_startLevel) const;
+  void SetFirstLevelPosition(QPointF const& p_position);
+  void AppendPath(Path const& p_path);
+  QList<Path> GetPathsFromStartLevel(Level* p_startLevel) const;
 
 int m_worldNumber;
 QString m_worldName;
@@ -62,6 +63,7 @@ QList<Level*> m_levelsList;
 QList<Path> m_pathsList;
 Level* m_previousLevel;
 Level* m_nextLevel;
+QPointF m_firstLevelPosition;
 };
 
 class MapView: public QGraphicsView {

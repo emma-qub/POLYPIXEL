@@ -27,4 +27,7 @@
     <qresource prefix="/fonts">
         <file alias="PICOPIXEL.ttf">resources/Picopixel.ttf</file>
     </qresource>
+    <qresource prefix="/maps">
+        <file alias="world1.map">resources/wolrd1.map</file>
+    </qresource>
 </RCC>

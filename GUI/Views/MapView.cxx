@@ -4,6 +4,8 @@
 
 #include <QAction>
 #include <QPropertyAnimation>
+#include <QFile>
+#include <QTextStream>
 
 
 
@@ -59,7 +61,7 @@ void MapView::InitView() {
   int verticalLineLength = height() / 10;
 
   for (auto path: m_currentWorld->m_pathsList) {
-    auto startLevel = path.m_levelStart;
+    auto startLevel = path.m_startLevel;
     QPointF startPosition(m_currentWorld->m_positionByLevel[startLevel]);
     for (auto direction: path.m_directionsList) {
       auto line = new QGraphicsLineItem;
@@ -93,7 +95,6 @@ void MapView::InitView() {
     }
   }
 
-
   // Draw Levels
   int levelSemiSide = 10;
   int levelSide = 2*levelSemiSide;
@@ -121,10 +122,72 @@ void MapView::InitView() {
 }
 
 void MapView::InitWorld1() {
+  // Read world information from map file
+  QFile world1MapFile(":/maps/world1.map");
+  Q_ASSERT_X(world1MapFile.open(QIODevice::ReadOnly), "MapView::InitWorld1", QString("Cannot open Map file: %1").arg(world1MapFile.errorString()).toLatin1());
+
+  // Create world
   auto world1 = new World(1, "Classic 80's");
-  world1->AppendLevel(QPointF(10*width()/100, 80*height()/100), "");
-  world1->AppendLevel(QPointF(20*width()/100, 60*height()/100), "", {Path::eRight, Path::eUp, Path::eUp});
-  world1->AppendLevel(QPointF(20*width()/100, 50*height()/100), "", {Path::eUp});
+  // Create 20 levels
+  for (int levelNumber = 1; levelNumber <= 20; ++levelNumber) {
+    QString levelNumberString = levelNumber < 10 ? "0"+QString::number(levelNumber) : QString::number(levelNumber);
+    auto level = new Level(levelNumber, "", QString(":/levels/W%1_L%2.ppxl").arg(world1->m_worldNumber).arg(levelNumberString));
+    world1->m_levelsList << level;
+  }
+  // Init first level position
+  auto firstLevelPosition = QPointF(10*width()/100, 80*height()/100);
+  world1->SetFirstLevelPosition(firstLevelPosition);
+  world1->m_positionByLevel[world1->m_levelsList.at(0)] = firstLevelPosition;
+
+  // Set levels and paths
+  QTextStream inFile(&world1MapFile);
+  do {
+    auto line = inFile.readLine();
+    if (line.isEmpty() || line.startsWith("#")) {
+      continue;
+    }
+
+    auto pathsList = line.split("|");
+    auto startLevelNumber = pathsList.takeFirst().toInt();
+    for (auto const& path: pathsList) {
+      auto pathInfo = path.split(";");
+      auto directionsStringList = pathInfo.at(0).split(",");
+      auto endLevelNumber = pathInfo.at(1).toInt();
+      double relativeX = 0;
+      double relativeY = 0;
+      QList<Path::Directions> directionsList;
+      QList<Path::Directions> reverDirectionsList;
+      for (auto directionLetter: directionsStringList) {
+        if (directionLetter == "r") {
+          directionsList.append(Path::eRight);
+          reverDirectionsList.prepend(Path::eLeft);
+          relativeX += width()/10;
+        } else if (directionLetter == "u") {
+          directionsList.append(Path::eUp);
+          reverDirectionsList.prepend(Path::eDown);
+          relativeY -= height()/10;
+        } else if (directionLetter == "l") {
+          directionsList.append(Path::eLeft);
+          reverDirectionsList.prepend(Path::eRight);
+          relativeX -= width()/10;
+        } else if (directionLetter == "d") {
+          directionsList.append(Path::eDown);
+          reverDirectionsList.prepend(Path::eUp);
+          relativeY += height()/10;
+        }
+      }
+      world1->AppendPath(Path(world1->m_levelsList.at(startLevelNumber-1), directionsList, world1->m_levelsList.at(endLevelNumber-1)));
+      world1->AppendPath(Path(world1->m_levelsList.at(endLevelNumber-1), reverDirectionsList, world1->m_levelsList.at(startLevelNumber-1)));
+      auto startLevelPosition = world1->m_positionByLevel[world1->m_levelsList.at(startLevelNumber-1)];
+      auto endLevelPosition = startLevelPosition;
+      endLevelPosition.rx() += relativeX;
+      endLevelPosition.ry() += relativeY;
+      world1->m_positionByLevel[world1->m_levelsList.at(endLevelNumber-1)] = endLevelPosition;
+    }
+
+  } while (!inFile.atEnd());
+
+  world1MapFile.close();
 
   m_worlds << world1;
 }
@@ -135,21 +198,23 @@ void MapView::MovePlayer(PlayerItem::Direction p_direction) {
   }
 
   // Get path according to level
-  auto path = m_currentWorld->GetPathFromStartLevel(m_currentLevel);
-  Q_ASSERT_X(path.m_directionsList.isEmpty() == false, "MapView::MovePlayer", "Player is soft locked.");
+  auto pathsList = m_currentWorld->GetPathsFromStartLevel(m_currentLevel);
+  Q_ASSERT_X(pathsList.isEmpty() == false, "MapView::MovePlayer", "Player is soft locked.");
 
-  // Get first direction
-  auto firstDirection = path.m_directionsList.first();
+  for (auto const& path: pathsList) {
+    // Get first direction
+    auto firstDirection = path.m_directionsList.first();
 
-  // If first direction and player's direction are the same
-  if (static_cast<int>(firstDirection) == static_cast<int>(p_direction)) {
-    m_currentDirections = path.m_directionsList;
-    m_playerIsMoving = true;
-    AnimatePlayer();
-    connect(this, &MapView::PlayerReadchedDestination, this, [this, path](){
-      m_playerIsMoving = false;
-      m_currentLevel = path.m_endLevel;
-    });
+    // If first direction and player's direction are the same
+    if (static_cast<int>(firstDirection) == static_cast<int>(p_direction)) {
+      m_currentDirections = path.m_directionsList;
+      m_playerIsMoving = true;
+      AnimatePlayer();
+      connect(this, &MapView::PlayerReadchedDestination, this, [this, path](){
+        m_playerIsMoving = false;
+        m_currentLevel = path.m_endLevel;
+      });
+    }
   }
 }
 
@@ -233,25 +298,22 @@ World::~World() {
   }
 }
 
-void World:: AppendLevel(const QPointF& p_position, QString const& p_levelName, const QList<Path::Directions>& p_stepsList) {
-  auto levelNumber = m_levelsList.size()+1;
-  QString levelNumberString = levelNumber < 10 ? "0"+QString::number(levelNumber) : QString::number(levelNumber);
-  auto level = new Level(levelNumber, p_levelName, QString(":/levels/W%1_L%2.ppxl").arg(m_worldNumber).arg(levelNumberString));
-  m_levelsList << level;
-  if (!p_stepsList.isEmpty() && levelNumber > 1) {
-    m_pathsList << Path(m_levelsList.at(levelNumber-2), p_stepsList, m_levelsList.at(levelNumber-1));
-  }
-  m_positionByLevel[level] = p_position;
-
+void World::SetFirstLevelPosition(const QPointF& p_position) {
+  m_firstLevelPosition = p_position;
 }
 
-Path World::GetPathFromStartLevel(Level* p_startLevel) const
+void World::AppendPath(const Path& p_path) {
+  m_pathsList << p_path;
+}
+
+QList<Path> World::GetPathsFromStartLevel(Level* p_startLevel) const
 {
+  QList<Path> paths;
   for (auto const& path: m_pathsList) {
-    if (path.m_levelStart == p_startLevel) {
-      return path;
+    if (path.m_startLevel == p_startLevel) {
+      paths << path;
     }
   }
 
-  return Path(nullptr, QList<Path::Directions>(), nullptr);
+  return paths;
 }

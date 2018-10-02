@@ -1,0 +1,7 @@
+#start_level|direction_11,...,direction_1n;end_level1|...|direction_m1,...,direction_mn;end_levelm
+1|r,u,u;2
+2|r;3
+3|u,r;4|d,r;5
+4|r,d;6
+5|r,u;6
+6|r,r;7
