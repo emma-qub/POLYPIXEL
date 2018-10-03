@@ -25,11 +25,9 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
 }
 
-void PlayingController::Init() {
-  m_view->Init();
+void PlayingController::InitView() {
+  m_view->InitView();
 }
-
-
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
   m_view->StartLevel();
@@ -54,10 +52,10 @@ void PlayingController::SetStartPoint(QPoint const& p_startPoint) {
 }
 
 void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
-  QPoint p_endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
-  QCursor::setPos(p_endPoint);
+  QPoint endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
+  QCursor::setPos(endPoint);
   SetStartPoint(p_cursorPosition);
-  ComputeSlicingLines(p_endPoint);
+  ComputeSlicingLines(endPoint);
 }
 
 QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endPoint) {
@@ -70,7 +68,7 @@ QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endP
   auto linesColor = GetLinesColor(lines);
   for (auto const& line: lines)
   {
-//    m_view->DrawLine(line, linesColor, Qt::DashLine);
+    m_view->DrawLine(line, linesColor, Qt::DashLine);
   }
 
   return lines;
@@ -403,7 +401,6 @@ void PlayingController::CheckWinning() {
     m_gameInfo.m_stars = starsCount;
     UpdateStarsMax(starsCount);
 
-//    m_view->DrawAreas(areasList);
     m_view->EndLevel();
 
     disconnect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
@@ -429,21 +426,23 @@ double PlayingController::ComputePolygonPercentageArea(ppxl::Polygon const& poly
   return qRound(10.*polygon.OrientedArea() * 100. / m_orientedAreaTotal) / 10.;
 }
 
-void PlayingController::TranslatePolygons(QList<ppxl::Vector> const& shiftVectors) {
-  PolygonList newPolygons;
+void PlayingController::TranslatePolygons(QList<ppxl::Vector> const& p_shiftVectors) {
+//  PolygonList newPolygons;
 
-  auto polygons = m_model->GetPolygonsList();
-  assert(polygons.size() == shiftVectors.size());
+//  auto polygons = m_model->GetPolygonsList();
+//  assert(polygons.size() == shiftVectors.size());
 
-  int index = 0;
-  for (auto const* polygon: polygons) {
-    ppxl::Polygon newPolygon(*polygon);
-    newPolygon.Translate(shiftVectors.at(index));
-    newPolygons << newPolygon;
-    ++index;
-  }
+//  int index = 0;
+//  for (auto const* polygon: polygons) {
+//    ppxl::Polygon newPolygon(*polygon);
+//    newPolygon.Translate(shiftVectors.at(index));
+//    newPolygons << newPolygon;
+//    ++index;
+//  }
 
-  m_model->SetPolygonsList(newPolygons);
+//  m_model->SetPolygonsList(newPolygons);
+
+  m_view->AnimatePolygons(p_shiftVectors);
 }
 
 void PlayingController::UpdateStarsMax(int starsMaxCount) {

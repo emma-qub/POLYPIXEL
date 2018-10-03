@@ -29,35 +29,40 @@ PlayingView::PlayingView(QWidget* p_parent):
   mainLayout->setRowStretch(1, 1);
   setLayout(mainLayout);
 
-//  connect(m_scribblingView, &PlayingScribblingView::Scribbling, this, &PlayingView::Scribbling);
-//  connect(m_scribblingView, &PlayingScribblingView::Moving, this, &PlayingView::Moving);
-//  connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
-//  connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
-  //  connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
+  connect(m_scribblingView, &PlayingScribblingView::Scribbling, this, &PlayingView::Scribbling);
+  connect(m_scribblingView, &PlayingScribblingView::Moving, this, &PlayingView::Moving);
+  connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
+  connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
+  connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
+  connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDone, this, &PlayingView::PolygonsAnimationDone);
 }
 
-void PlayingView::Init() {
-  m_scribblingView->Init();
+void PlayingView::InitView() {
+  m_scribblingView->InitView();
 }
 
 void PlayingView::SetModel(PolygonModel* p_playingModel) {
   m_scribblingView->SetModel(p_playingModel);
 }
 
-//void PlayingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
-//  m_scribblingView->DrawLine(p_line, p_color, p_penStyle);
-//}
+void PlayingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
+  m_scribblingView->DrawLine(p_line, p_color, p_penStyle);
+}
 
 void PlayingView::DrawFromModel() {
   m_scribblingView->DrawFromModel();
 }
 
-//void PlayingView::DrawAreas(QList<double> const& p_areas) {
-//  m_scribblingView->DrawAreas(p_areas);
-//}
+void PlayingView::DrawAreas(QList<double> const& p_areas) {
+  m_scribblingView->DrawAreas(p_areas);
+}
 
 void PlayingView::ClearImage() {
   m_scribblingView->ClearImage();
+}
+
+void PlayingView::AnimatePolygons(QList<ppxl::Vector> const& p_shiftVectors) {
+  m_scribblingView->AnimatePolygons(p_shiftVectors);
 }
 
 void PlayingView::UpdateLinesCount(int p_linesCount, int p_linesGoal) {

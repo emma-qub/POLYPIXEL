@@ -117,7 +117,7 @@ MainWindow::MainWindow(QWidget* p_parent):
     if (m_centralWidget->currentWidget() == m_createLevelView) {
       m_createLevelController->Redraw();
     } else if (m_centralWidget->currentWidget() == m_gameView) {
-      m_gameView->Init();
+      m_gameView->InitView();
       m_gameView->PlayLevel(m_currentLevel);
     } else if (m_centralWidget->currentWidget() == m_mapView) {
       m_mapView->InitView();

@@ -114,7 +114,7 @@ void TestingController::CheckWinning() {
 
     UpdateViewFromGameInfo();
 
-//    m_view->DrawAreas(areasList);
+    m_view->DrawAreas(areasList);
     m_view->EndLevel();
 
     disconnect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);

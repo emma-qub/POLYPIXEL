@@ -44,7 +44,7 @@ public:
 
   PlayingController(PlayingView* p_view, QObject* p_parent = nullptr);
 
-  void Init();
+  void InitView();
 
   void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
@@ -72,7 +72,7 @@ protected:
   virtual void CheckWinning();
   double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
   ppxl::Point ComputeGlobalBarycenter() const;
-  void TranslatePolygons(QList<ppxl::Vector> const& shiftVectors);
+  void TranslatePolygons(QList<ppxl::Vector> const& p_shiftVectors);
   void UpdateStarsMax(int starsMaxCount);
 
   //  Deviation* getNearestDeviation(ppxl::Segment const& line) const;

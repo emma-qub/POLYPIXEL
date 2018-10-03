@@ -2,11 +2,25 @@
 #define ABSTRACTSCRIBBLINGVIEW2_HXX
 
 #include <QGraphicsView>
+#include <QGraphicsPolygonItem>
 
 #include "Core/Segment.hxx"
 #include "Core/Vector.hxx"
 
 class PolygonModel;
+
+class GraphicsPolygonItem: public QObject, public QGraphicsPolygonItem {
+  Q_OBJECT
+  Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+
+public:
+  explicit GraphicsPolygonItem(QGraphicsItem* p_parent = nullptr): QGraphicsPolygonItem(p_parent) {}
+  explicit GraphicsPolygonItem(QPolygonF const& p_polygon, QGraphicsItem* p_parent = nullptr):
+    QGraphicsPolygonItem(p_polygon, p_parent) {}
+
+  ~GraphicsPolygonItem() override = default;
+
+};
 
 class AbstractScribblingView2: public QGraphicsView {
   Q_OBJECT
@@ -15,17 +29,17 @@ public:
   AbstractScribblingView2(QWidget* p_parent = nullptr);
   ~AbstractScribblingView2() override;
 
-  virtual void Init();
+  virtual void InitView();
 
   virtual void SetModel(PolygonModel* p_model);
   void SetCanScribble(bool p_value);
   bool GetCanScribble() const;
+  inline QList<GraphicsPolygonItem*> GetGraphicsPolygonList() const { return m_graphicsPolygonList; }
 
-  void ClearImage();
-
-  void DrawLine(ppxl::Segment const& p_line, QColor const& p_color);
+  void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, const ppxl::Vector& shiftVector = ppxl::Vector());
   virtual void DrawFromModel();
+  void ClearImage();
 
 protected:
   inline PolygonModel* GetModel() const { return m_model; }
@@ -42,6 +56,7 @@ private:
   QPen m_pen;
   bool m_canScribble;
   bool m_viewInitialized;
+  QList<GraphicsPolygonItem*> m_graphicsPolygonList;
 };
 
 #endif

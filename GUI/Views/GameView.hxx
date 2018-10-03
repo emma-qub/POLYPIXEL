@@ -18,7 +18,7 @@ class GameView: public QWidget {
 public:
   explicit GameView(QWidget* p_parent = nullptr);
 
-  void Init();
+  void InitView();
 
   void SetModel(PolygonModel* p_gameModel);
 

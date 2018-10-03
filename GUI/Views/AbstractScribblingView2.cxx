@@ -1,6 +1,7 @@
 #include "AbstractScribblingView2.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
+#include "Core/Point.hxx"
 
 #include <QGraphicsLineItem>
 
@@ -16,7 +17,7 @@ AbstractScribblingView2::AbstractScribblingView2(QWidget* p_parent):
   m_pen = (QPen(QBrush(QColor("#000000")), m_penWidth));
 }
 
-void AbstractScribblingView2::Init() {
+void AbstractScribblingView2::InitView() {
   if (m_viewInitialized) {
     return;
   }
@@ -53,12 +54,13 @@ void AbstractScribblingView2::ClearImage() {
   update();
 }
 
-void AbstractScribblingView2::DrawLine(ppxl::Segment const& p_line, QColor const& p_color) {
+void AbstractScribblingView2::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   if (m_canScribble) {
     ppxl::Point p_startPoint(p_line.GetA());
     ppxl::Point p_endPoint(p_line.GetB());
 
     m_pen.setColor(p_color);
+    m_pen.setStyle(p_penStyle);
     m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
   }
 }
@@ -84,21 +86,22 @@ void AbstractScribblingView2::DrawFromModel() {
     return;
   }
 
-  // Draw every polygon in model color
+  m_graphicsPolygonList.clear();
+  m_pen.setStyle(Qt::SolidLine);
   auto polygonItems = m_model->GetPolygonsItem();
-
   for (int polygonRow = 0; polygonRow < polygonItems->rowCount(); ++polygonRow) {
     auto polygonItem = polygonItems->child(polygonRow, 0);
-    for (int row = 0; row < polygonItem->rowCount(); ++row) {
-      int indexA = row;
-      int indexB =(row+1)%polygonItem->rowCount();
-      ppxl::Point A(polygonItem->child(indexA, 1)->text().toDouble(),
-                    polygonItem->child(indexA, 2)->text().toDouble());
-      ppxl::Point B(polygonItem->child(indexB, 1)->text().toDouble(),
-                    polygonItem->child(indexB, 2)->text().toDouble());
-      auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
-      DrawLine(A, B, color);
+    m_penColor =  polygonItem->data(Qt::DecorationRole).value<QColor>();
+    m_pen.setColor(m_penColor);
+    auto* polygon = polygonItem->data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+    QVector<QPointF> verticesList;
+    for (auto const& vertex: polygon->GetVertices()) {
+      verticesList << QPointF(vertex.GetX(), vertex.GetY());
     }
+    auto graphicsPolygonItem = new GraphicsPolygonItem(QPolygonF(verticesList));
+    graphicsPolygonItem->setPen(m_pen);
+    m_scene->addItem(graphicsPolygonItem);
+    m_graphicsPolygonList << graphicsPolygonItem;
   }
 }
 
