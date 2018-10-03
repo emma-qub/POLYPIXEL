@@ -30,6 +30,10 @@ GameView::GameView(QWidget* p_parent):
   connect(m_pauseButton, &QPushButton::clicked, this, &GameView::PauseRequested);
 }
 
+void GameView::Init() {
+  m_playingView->Init();
+}
+
 void GameView::PlayLevel(QString const& p_levelPath) {
   m_playingController->PlayLevel(p_levelPath);
 }

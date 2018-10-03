@@ -20,7 +20,7 @@ MapView::MapView(QWidget* p_parent):
   m_worlds(),
   m_currentLevel(nullptr),
   m_playerIsMoving(false),
-  viewInitialized(false) {
+  m_viewInitialized(false) {
 }
 
 MapView::~MapView() {
@@ -30,7 +30,7 @@ MapView::~MapView() {
 }
 
 void MapView::InitView() {
-  if (viewInitialized) {
+  if (m_viewInitialized) {
     return;
   }
 
@@ -118,7 +118,7 @@ void MapView::InitView() {
   connect(m_player, &PlayerItem::Move, this, &MapView::MovePlayer);
   connect(m_player, &PlayerItem::Enter, this, &MapView::PlayLevel);
 
-  viewInitialized = true;
+  m_viewInitialized = true;
 }
 
 void MapView::InitWorld1() {

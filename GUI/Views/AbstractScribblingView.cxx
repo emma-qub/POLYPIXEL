@@ -28,9 +28,9 @@ bool AbstractScribblingView::GetCanScribble() const {
 
 void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   if (m_canScribble) {
-    ppxl::Point startPoint(p_line.GetA());
-    ppxl::Point endPoint(p_line.GetB());
-    DrawLine(startPoint, endPoint, p_color, p_penStyle);
+    ppxl::Point p_startPoint(p_line.GetA());
+    ppxl::Point p_endPoint(p_line.GetB());
+    DrawLine(p_startPoint, p_endPoint, p_color, p_penStyle);
   }
 }
 

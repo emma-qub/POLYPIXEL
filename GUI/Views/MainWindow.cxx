@@ -117,7 +117,8 @@ MainWindow::MainWindow(QWidget* p_parent):
     if (m_centralWidget->currentWidget() == m_createLevelView) {
       m_createLevelController->Redraw();
     } else if (m_centralWidget->currentWidget() == m_gameView) {
-      m_gameController->Update();
+      m_gameView->Init();
+      m_gameView->PlayLevel(m_currentLevel);
     } else if (m_centralWidget->currentWidget() == m_mapView) {
       m_mapView->InitView();
     }
@@ -125,7 +126,7 @@ MainWindow::MainWindow(QWidget* p_parent):
 
   connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
   connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
-  connect(m_mapView, &MapView::PlayLevelRequested, m_gameView, &GameView::PlayLevel);
+  connect(m_mapView, &MapView::PlayLevelRequested, this, &MainWindow::SetCurrentLevel);
 
   m_stateMachine.setInitialState(loadingState);
   m_stateMachine.start();

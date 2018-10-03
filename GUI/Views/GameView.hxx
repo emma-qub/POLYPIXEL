@@ -18,6 +18,8 @@ class GameView: public QWidget {
 public:
   explicit GameView(QWidget* p_parent = nullptr);
 
+  void Init();
+
   void SetModel(PolygonModel* p_gameModel);
 
   void PlayLevel(QString const& p_levelPath);

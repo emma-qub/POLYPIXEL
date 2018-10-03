@@ -30,6 +30,8 @@ public:
 protected:
   void SetModelsToTestController();
 
+  void SetCurrentLevel(QString const& p_currentLevel) { m_currentLevel = p_currentLevel; }
+
 private:
   QStateMachine m_stateMachine;
 
@@ -47,6 +49,8 @@ private:
   TestLevelView* m_testLevelView;
   TestLevelController* m_testLevelController;
   MapView* m_mapView;
+
+  QString m_currentLevel;
 };
 
 #endif

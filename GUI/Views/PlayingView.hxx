@@ -16,11 +16,13 @@ class PlayingView: public QWidget {
 public:
   PlayingView(QWidget* p_parent = nullptr);
 
+  void Init();
+
   void SetModel(PolygonModel* p_playingModel);
 
-  void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
+//  void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawFromModel();
-  void DrawAreas(QList<double> const& p_areas);
+//  void DrawAreas(QList<double> const& p_areas);
   void ClearImage();
 
   void UpdateLinesCount(int p_linesCount, int p_linesGoal = -1);

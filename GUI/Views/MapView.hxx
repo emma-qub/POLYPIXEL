@@ -94,7 +94,7 @@ private:
   World* m_currentWorld;
   QList<Path::Directions> m_currentDirections;
   bool m_playerIsMoving;
-  bool viewInitialized;
+  bool m_viewInitialized;
 };
 
 #endif

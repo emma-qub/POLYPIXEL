@@ -44,6 +44,8 @@ public:
 
   PlayingController(PlayingView* p_view, QObject* p_parent = nullptr);
 
+  void Init();
+
   void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
   void Redraw();
