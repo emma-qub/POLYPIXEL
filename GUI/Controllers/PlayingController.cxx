@@ -23,6 +23,8 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
   connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
+  connect(m_view, &PlayingView::PolygonsAnimationDone, this, &PlayingController::DisplayGameOver);
+  connect(m_view, &PlayingView::StartLevelRequested, this, &PlayingController::StartLevel);
 }
 
 void PlayingController::InitView() {
@@ -30,7 +32,6 @@ void PlayingController::InitView() {
 }
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
-  m_view->StartLevel();
   m_model->InitColor();
   m_levelPath = p_levelPath;
   OpenLevel(p_levelPath);
@@ -323,21 +324,29 @@ ppxl::Point* PlayingController::GetOtherBound(ppxl::Point const* intersection, s
 }
 
 void PlayingController::OpenLevel(QString const& p_levelPath) {
-  m_view->ClearImage();
-
-  if (!p_levelPath.isEmpty()) {
-    Parser parser(p_levelPath);
-    m_model->SetPolygonsList(parser.GetPolygonList());
-    m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
-      0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
+  if (p_levelPath.isEmpty()) {
+    return;
   }
+
+  // Prompt Level Info
+  Parser parser(p_levelPath);
+  m_model->SetPolygonsList(parser.GetPolygonList());
+  m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
+    0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
+
+  m_view->SetLevelInfo(2, m_gameInfo.m_linesGoal, m_gameInfo.m_partsCount, m_gameInfo.m_starsMax);
+  m_view->DisplayGameStart();
+}
+
+void PlayingController::StartLevel() {
+  m_view->StartLevel();
+  m_view->ClearImage();
 
   UpdateViewFromGameInfo();
 
   for (auto const* polygon: m_model->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
   }
-
   Redraw();
 
   connect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
@@ -461,6 +470,9 @@ void PlayingController::UpdateStarsMax(int starsMaxCount) {
   }
 }
 
+void PlayingController::DisplayGameOver() {
+  m_view->DisplayGameOver();
+}
 
 /*
 void PlayingController::undoSliceIt() {

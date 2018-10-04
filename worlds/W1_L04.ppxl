@@ -11,5 +11,5 @@
   <partsgoal value="4"/>
   <maxgaptowin value="50"/>
   <tolerance value="1"/>
-  <starscount value="0"/>
+  <starscount value="2"/>
 </level>

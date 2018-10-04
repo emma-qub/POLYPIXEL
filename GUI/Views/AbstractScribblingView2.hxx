@@ -44,6 +44,7 @@ public:
 protected:
   inline PolygonModel* GetModel() const { return m_model; }
   inline void setPenWidth(int p_width) { m_penWidth = p_width; }
+  inline QGraphicsScene* GetScene() const { return m_scene; }
 
   void DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color);
   void DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color);

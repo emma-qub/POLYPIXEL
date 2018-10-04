@@ -30,8 +30,11 @@ public:
   void UpdateLinesCount(int p_linesCount, int p_linesGoal = -1);
   void UpdatePartsCount(int p_partsCount, int p_partsGoal = -1);
 
+  void SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax);
+  void DisplayGameStart();
   void StartLevel();
   void EndLevel();
+  void DisplayGameOver();
 
 signals:
   void Scribbling(QPoint const& p_startPoint);
@@ -40,6 +43,7 @@ signals:
   void ControlPressed(QPoint const& p_cursorPosition);
   void ControlReleased(QPoint const& p_cursorPosition);
   void PolygonsAnimationDone();
+  void StartLevelRequested();
 
 protected:
   PlayingScribblingView* m_scribblingView;

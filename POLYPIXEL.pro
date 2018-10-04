@@ -57,7 +57,9 @@ SOURCES += \
     GUI/Views/MapView.cxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.cxx \
     GUI/GraphicsItem/PlayerItem.cxx \
-    GUI/Views/AbstractScribblingView2.cxx
+    GUI/Views/AbstractScribblingView2.cxx \
+    GUI/GraphicsItem/GameOverItem.cxx \
+    GUI/GraphicsItem/GameStartItem.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -102,7 +104,9 @@ HEADERS += \
     GUI/Views/MapView.hxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.hxx \
     GUI/GraphicsItem/PlayerItem.hxx \
-    GUI/Views/AbstractScribblingView2.hxx
+    GUI/Views/AbstractScribblingView2.hxx \
+    GUI/GraphicsItem/GameOverItem.hxx \
+    GUI/GraphicsItem/GameStartItem.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

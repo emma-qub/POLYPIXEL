@@ -1,6 +1,8 @@
 #include "PlayingScribblingView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
+#include "GUI/GraphicsItem/GameOverItem.hxx"
+#include "GUI/GraphicsItem/GameStartItem.hxx"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -10,9 +12,25 @@
 PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   AbstractScribblingView2(p_parent),
   m_scribbling(false),
-  m_cursorPosition(0, 0) {
+  m_cursorPosition(0, 0),
+  m_gameOverItem(nullptr),
+  m_gameStartItem(nullptr),
+  m_levelNumber(-1),
+  m_linesGoal(-1),
+  m_partsGoal(-1),
+  m_starsMax(-1)
+{
 
   setFocusPolicy(Qt::StrongFocus);
+}
+
+void PlayingScribblingView::InitView() {
+  AbstractScribblingView2::InitView();
+
+  m_gameOverItem = new GameOverItem(0, 0, width()/3, 2*height()/3);
+  m_gameStartItem = new GameStartItem(0, 0, width()/3, 2*height()/3);
+
+  connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &PlayingScribblingView::StartLevelRequested);
 }
 
 PlayingScribblingView::~PlayingScribblingView() = default;
@@ -47,6 +65,33 @@ void PlayingScribblingView::AnimatePolygons(QList<ppxl::Vector> const& shiftVect
   animationGroup->start();
 }
 
+void PlayingScribblingView::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax) {
+  m_levelNumber = p_levelNumber;
+  m_linesGoal = p_linesGoal;
+  m_partsGoal = p_partsGoal;
+  m_starsMax = p_starsMax;
+}
+
+void PlayingScribblingView::DisplayGameStart() {
+  QBrush overlayBrush(QColor(0, 0, 0, 192));
+  GetScene()->addRect(0, 0, width(), height(), QPen(Qt::NoPen), overlayBrush);
+  m_gameStartItem->setPos(width()/3, -2*height()/3);
+  GetScene()->addItem(m_gameStartItem);
+  m_gameStartItem->SetLevelInfo(m_levelNumber, m_linesGoal, m_partsGoal, m_starsMax);
+  m_gameStartItem->Open(QPointF(width()/3, -2*height()/3), QPointF(width()/3, height()/6));
+  m_gameStartItem->setFocus();
+}
+
+void PlayingScribblingView::DisplayGameOver() {
+  QBrush overlayBrush(QColor(0, 0, 0, 192));
+  GetScene()->addRect(0, 0, width(), height(), QPen(Qt::NoPen), overlayBrush);
+  m_gameOverItem->setPos(width()/3, -2*height()/3);
+  GetScene()->addItem(m_gameOverItem);
+  m_gameOverItem->Open(QPointF(width()/3, -2*height()/3), QPointF(width()/3, height()/6));
+  m_gameOverItem->setFocus();
+}
+
+
 void PlayingScribblingView::keyPressEvent(QKeyEvent* p_event) {
   if (m_scribbling && p_event->key() == Qt::Key_Control)
   {
@@ -71,6 +116,8 @@ void PlayingScribblingView::mousePressEvent(QMouseEvent* p_event) {
     m_cursorPosition = p_event->pos();
     Q_EMIT(Scribbling(p_event->pos()));
   }
+
+  QGraphicsView::mousePressEvent(p_event);
 }
 
 void PlayingScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
@@ -78,6 +125,9 @@ void PlayingScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
     m_cursorPosition = p_event->pos();
     Q_EMIT(Moving(p_event->pos()));
   }
+
+  // Required to get hover events on graphics items
+  QGraphicsView::mouseMoveEvent(p_event);
 }
 
 void PlayingScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
@@ -86,10 +136,6 @@ void PlayingScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
     Q_EMIT(Slicing(p_event->pos()));
     m_scribbling = false;
   }
-}
 
-//void PlayingScribblingView::paintEvent(QPaintEvent* p_event) {
-//  QPainter painter(this);
-//  QRect dirtyRect = p_event->rect();
-//  painter.drawImage(dirtyRect, GetImage(), dirtyRect);
-//}
+  QGraphicsView::mouseReleaseEvent(p_event);
+}

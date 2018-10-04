@@ -52,11 +52,11 @@ public:
 
 protected:
   virtual void UpdateViewFromGameInfo();
+
   void SetStartPoint(QPoint const& p_startPoint);
-  void InvertScribbleLine(const QPoint& p_cursorPosition);
+  ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
+
   QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
-  QColor GetLinesColor(QList<ppxl::Segment> const& p_lines) const;
-  LineType ComputeLinesType(QList<ppxl::Segment> const& p_lines) const;
   void SliceIt(QPoint const& p_endPoint);
   void ComputeNewPolygonList(QList<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const;
   void GetVerticesAndIntersections(ppxl::Segment const& line, ppxl::Polygon const& polygon,
@@ -64,16 +64,25 @@ protected:
   void CleanIntersections(ppxl::Polygon const& polygon, std::vector<ppxl::Point*>& intersections) const;
   std::vector<std::pair<ppxl::Point*, ppxl::Point*>> GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const;
   bool StillHasBaseVertices(std::vector<ppxl::Point*> const& verticesGlobal, std::vector<ppxl::Point*> const& intersections) const;
-  ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
-  void OpenLevel(QString const& p_levelPath);
-  QList<ppxl::Vector> ComputeShiftVectorsList();
-  QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
-  int ComputeStarsCount(double p_gap);
+
   virtual void CheckWinning();
+
+  void InvertScribbleLine(const QPoint& p_cursorPosition);
+  QColor GetLinesColor(QList<ppxl::Segment> const& p_lines) const;
+  LineType ComputeLinesType(QList<ppxl::Segment> const& p_lines) const;
+
+  void OpenLevel(QString const& p_levelPath);
+  void StartLevel();
+
+  QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
   double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
+  QList<ppxl::Vector> ComputeShiftVectorsList();
   ppxl::Point ComputeGlobalBarycenter() const;
   void TranslatePolygons(QList<ppxl::Vector> const& p_shiftVectors);
+  int ComputeStarsCount(double p_gap);
   void UpdateStarsMax(int starsMaxCount);
+
+  void DisplayGameOver();
 
   //  Deviation* getNearestDeviation(ppxl::Segment const& line) const;
   //  void computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const;

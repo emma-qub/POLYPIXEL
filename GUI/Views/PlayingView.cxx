@@ -35,6 +35,7 @@ PlayingView::PlayingView(QWidget* p_parent):
   connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
   connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
   connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDone, this, &PlayingView::PolygonsAnimationDone);
+  connect(m_scribblingView, &PlayingScribblingView::StartLevelRequested, this, &PlayingView::StartLevelRequested);
 }
 
 void PlayingView::InitView() {
@@ -85,10 +86,22 @@ void PlayingView::UpdatePartsCount(int p_partsCount, int p_partsGoal) {
   m_partsCountLabel->setText(tr("Parts: %1/%2").arg(m_partsCount).arg(m_partsGoal));
 }
 
+void PlayingView::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax) {
+  m_scribblingView->SetLevelInfo(p_levelNumber, p_linesGoal, p_partsGoal, p_starsMax);
+}
+
+void PlayingView::DisplayGameStart() {
+  m_scribblingView->DisplayGameStart();
+}
+
 void PlayingView::StartLevel() {
   m_scribblingView->SetCanScribble(true);
 }
 
 void PlayingView::EndLevel() {
   m_scribblingView->SetCanScribble(false);
+}
+
+void PlayingView::DisplayGameOver() {
+  m_scribblingView->DisplayGameOver();
 }
