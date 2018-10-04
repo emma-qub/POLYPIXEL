@@ -31,10 +31,11 @@ void PlayingScribblingView::InitView() {
   AbstractScribblingView2::InitView();
 
   m_gameOverItem = new GameOverItem(0, 0, width()/3, 2*height()/3);
-  m_gameStartItem = new GameStartItem(0, 0, width()/3, 2*height()/3);
+  m_gameStartItem = new GameStartItem(0, 0, width()/4, 2*height()/3, 20);
 
   connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &PlayingScribblingView::FadeOutOverlay);
   connect(this, &PlayingScribblingView::FadeOutOverlayDone, this, &PlayingScribblingView::StartLevelRequested);
+  connect(m_gameStartItem, &GameStartItem::CancelLevelRequested, this, &PlayingScribblingView::CancelLevelRequested);
 }
 
 PlayingScribblingView::~PlayingScribblingView() = default;
@@ -80,10 +81,13 @@ void PlayingScribblingView::SetOverlayItem() {
 
 void PlayingScribblingView::DisplayGameStart() {
   SetOverlayItem();
-  m_gameStartItem->setPos(width()/3, -2*height()/3);
+  QPointF startTopLeftCorner(3.*width()/8., -2.*height()/3.);
+  QPointF endStartLeftCorner(startTopLeftCorner.x(), height()/6.);
+
+  m_gameStartItem->setPos(startTopLeftCorner);
   GetScene()->addItem(m_gameStartItem);
   m_gameStartItem->SetLevelInfo(m_levelNumber, m_linesGoal, m_partsGoal, m_starsMax);
-  m_gameStartItem->Open(QPointF(width()/3, -2*height()/3), QPointF(width()/3, height()/6));
+  m_gameStartItem->Open(startTopLeftCorner, endStartLeftCorner);
   m_gameStartItem->setFocus();
 }
 

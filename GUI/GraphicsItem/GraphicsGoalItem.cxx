@@ -14,8 +14,11 @@ GraphicsGoalItem::GraphicsGoalItem(QPixmap const& p_pixmap, QString const& p_tex
   auto textRect = m_textItem->boundingRect();
   m_textItem->setPos(0, pixmapRect.height());
 
-  m_pixmapItem->setPos(std::min((textRect.width()-pixmapRect.width())/2., 0.), 0.);
-  m_textItem->setPos(std::min((pixmapRect.width()-textRect.width())/2., 0.), pixmapRect.height());
+  if (textRect.width() < pixmapRect.width()) {
+    m_textItem->setPos((pixmapRect.width()-textRect.width())/2., pixmapRect.height());
+  } else {
+    m_pixmapItem->setPos((textRect.width()-pixmapRect.width())/2., 0.);
+  }
 }
 
 QRectF GraphicsGoalItem::boundingRect() const {

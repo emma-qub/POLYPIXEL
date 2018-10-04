@@ -44,6 +44,7 @@ signals:
   void ControlReleased(QPoint const& p_cursorPosition);
   void PolygonsAnimationDone();
   void StartLevelRequested();
+  void CancelLevelRequested();
 
 protected:
   PlayingScribblingView* m_scribblingView;

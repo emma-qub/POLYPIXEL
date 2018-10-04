@@ -28,6 +28,7 @@ GameView::GameView(QWidget* p_parent):
   setLayout(mainLayout);
 
   connect(m_pauseButton, &QPushButton::clicked, this, &GameView::PauseRequested);
+  connect(m_playingController, &PlayingController::CancelLevelRequested, this, &GameView::CancelLevelRequested);
 }
 
 void GameView::InitView() {

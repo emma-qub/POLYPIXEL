@@ -36,6 +36,7 @@ PlayingView::PlayingView(QWidget* p_parent):
   connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
   connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDone, this, &PlayingView::PolygonsAnimationDone);
   connect(m_scribblingView, &PlayingScribblingView::StartLevelRequested, this, &PlayingView::StartLevelRequested);
+  connect(m_scribblingView, &PlayingScribblingView::CancelLevelRequested, this, &PlayingView::CancelLevelRequested);
 }
 
 void PlayingView::InitView() {

@@ -25,6 +25,7 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
   connect(m_view, &PlayingView::PolygonsAnimationDone, this, &PlayingController::DisplayGameOver);
   connect(m_view, &PlayingView::StartLevelRequested, this, &PlayingController::StartLevel);
+  connect(m_view, &PlayingView::CancelLevelRequested, this, &PlayingController::CancelLevelRequested);
 }
 
 void PlayingController::InitView() {
@@ -328,13 +329,15 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
     return;
   }
 
+  auto levelNumber = p_levelPath.split('/').last().split("L").last().split(".ppxl").first().toInt();
+
   // Prompt Level Info
   Parser parser(p_levelPath);
   m_model->SetPolygonsList(parser.GetPolygonList());
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
-  m_view->SetLevelInfo(2, m_gameInfo.m_linesGoal, m_gameInfo.m_partsGoal, m_gameInfo.m_starsMax);
+  m_view->SetLevelInfo(levelNumber, m_gameInfo.m_linesGoal, m_gameInfo.m_partsGoal, m_gameInfo.m_starsMax);
   m_view->DisplayGameStart();
 }
 

@@ -61,7 +61,8 @@ SOURCES += \
     GUI/GraphicsItem/GameOverItem.cxx \
     GUI/GraphicsItem/GameStartItem.cxx \
     GUI/GraphicsItem/GraphicsStarsItem.cxx \
-    GUI/GraphicsItem/GraphicsGoalItem.cxx
+    GUI/GraphicsItem/GraphicsGoalItem.cxx \
+    GUI/GraphicsItem/GraphicsRoundedRectItem.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -110,7 +111,8 @@ HEADERS += \
     GUI/GraphicsItem/GameOverItem.hxx \
     GUI/GraphicsItem/GameStartItem.hxx \
     GUI/GraphicsItem/GraphicsStarsItem.hxx \
-    GUI/GraphicsItem/GraphicsGoalItem.hxx
+    GUI/GraphicsItem/GraphicsGoalItem.hxx \
+    GUI/GraphicsItem/GraphicsRoundedRectItem.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -50,6 +50,9 @@ public:
   void RestartLevel();
   void Redraw();
 
+signals:
+  void CancelLevelRequested();
+
 protected:
   virtual void UpdateViewFromGameInfo();
 
