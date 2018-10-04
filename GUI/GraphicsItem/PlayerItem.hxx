@@ -2,7 +2,7 @@
 #define PLAYER_HXX
 
 #include <QObject>
-#include <QGraphicsPixmapItem>
+#include <QGraphicsItem>
 
 class PlayerItem: public QObject, public QGraphicsPixmapItem {
   Q_OBJECT

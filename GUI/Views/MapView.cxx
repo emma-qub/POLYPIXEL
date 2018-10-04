@@ -251,9 +251,8 @@ void MapView::AnimatePlayer() {
   animation->setDuration(500);
   //animation->setEasingCurve(QEasingCurve::InOutQuint);
   connect(animation, &QPropertyAnimation::finished, this, &MapView::AnimatePlayer);
-  connect(animation, &QPropertyAnimation::finished, animation, &QPropertyAnimation::deleteLater);
-  animation->start();
 
+  animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void MapView::PlayLevel() {

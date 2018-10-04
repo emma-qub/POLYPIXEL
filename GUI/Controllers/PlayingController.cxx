@@ -334,7 +334,7 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
-  m_view->SetLevelInfo(2, m_gameInfo.m_linesGoal, m_gameInfo.m_partsCount, m_gameInfo.m_starsMax);
+  m_view->SetLevelInfo(2, m_gameInfo.m_linesGoal, m_gameInfo.m_partsGoal, m_gameInfo.m_starsMax);
   m_view->DisplayGameStart();
 }
 

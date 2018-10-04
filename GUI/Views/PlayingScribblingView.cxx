@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include <QGraphicsEffect>
 
 PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   AbstractScribblingView2(p_parent),
@@ -15,6 +16,8 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   m_cursorPosition(0, 0),
   m_gameOverItem(nullptr),
   m_gameStartItem(nullptr),
+  m_overlayItem(nullptr),
+  m_overlayBrush(QColor(0, 0, 0, 192)),
   m_levelNumber(-1),
   m_linesGoal(-1),
   m_partsGoal(-1),
@@ -30,7 +33,8 @@ void PlayingScribblingView::InitView() {
   m_gameOverItem = new GameOverItem(0, 0, width()/3, 2*height()/3);
   m_gameStartItem = new GameStartItem(0, 0, width()/3, 2*height()/3);
 
-  connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &PlayingScribblingView::StartLevelRequested);
+  connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &PlayingScribblingView::FadeOutOverlay);
+  connect(this, &PlayingScribblingView::FadeOutOverlayDone, this, &PlayingScribblingView::StartLevelRequested);
 }
 
 PlayingScribblingView::~PlayingScribblingView() = default;
@@ -56,13 +60,11 @@ void PlayingScribblingView::AnimatePolygons(QList<ppxl::Vector> const& shiftVect
     animation->setEndValue(QPointF(polygonItem->pos().x()+shiftVector.GetX(), polygonItem->pos().y()+shiftVector.GetY()));
     animation->setDuration(1000);
     animationGroup->addAnimation(animation);
-    connect(animation, &QPropertyAnimation::finished, animation, &QPropertyAnimation::deleteLater);
     ++i;
   }
 
-  connect(animationGroup, &QParallelAnimationGroup::finished, animationGroup, &QParallelAnimationGroup::deleteLater);
   connect(animationGroup, &QParallelAnimationGroup::finished, this, &PlayingScribblingView::PolygonsAnimationDone);
-  animationGroup->start();
+  animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void PlayingScribblingView::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax) {
@@ -72,9 +74,12 @@ void PlayingScribblingView::SetLevelInfo(int p_levelNumber, int p_linesGoal, int
   m_starsMax = p_starsMax;
 }
 
+void PlayingScribblingView::SetOverlayItem() {
+  m_overlayItem = scene()->addRect(0, 0, scene()->width(), scene()->height(), QPen(Qt::NoPen), m_overlayBrush);
+}
+
 void PlayingScribblingView::DisplayGameStart() {
-  QBrush overlayBrush(QColor(0, 0, 0, 192));
-  GetScene()->addRect(0, 0, width(), height(), QPen(Qt::NoPen), overlayBrush);
+  SetOverlayItem();
   m_gameStartItem->setPos(width()/3, -2*height()/3);
   GetScene()->addItem(m_gameStartItem);
   m_gameStartItem->SetLevelInfo(m_levelNumber, m_linesGoal, m_partsGoal, m_starsMax);
@@ -82,15 +87,47 @@ void PlayingScribblingView::DisplayGameStart() {
   m_gameStartItem->setFocus();
 }
 
+void PlayingScribblingView::CloseGameStart() {
+  m_gameStartItem->CloseToPlay();
+}
+
 void PlayingScribblingView::DisplayGameOver() {
-  QBrush overlayBrush(QColor(0, 0, 0, 192));
-  GetScene()->addRect(0, 0, width(), height(), QPen(Qt::NoPen), overlayBrush);
+  SetOverlayItem();
   m_gameOverItem->setPos(width()/3, -2*height()/3);
   GetScene()->addItem(m_gameOverItem);
   m_gameOverItem->Open(QPointF(width()/3, -2*height()/3), QPointF(width()/3, height()/6));
   m_gameOverItem->setFocus();
 }
 
+void PlayingScribblingView::FadeInOverlay() {
+  auto effect = new QGraphicsOpacityEffect(this);
+  m_overlayItem->setGraphicsEffect(effect);
+
+  auto* animation = new QPropertyAnimation(effect, "opacity", this);
+
+  animation->setStartValue(0.);
+  animation->setEndValue(192./255.);
+  animation->setDuration(200);
+
+  connect(animation, &QPropertyAnimation::finished, this, &PlayingScribblingView::FadeInOverlayDone);
+
+  animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void PlayingScribblingView::FadeOutOverlay() {
+  auto effect = new QGraphicsOpacityEffect(this);
+  m_overlayItem->setGraphicsEffect(effect);
+
+  auto* animation = new QPropertyAnimation(effect, "opacity", this);
+
+  animation->setStartValue(192./255.);
+  animation->setEndValue(0.);
+  animation->setDuration(200);
+
+  connect(animation, &QPropertyAnimation::finished, this, &PlayingScribblingView::FadeOutOverlayDone);
+
+  animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
 
 void PlayingScribblingView::keyPressEvent(QKeyEvent* p_event) {
   if (m_scribbling && p_event->key() == Qt::Key_Control)

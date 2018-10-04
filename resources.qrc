@@ -14,7 +14,7 @@
         <file alias="W1_L09.ppxl">worlds/W1_L09.ppxl</file>
         <file alias="W1_L10.ppxl">worlds/W1_L10.ppxl</file>
     </qresource>
-    <qresource prefix="/sprites">
+    <qresource prefix="/sprites/player">
         <file alias="player2.png">resources/player2.png</file>
         <file alias="player3.png">resources/player3.png</file>
         <file alias="player4.png">resources/player4.png</file>
@@ -29,5 +29,11 @@
     </qresource>
     <qresource prefix="/maps">
         <file alias="world1.map">resources/wolrd1.map</file>
+    </qresource>
+    <qresource prefix="/sprites/level">
+        <file alias="emptyStar.png">resources/emptyStar.png</file>
+        <file alias="fullStar.png">resources/fullStar.png</file>
+        <file alias="parts.png">resources/parts.png</file>
+        <file alias="lines.png">resources/lines.png</file>
     </qresource>
 </RCC>

@@ -19,7 +19,5 @@ void GameOverItem::Open(QPointF const& p_startPos, QPointF const& p_endPos) {
   animation->setDuration(500);
   animation->setEasingCurve(QEasingCurve::OutBack);
 
-  connect(animation, &QPropertyAnimation::finished, animation, &QPropertyAnimation::deleteLater);
-
-  animation->start();
+  animation->start(QAbstractAnimation::DeleteWhenStopped);
 }

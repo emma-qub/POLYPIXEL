@@ -5,6 +5,11 @@
 #include <QGraphicsItem>
 #include <QPen>
 #include <QMouseEvent>
+#include <QFont>
+
+class GraphicsStarsItem;
+class GraphicsGoalItem;
+
 
 class CloseItem: public QObject, public QGraphicsRectItem {
   Q_OBJECT
@@ -58,13 +63,15 @@ protected:
 private:
   QGraphicsRectItem* m_overlayItem;
   QGraphicsSimpleTextItem* m_levelNumberItem;
-  QGraphicsSimpleTextItem* m_levelGoalsItem;
-  QGraphicsSimpleTextItem* m_levelStarsItem;
+  GraphicsGoalItem* m_levelLinesGoalItem;
+  GraphicsGoalItem* m_levelPartsGoalItem;
+  GraphicsStarsItem* m_levelStarsItem;
   CloseItem* m_closeRectItem;
   PlayItem* m_playRectItem;
   QPen m_pen;
   QPointF m_startPos;
   QPointF m_endPos;
+  QFont m_font;
 };
 
 #endif

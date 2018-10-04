@@ -16,12 +16,12 @@ PlayerItem::PlayerItem(QGraphicsItem* p_parent):
 
   setFlag(QGraphicsItem::ItemIsFocusable);
 
-  setPixmap(QPixmap(":/sprites/player1.png"));
+  setPixmap(QPixmap(":/sprites/player/player1.png"));
 
   auto* timer = new QTimer(this);
   connect(timer, &QTimer::timeout, this, [this](){
     m_animationStep = (m_animationStep+1)%8+1;
-    setPixmap(QPixmap(QString(":/sprites/player")+QString::number(m_animationStep)+QString(".png")));
+    setPixmap(QPixmap(QString(":/sprites/player/player")+QString::number(m_animationStep)+QString(".png")));
   });
 
   timer->start(180);

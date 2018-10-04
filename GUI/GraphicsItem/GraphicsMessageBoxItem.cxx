@@ -143,26 +143,23 @@ void GraphicsMessageBoxItem::Animate(int p_startHeight, int p_endHeight, int p_s
   dialogAnimation->setStartValue(p_startHeight);
   dialogAnimation->setEndValue(p_endHeight);
   dialogAnimation->setEasingCurve(QEasingCurve::InOutQuint);
-  connect(dialogAnimation, &QPropertyAnimation::finished, dialogAnimation, &QPropertyAnimation::deleteLater);
 
   auto avatarAnimation = new QPropertyAnimation(m_avatarItem, "height");
   avatarAnimation->setDuration(duration);
   avatarAnimation->setStartValue(p_startAvatarHeight);
   avatarAnimation->setEndValue(p_endAvatarHeight);
   avatarAnimation->setEasingCurve(QEasingCurve::InOutQuint);
-  connect(avatarAnimation, &QPropertyAnimation::finished, avatarAnimation, &QPropertyAnimation::deleteLater);
 
   auto animation = new QParallelAnimationGroup(this);
   animation->addAnimation(dialogAnimation);
   animation->addAnimation(avatarAnimation);
-  connect(animation, &QParallelAnimationGroup::finished, animation, &QParallelAnimationGroup::deleteLater);
   if (m_messageItem->TextDisplayDone()) {
     connect(animation, &QParallelAnimationGroup::finished, this, &GraphicsMessageBoxItem::Done);
   } else {
     connect(animation, &QParallelAnimationGroup::finished, this, &GraphicsMessageBoxItem::DisplayText);
   }
 
-  animation->start();
+  animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void GraphicsMessageBoxItem::Open() {
@@ -183,9 +180,8 @@ void GraphicsMessageBoxItem::DisplayText() {
   textAnimation->setStartValue(0);
   textAnimation->setEndValue(messageSize);
   connect(textAnimation, &QPropertyAnimation::finished, this, &::GraphicsMessageBoxItem::UpdateTextStatus);
-  connect(textAnimation, &QPropertyAnimation::finished, textAnimation, &QPropertyAnimation::deleteLater);
 
-  textAnimation->start();
+  textAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void GraphicsMessageBoxItem::UpdateTextStatus() {
