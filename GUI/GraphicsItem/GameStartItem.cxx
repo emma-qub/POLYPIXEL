@@ -94,6 +94,35 @@ void GameStartItem::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_parts
 
   m_levelStarsItem = new GraphicsStarsItem(p_starsMax, this);
   m_levelStarsItem->setPos(rect().center() - m_levelStarsItem->boundingRect().center());
+
+//  auto pixelRectItem = new GraphicsPixelRectItem(0, 0, 100, 200, this);
+//  pixelRectItem->setPos(0, 0);
+//  pixelRectItem->SetRadiusType(GraphicsPixelRectItem::eFlatRadius);
+//  pixelRectItem->SetRadiusPositions(GraphicsPixelRectItem::eTopLeftRadius);
+//  pixelRectItem->setBrush(QColor("#e63ab7"));
+//  pixelRectItem->setPen(Qt::NoPen);
+
+//  auto pixelRectItem2 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
+//  pixelRectItem2->setPos(101, 0);
+//  pixelRectItem2->SetRadiusType(GraphicsPixelRectItem::eSmallRadius);
+//  pixelRectItem2->SetRadiusPositions(GraphicsPixelRectItem::eTopLeftRadius);
+//  pixelRectItem2->setBrush(QColor("#28e6d6"));
+//  pixelRectItem2->setPen(Qt::NoPen);
+
+//  auto pixelRectItem3 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
+//  pixelRectItem3->setPos(0, 201);
+//  pixelRectItem3->SetRadiusType(GraphicsPixelRectItem::eMediumRadius);
+//  pixelRectItem3->SetRadiusPositions(GraphicsPixelRectItem::eLeftRadius);
+//  pixelRectItem3->setBrush(QColor("#70e51a"));
+//  pixelRectItem3->setPen(Qt::NoPen);
+
+//  auto pixelRectItem4 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
+//  pixelRectItem4->setPos(101, 201);
+//  pixelRectItem4->SetRadiusType(GraphicsPixelRectItem::eLargeRadius);
+//  pixelRectItem4->SetRadiusPositions(GraphicsPixelRectItem::eRightRadius);
+//  pixelRectItem4->setBrush(QColor("#8a2dcc"));
+//  pixelRectItem4->setPen(Qt::NoPen);
+
 }
 
 GameStartItem::~GameStartItem() = default;
