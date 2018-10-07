@@ -3,6 +3,10 @@
 #include "GUI/Models/PolygonModel.hxx"
 #include "Core/Point.hxx"
 
+#include "GUI/GraphicsItem/GraphicsPixelLine.hxx"
+
+
+
 #include <QGraphicsLineItem>
 
 AbstractScribblingView2::AbstractScribblingView2(QWidget* p_parent):
@@ -61,7 +65,12 @@ void AbstractScribblingView2::DrawLine(ppxl::Segment const& p_line, QColor const
 
     m_pen.setColor(p_color);
     m_pen.setStyle(p_penStyle);
-    m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
+
+    auto line = new GraphicsPixelLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), 5);
+    line->setBrush(p_color);
+    m_scene->addItem(line);
+
+    //m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
   }
 }
 
