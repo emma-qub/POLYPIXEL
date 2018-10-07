@@ -1,22 +1,21 @@
 #include "MapView.hxx"
 
 #include "GUI/GraphicsItem/GraphicsMessageBoxItem.hxx"
+#include "GUI/GraphicsItem/GameStartItem.hxx"
+#include "Parser/Parser.hxx"
 
 #include <QAction>
-#include <QPropertyAnimation>
 #include <QFile>
 #include <QTextStream>
-
-
-
-#include <QDebug>
-
-
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
+#include <QGraphicsEffect>
 
 MapView::MapView(QWidget* p_parent):
   QGraphicsView(p_parent),
   m_scene(nullptr),
   m_player(nullptr),
+  m_gameStartItem(nullptr),
   m_worlds(),
   m_currentLevel(nullptr),
   m_playerIsMoving(false),
@@ -116,7 +115,7 @@ void MapView::InitView() {
   m_player->setPos(firstLevelPosition.x()-playerBoundungRect.width()/2, firstLevelPosition.y()-playerBoundungRect.height()/2);
 
   connect(m_player, &PlayerItem::Move, this, &MapView::MovePlayer);
-  connect(m_player, &PlayerItem::Enter, this, &MapView::PlayLevel);
+  connect(m_player, &PlayerItem::Enter, this, &MapView::DisplayGameStart);
 
   m_viewInitialized = true;
 }
@@ -256,7 +255,14 @@ void MapView::AnimatePlayer() {
 }
 
 void MapView::PlayLevel() {
+  CleanGameStart();
   Q_EMIT(PlayLevelRequested(m_currentLevel->m_levelPath));
+}
+
+void MapView::CleanGameStart() {
+  scene()->removeItem(m_gameStartItem);
+  m_gameStartItem = nullptr;
+  m_player->setFocus();
 }
 
 void MapView::OpenMessageBoxTest() {
@@ -275,6 +281,26 @@ void MapView::OpenMessageBoxTest() {
   });
 }
 
+void MapView::DisplayGameStart() {
+  // Create GameStart item
+  m_gameStartItem = new GameStartItem(0, 0, width()/4, 2*height()/3, 20);
+  scene()->addItem(m_gameStartItem);
+  m_gameStartItem->InitItems();
+
+  QPointF startTopLeftCorner(3.*width()/8., -2.*height()/3.);
+  QPointF endStartLeftCorner(startTopLeftCorner.x(), height()/6.);
+
+  m_gameStartItem->setPos(startTopLeftCorner);
+
+  Parser parser(m_currentLevel->m_levelPath);
+  m_gameStartItem->SetLevelInfo(m_currentLevel->m_levelNumber,
+    parser.GetLinesGoal(), parser.GetPartsGoal(), parser.GetStarsCount());
+  m_gameStartItem->Open(startTopLeftCorner, endStartLeftCorner);
+  m_gameStartItem->setFocus();
+
+  connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &MapView::PlayLevel);
+  connect(m_gameStartItem, &GameStartItem::CancelLevelRequested, this, &MapView::CleanGameStart);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,10 +6,17 @@
 class GraphicsGoalItem: public QGraphicsRectItem {
 
 public:
-  GraphicsGoalItem(QPixmap const& p_pixmap, QString const& p_text, QFont const& p_font, QGraphicsItem* p_parent = nullptr);
+  GraphicsGoalItem(QFont const& p_font, QGraphicsItem* p_parent = nullptr);
+  GraphicsGoalItem(QFont const& p_font, QPixmap const& p_pixmap, int p_goalNumber, QGraphicsItem* p_parent = nullptr);
   ~GraphicsGoalItem() override;
 
+  void SetPixmap(const QPixmap& p_pixmap);
+  void SetGoalNumber(int p_goalNumber);
+
   QRectF boundingRect() const override;
+
+protected:
+  void AlignPixmapAndText();
 
 private:
   QGraphicsPixmapItem* m_pixmapItem;

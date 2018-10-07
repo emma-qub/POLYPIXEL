@@ -96,6 +96,7 @@ void GraphicsPixelRectItem::paint(QPainter* p_painter, const QStyleOptionGraphic
 
 GraphicsRoundedRectItem::GraphicsRoundedRectItem(
   qreal p_x, qreal p_y, qreal p_width, qreal p_height, qreal p_radiusX, qreal p_radiusY, QGraphicsItem* p_parent):
+  QObject(),
   QGraphicsRectItem(p_x, p_y, p_width, p_height, p_parent),
   m_radiusX(p_radiusX),
   m_radiusY(p_radiusY) {

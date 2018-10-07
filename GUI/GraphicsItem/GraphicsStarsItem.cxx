@@ -1,7 +1,21 @@
 #include "GraphicsStarsItem.hxx"
 
+#include <QGraphicsScene>
+
+GraphicsStarsItem::GraphicsStarsItem(QGraphicsItem* p_parent):
+  GraphicsStarsItem(-1, p_parent) {
+}
+
 GraphicsStarsItem::GraphicsStarsItem(int p_starsCount, QGraphicsItem* p_parent):
   QGraphicsPixmapItem(p_parent) {
+
+  SetStarsCount(p_starsCount);
+}
+
+void GraphicsStarsItem::SetStarsCount(int p_starsCount) {
+  for (auto* item: childItems()) {
+    scene()->removeItem(item);
+  }
 
   double xOffset = 0;
 

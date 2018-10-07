@@ -23,9 +23,7 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
   connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
-  connect(m_view, &PlayingView::PolygonsAnimationDone, this, &PlayingController::DisplayGameOver);
-  connect(m_view, &PlayingView::StartLevelRequested, this, &PlayingController::StartLevel);
-  connect(m_view, &PlayingView::CancelLevelRequested, this, &PlayingController::CancelLevelRequested);
+  //connect(m_view, &PlayingView::PolygonsAnimationDon, this, &PlayingController::);
 }
 
 void PlayingController::InitView() {
@@ -329,16 +327,13 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
     return;
   }
 
-  auto levelNumber = p_levelPath.split('/').last().split("L").last().split(".ppxl").first().toInt();
-
   // Prompt Level Info
   Parser parser(p_levelPath);
   m_model->SetPolygonsList(parser.GetPolygonList());
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
-  m_view->SetLevelInfo(levelNumber, m_gameInfo.m_linesGoal, m_gameInfo.m_partsGoal, m_gameInfo.m_starsMax);
-  m_view->DisplayGameStart();
+  StartLevel();
 }
 
 void PlayingController::StartLevel() {
@@ -371,11 +366,11 @@ QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxAr
   return orientedAreas;
 }
 
-QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList() {
+QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter) {
   QList<ppxl::Vector> shiftVectors;
 
   for (auto const* polygon: m_model->GetPolygonsList()) {
-    ppxl::Vector currShift(ComputeGlobalBarycenter(), polygon->Barycenter());
+    ppxl::Vector currShift(p_globalBarycenter, polygon->Barycenter());
     double currShiftLength = currShift.Norm();
     currShift.Normalize();
     currShift *= 0.2*currShiftLength;
@@ -403,16 +398,19 @@ void PlayingController::CheckWinning() {
   if (m_gameInfo.m_linesCount >= m_gameInfo.m_linesGoal || m_gameInfo.m_partsCount >= m_gameInfo.m_partsGoal) {
     double minArea;
     double maxArea;
+    auto globalBarycenter = ComputeGlobalBarycenter();
+    auto shiftVectorsList = ComputeShiftVectorsList(globalBarycenter);
     auto areasList = ComputeAreas(minArea, maxArea);
     double gap = std::abs(maxArea - minArea);
-
-    auto shiftVectorsList = ComputeShiftVectorsList();
-    TranslatePolygons(shiftVectorsList);
 
     auto starsCount = ComputeStarsCount(gap);
     m_gameInfo.m_stars = starsCount;
     UpdateStarsMax(starsCount);
 
+    m_view->SetEndLevelInfo(m_gameInfo.m_linesCount, m_gameInfo.m_linesGoal, m_gameInfo.m_partsCount, m_gameInfo.m_partsGoal, m_gameInfo.m_stars);
+    m_view->SetAreasData(areasList, shiftVectorsList, globalBarycenter);
+
+    m_view->AnimatePolygons();
     m_view->EndLevel();
 
     disconnect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
@@ -436,25 +434,6 @@ ppxl::Point PlayingController::ComputeGlobalBarycenter() const {
 
 double PlayingController::ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const {
   return qRound(10.*polygon.OrientedArea() * 100. / m_orientedAreaTotal) / 10.;
-}
-
-void PlayingController::TranslatePolygons(QList<ppxl::Vector> const& p_shiftVectors) {
-//  PolygonList newPolygons;
-
-//  auto polygons = m_model->GetPolygonsList();
-//  assert(polygons.size() == shiftVectors.size());
-
-//  int index = 0;
-//  for (auto const* polygon: polygons) {
-//    ppxl::Polygon newPolygon(*polygon);
-//    newPolygon.Translate(shiftVectors.at(index));
-//    newPolygons << newPolygon;
-//    ++index;
-//  }
-
-//  m_model->SetPolygonsList(newPolygons);
-
-  m_view->AnimatePolygons(p_shiftVectors);
 }
 
 void PlayingController::UpdateStarsMax(int starsMaxCount) {

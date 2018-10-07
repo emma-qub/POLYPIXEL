@@ -34,9 +34,7 @@ PlayingView::PlayingView(QWidget* p_parent):
   connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
   connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
   connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
-  connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDone, this, &PlayingView::PolygonsAnimationDone);
-  connect(m_scribblingView, &PlayingScribblingView::StartLevelRequested, this, &PlayingView::StartLevelRequested);
-  connect(m_scribblingView, &PlayingScribblingView::CancelLevelRequested, this, &PlayingView::CancelLevelRequested);
+  //connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDon, this, &PlayingView::PolygonsAnimationDon);
 }
 
 void PlayingView::InitView() {
@@ -55,16 +53,16 @@ void PlayingView::DrawFromModel() {
   m_scribblingView->DrawFromModel();
 }
 
-void PlayingView::DrawAreas(QList<double> const& p_areas) {
-  m_scribblingView->DrawAreas(p_areas);
+void PlayingView::SetAreasData(QList<double> const& p_areas, QList<ppxl::Vector> p_shiftVectors, ppxl::Point const& p_figureCenter) {
+  m_scribblingView->SetAreasData(p_areas, p_shiftVectors, p_figureCenter);
 }
 
 void PlayingView::ClearImage() {
   m_scribblingView->ClearImage();
 }
 
-void PlayingView::AnimatePolygons(QList<ppxl::Vector> const& p_shiftVectors) {
-  m_scribblingView->AnimatePolygons(p_shiftVectors);
+void PlayingView::AnimatePolygons() {
+  m_scribblingView->AnimatePolygons();
 }
 
 void PlayingView::UpdateLinesCount(int p_linesCount, int p_linesGoal) {
@@ -87,20 +85,16 @@ void PlayingView::UpdatePartsCount(int p_partsCount, int p_partsGoal) {
   m_partsCountLabel->setText(tr("Parts: %1/%2").arg(m_partsCount).arg(m_partsGoal));
 }
 
-void PlayingView::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax) {
-  m_scribblingView->SetLevelInfo(p_levelNumber, p_linesGoal, p_partsGoal, p_starsMax);
-}
-
-void PlayingView::DisplayGameStart() {
-  m_scribblingView->DisplayGameStart();
-}
-
 void PlayingView::StartLevel() {
   m_scribblingView->SetCanScribble(true);
 }
 
 void PlayingView::EndLevel() {
   m_scribblingView->SetCanScribble(false);
+}
+
+void PlayingView::SetEndLevelInfo(int m_linesCount, int m_linesGoal, int m_partsCount, int m_partsGoal, int m_stars) {
+  m_scribblingView->SetEndLevelInfo(m_linesCount, m_linesGoal, m_partsCount, m_partsGoal, m_stars);
 }
 
 void PlayingView::DisplayGameOver() {

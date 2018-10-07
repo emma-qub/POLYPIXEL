@@ -8,6 +8,7 @@
 #include <memory>
 
 class PlayerItem;
+class GameStartItem;
 
 struct Level {
   Level(int p_levelNumber, QString const& p_levelName, QString const& p_levelPath):
@@ -78,6 +79,7 @@ public:
 signals:
   void PlayerReadchedDestination();
   void PlayLevelRequested(QString const& p_levelPath);
+  void CancelLevelRequested();
 
 protected:
   void OpenMessageBoxTest();
@@ -85,14 +87,20 @@ protected:
   void MovePlayer(PlayerItem::Direction p_direction);
   void AnimatePlayer();
   void PlayLevel();
+  void CleanGameStart();
+
+  void DisplayGameStart();
 
 private:
   QGraphicsScene* m_scene;
   PlayerItem* m_player;
+  GameStartItem* m_gameStartItem;
+
   QList<World*> m_worlds;
   Level* m_currentLevel;
   World* m_currentWorld;
   QList<Path::Directions> m_currentDirections;
+
   bool m_playerIsMoving;
   bool m_viewInitialized;
 };

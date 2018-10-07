@@ -103,7 +103,6 @@ MainWindow::MainWindow(QWidget* p_parent):
   //worldsState->addTransition(m_worldsView, &WorldsView::AchievementsRequested, achievementsState);
   //worldsState->addTransition(m_worldsView, &WorldsView::Done, mainMenuState);
   gameState->addTransition(m_gameView, &GameView::PauseRequested, pauseState);
-  gameState->addTransition(m_gameView, &GameView::CancelLevelRequested, mapState);
   pauseState->addTransition(m_pauseView, &PauseView::ResumeRequested, gameState);
   pauseState->addTransition(m_pauseView, &PauseView::RestartRequested, gameState);
   pauseState->addTransition(m_pauseView, &PauseView::LevelsRequested, mapState);

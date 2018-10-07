@@ -27,7 +27,6 @@ public:
 
 signals:
   void PauseRequested();
-  void CancelLevelRequested();
 
 private:
   QLabel* m_gameLabel;

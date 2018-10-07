@@ -2,7 +2,7 @@
 #define GRAPHICSROUNDEDRECTITEM_HXX
 
 #include <QGraphicsItem>
-
+#include <QObject>
 
 
 class GraphicsPixelRectItem: public QGraphicsRectItem {
@@ -81,11 +81,23 @@ private:
 
 
 
-class GraphicsRoundedRectItem: public QGraphicsRectItem {
+class GraphicsRoundedRectItem: public QObject, public QGraphicsRectItem {
+  Q_OBJECT
+  Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+  Q_PROPERTY(QRectF rect READ rect WRITE setRect)
+  Q_PROPERTY(qreal scale READ scale WRITE setScale)
 
 public:
   GraphicsRoundedRectItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height, qreal p_radiusX, qreal p_radiusY, QGraphicsItem* p_parent = nullptr);
   ~GraphicsRoundedRectItem() override;
+
+  qreal scale() {return m_scale;}
+  void setScale(qreal p_scale) {
+    QTransform t;
+    t.scale(p_scale, p_scale);
+    setTransform(t);
+    setTransformOriginPoint(boundingRect().center());
+  }
 
   QRectF boundingRect() const override;
   void paint(QPainter* p_painter, QStyleOptionGraphicsItem const* p_option, QWidget* p_widget) override;
@@ -95,6 +107,7 @@ public:
 private:
   qreal m_radiusX;
   qreal m_radiusY;
+  qreal m_scale;
 };
 
 class GraphicsTopRoundedRectItem: public QGraphicsRectItem {
