@@ -13,7 +13,8 @@ public:
     eRight,
     eUp,
     eLeft,
-    eDown
+    eDown,
+    eNone
   };
 
   PlayerItem(QGraphicsItem* p_parent = nullptr);

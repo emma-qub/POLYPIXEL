@@ -20,7 +20,6 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   m_gameOverItem(nullptr),
   m_overlayItem(nullptr),
   m_overlayBrush(QColor(0, 0, 0, 192)),
-  m_levelNumber(-1),
   m_linesCount(-1),
   m_linesGoal(-1),
   m_partsCount(-1),
@@ -36,7 +35,7 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
 void PlayingScribblingView::InitView() {
   AbstractScribblingView2::InitView();
 
-  m_gameOverItem = new GameOverItem(0, 0, width()/3, 2*height()/3);
+  m_gameOverItem = new GameOverItem(0, 0, width()/3, 700, 20.);
 }
 
 PlayingScribblingView::~PlayingScribblingView() = default;
@@ -62,8 +61,12 @@ void PlayingScribblingView::DisplayGameOver() {
   m_gameOverItem->setPos(width()/3, -2*height()/3);
   scene()->addItem(m_gameOverItem);
   m_gameOverItem->SetAreasData(GetModel()->GetPolygonsList(), m_areas, m_figureCenter);
+  m_gameOverItem->SetLevelData(m_linesCount, m_linesGoal, m_partsCount, m_partsGoal, m_starsMax);
   m_gameOverItem->Open(QPointF(width()/3, -2*height()/3), QPointF(width()/3, height()/6));
   m_gameOverItem->setFocus();
+
+  connect(m_gameOverItem, &GameOverItem::ReplayRequested, this, &PlayingScribblingView::ReplayRequested);
+  connect(m_gameOverItem, &GameOverItem::GoToMapRequested, this, &PlayingScribblingView::GoToMapRequested);
 }
 
 void PlayingScribblingView::SetEndLevelInfo(int p_linesCount, int p_linesGoal, int p_partsCount, int p_partsGoal, int p_stars) {
@@ -82,7 +85,7 @@ void PlayingScribblingView::SetAreasData(QList<double> const& p_areas, QList<ppx
 
 void PlayingScribblingView::DisplayWinOrFail() {
   QString endMessage;
-  bool fail = m_starsMax == 0 || m_linesCount != m_linesGoal || m_partsCount != m_partsGoal;
+  bool fail = m_starsMax == 0;
   bool perfect = m_starsMax == 4;
   if (fail) {
     endMessage = tr("Fail");
@@ -178,9 +181,13 @@ void PlayingScribblingView::AnimatePerfect(QObject* p_rectItem, QRectF const& p_
   animationInPos->setDuration(250);
   animationInPos->setEasingCurve(QEasingCurve::InExpo);
 
-  auto animation = new QParallelAnimationGroup(this);
-  animation->addAnimation(animationInScale);
-  animation->addAnimation(animationInPos);
+  auto animationIn = new QParallelAnimationGroup(this);
+  animationIn->addAnimation(animationInScale);
+  animationIn->addAnimation(animationInPos);
+
+  auto animation = new QSequentialAnimationGroup(this);
+  animation->addAnimation(animationIn);
+  animation->addPause(1000);
   connect(animation, &QParallelAnimationGroup::finished, this, &PlayingScribblingView::DisplayGameOver);
   animation->start(QAbstractAnimation::DeleteWhenStopped);
 }

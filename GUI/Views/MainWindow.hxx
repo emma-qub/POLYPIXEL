@@ -29,8 +29,8 @@ public:
 
 protected:
   void SetModelsToTestController();
-
   void SetCurrentLevel(QString const& p_currentLevel) { m_currentLevel = p_currentLevel; }
+  void GoToMap(bool p_moveToNextLevel);
 
 private:
   QStateMachine m_stateMachine;

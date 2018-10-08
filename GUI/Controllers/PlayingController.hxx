@@ -50,6 +50,9 @@ public:
   void RestartLevel();
   void Redraw();
 
+signals:
+  void GoToMapRequested(bool p_moveToNextLevel);
+
 protected:
   virtual void UpdateViewFromGameInfo();
 

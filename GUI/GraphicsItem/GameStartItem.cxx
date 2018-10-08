@@ -49,8 +49,6 @@ GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height
     "  font-style: normal;"
     "  font-size: 36px;"
     "}";
-  auto cancelButton = new QPushButton("X");
-
   auto playButton = new QPushButton("Let's play");
   playButton->setFlat(true);
   playButton->setStyleSheet(buttonStyle);
@@ -61,8 +59,9 @@ GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height
 
   connect(playButton, &QPushButton::clicked, this, &GameStartItem::CloseToPlay);
 
+  auto cancelButton = new QPushButton(QIcon(QPixmap(":/sprites/level/close.svg").scaled(32, 32)), "");
+  cancelButton->setIconSize(QSize(32, 32));
   cancelButton->setFlat(true);
-  cancelButton->setStyleSheet(buttonStyle);
   cancelButton->setFixedSize(static_cast<int>(closeRect.height())/2, static_cast<int>(closeRect.height())/2);
   auto proxyCancelItem = new QGraphicsProxyWidget(this);
   proxyCancelItem->setWidget(cancelButton);
@@ -90,11 +89,13 @@ void GameStartItem::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_parts
   auto shiftX = rect().center().x() - m_levelNumberItem->boundingRect().center().x();
   m_levelNumberItem->setPos(shiftX, 10);
 
-  m_levelLinesGoalItem->SetPixmap(QPixmap(":/sprites/level/lines.png"));
+  int iconSide = 32;
+
+  m_levelLinesGoalItem->SetPixmap(QPixmap(":/sprites/level/pencil.svg").scaled(iconSide, iconSide));
   m_levelLinesGoalItem->SetGoalNumber(p_linesGoal);
   m_levelLinesGoalItem->setPos(rect().width()/2.-5.*m_levelLinesGoalItem->boundingRect().width()/4., m_levelNumberItem->boundingRect().height()+32.);
 
-  m_levelPartsGoalItem->SetPixmap(QPixmap(":/sprites/level/parts.png"));
+  m_levelPartsGoalItem->SetPixmap(QPixmap(":/sprites/level/piece.svg").scaled(iconSide, iconSide));
   m_levelPartsGoalItem->SetGoalNumber(p_partsGoal);
   m_levelPartsGoalItem->setPos(rect().width()/2.+m_levelLinesGoalItem->boundingRect().width()/4., m_levelNumberItem->boundingRect().height()+32.);
 

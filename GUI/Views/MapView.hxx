@@ -26,7 +26,8 @@ struct Path {
     eRight,
     eUp,
     eLeft,
-    eDown
+    eDown,
+    eNone
   };
 
   Path(Level* p_levelStart, QList<Directions> const& p_stepsList, Level* p_levelEnd):
@@ -34,10 +35,16 @@ struct Path {
     m_directionsList(p_stepsList),
     m_endLevel(p_levelEnd) {}
 
-  Level* FindDestination(Level* p_level) {
+  Level* FindNextLevel(Level* p_level) const {
     if (p_level == m_startLevel) {
       return m_endLevel;
-    } else if (p_level == m_endLevel) {
+    } else {
+      return nullptr;
+    }
+  }
+
+  Level* FindPreviousLevel(Level* p_level) const {
+    if (p_level == m_endLevel) {
       return m_startLevel;
     } else {
       return nullptr;
@@ -56,14 +63,13 @@ struct World {
   void SetFirstLevelPosition(QPointF const& p_position);
   void AppendPath(Path const& p_path);
   QList<Path> GetPathsFromStartLevel(Level* p_startLevel) const;
+  Path::Directions FindDirectionToNextLevel(Level* p_level);
 
 int m_worldNumber;
 QString m_worldName;
 QMap<Level*, QPointF> m_positionByLevel;
 QList<Level*> m_levelsList;
 QList<Path> m_pathsList;
-Level* m_previousLevel;
-Level* m_nextLevel;
 QPointF m_firstLevelPosition;
 };
 
@@ -75,9 +81,10 @@ public:
   ~MapView() override;
 
   void InitView();
+  void MoveToNextLevel();
 
 signals:
-  void PlayerReadchedDestination();
+  void PlayerReachedDestination();
   void PlayLevelRequested(QString const& p_levelPath);
   void CancelLevelRequested();
 

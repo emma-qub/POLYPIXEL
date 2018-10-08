@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   //worldsState->addTransition(m_worldsView, &WorldsView::AchievementsRequested, achievementsState);
   //worldsState->addTransition(m_worldsView, &WorldsView::Done, mainMenuState);
   gameState->addTransition(m_gameView, &GameView::PauseRequested, pauseState);
+  gameState->addTransition(m_gameView, &GameView::GoToMapRequested, mapState);
   pauseState->addTransition(m_pauseView, &PauseView::ResumeRequested, gameState);
   pauseState->addTransition(m_pauseView, &PauseView::RestartRequested, gameState);
   pauseState->addTransition(m_pauseView, &PauseView::LevelsRequested, mapState);
@@ -127,6 +128,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
   connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
   connect(m_mapView, &MapView::PlayLevelRequested, this, &MainWindow::SetCurrentLevel);
+  connect(m_gameView, &GameView::GoToMapRequested, this, &MainWindow::GoToMap);
 
   m_stateMachine.setInitialState(loadingState);
   m_stateMachine.start();
@@ -145,4 +147,10 @@ void MainWindow::SetModelsToTestController() {
   m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
   m_testLevelController->SetModel(m_createLevelController->GetModel());
   m_testLevelController->PlayLevel();
+}
+
+void MainWindow::GoToMap(bool p_moveToNextLevel) {
+  if (p_moveToNextLevel) {
+    m_mapView->MoveToNextLevel();
+  }
 }

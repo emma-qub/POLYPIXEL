@@ -31,12 +31,6 @@ signals:
   void StartLevelRequested();
   void CancelLevelRequested();
 
-
-
-  void FadeInOverlayDone();
-  void FadeOutOverlayDone();
-
-
 private:
   QGraphicsSimpleTextItem* m_levelNumberItem;
   GraphicsGoalItem* m_levelLinesGoalItem;

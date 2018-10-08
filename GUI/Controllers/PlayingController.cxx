@@ -23,7 +23,8 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
   connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
-  //connect(m_view, &PlayingView::PolygonsAnimationDon, this, &PlayingController::);
+  connect(m_view, &PlayingView::ReplayRequested, this, &PlayingController::RestartLevel);
+  connect(m_view, &PlayingView::GoToMapRequested, this, &PlayingController::GoToMapRequested);
 }
 
 void PlayingController::InitView() {
@@ -339,6 +340,7 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
 void PlayingController::StartLevel() {
   m_view->StartLevel();
   m_view->ClearImage();
+  m_orientedAreaTotal = 0.;
 
   UpdateViewFromGameInfo();
 
@@ -355,8 +357,18 @@ QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxAr
   p_minArea = 100.;
   p_maxArea = 0.;
 
-  for (auto const* polygon: m_model->GetPolygonsList()) {
-    double currArea = ComputePolygonPercentageArea(*polygon);
+  double areaCumul = 0.;
+  auto polygonsList = m_model->GetPolygonsList();
+  for (int row = 0; row < polygonsList.size(); ++row) {
+    auto polygon = polygonsList.at(row);
+    double currArea = 0.;
+
+    if (row == polygonsList.size()-1) {
+      currArea = 100. - areaCumul;
+    } else {
+      currArea = ComputePolygonPercentageArea(*polygon);
+      areaCumul += currArea;
+    }
 
     orientedAreas << currArea;
     p_minArea = std::min(currArea, p_minArea);
@@ -385,7 +397,7 @@ int PlayingController::ComputeStarsCount(double p_gap) {
 
   if (m_gameInfo.m_partsCount == m_gameInfo.m_partsGoal && m_gameInfo.m_linesCount == m_gameInfo.m_linesGoal) {
     auto gapRatio = p_gap / static_cast<double>(m_gameInfo.m_maxGapToWin);
-    starsCount = 4 - static_cast<int>(std::ceil(3. * gapRatio));
+    starsCount = std::max(starsCount, 4 - static_cast<int>(std::ceil(3. * gapRatio)));
     if (starsCount >= 3 && static_cast<int>(10. * p_gap / static_cast<double>(m_gameInfo.m_partsGoal)) <= m_gameInfo.m_tolerance) {
       starsCount = 4;
     }
@@ -406,6 +418,14 @@ void PlayingController::CheckWinning() {
     auto starsCount = ComputeStarsCount(gap);
     m_gameInfo.m_stars = starsCount;
     UpdateStarsMax(starsCount);
+
+    if (starsCount == 4) {
+      areasList.clear();
+      double area = 100./m_gameInfo.m_partsGoal;
+      for (int k = 0; k < m_gameInfo.m_partsCount; ++k) {
+        areasList << area;
+      }
+    }
 
     m_view->SetEndLevelInfo(m_gameInfo.m_linesCount, m_gameInfo.m_linesGoal, m_gameInfo.m_partsCount, m_gameInfo.m_partsGoal, m_gameInfo.m_stars);
     m_view->SetAreasData(areasList, shiftVectorsList, globalBarycenter);

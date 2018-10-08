@@ -42,6 +42,8 @@ signals:
   void ControlPressed(QPoint const& p_cursorPosition);
   void ControlReleased(QPoint const& p_cursorPosition);
   void PolygonsAnimationDone();
+  void ReplayRequested();
+  void GoToMapRequested(bool p_moveToNextLevel);
 
 protected:
   PlayingScribblingView* m_scribblingView;

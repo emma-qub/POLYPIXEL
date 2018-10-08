@@ -34,7 +34,8 @@ PlayingView::PlayingView(QWidget* p_parent):
   connect(m_scribblingView, &PlayingScribblingView::Slicing, this, &PlayingView::Slicing);
   connect(m_scribblingView, &PlayingScribblingView::ControlPressed, this, &PlayingView::ControlPressed);
   connect(m_scribblingView, &PlayingScribblingView::ControlReleased, this, &PlayingView::ControlReleased);
-  //connect(m_scribblingView, &PlayingScribblingView::PolygonsAnimationDon, this, &PlayingView::PolygonsAnimationDon);
+  connect(m_scribblingView, &PlayingScribblingView::ReplayRequested, this, &PlayingView::ReplayRequested);
+  connect(m_scribblingView, &PlayingScribblingView::GoToMapRequested, this, &PlayingView::GoToMapRequested);
 }
 
 void PlayingView::InitView() {

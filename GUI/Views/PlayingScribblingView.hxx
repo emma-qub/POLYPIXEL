@@ -30,8 +30,8 @@ signals:
   void ControlPressed(QPoint const& p_cursorPosition);
   void ControlReleased(QPoint const& p_cursorPosition);
   void PolygonsAnimationDone();
-  void FadeInOverlayDone();
-  void FadeOutOverlayDone();
+  void ReplayRequested();
+  void GoToMapRequested(bool p_moveToNextLevel);
 
 protected:
   void keyPressEvent(QKeyEvent* p_event) override;
@@ -52,7 +52,6 @@ private:
   QGraphicsRectItem* m_overlayItem;
   QBrush m_overlayBrush;
 
-  int m_levelNumber;
   int m_linesCount;
   int m_linesGoal;
   int m_partsCount;

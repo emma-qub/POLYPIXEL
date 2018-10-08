@@ -33,7 +33,10 @@
     <qresource prefix="/sprites/level">
         <file alias="emptyStar.png">resources/emptyStar.png</file>
         <file alias="fullStar.png">resources/fullStar.png</file>
-        <file alias="parts.png">resources/parts.png</file>
-        <file alias="lines.png">resources/lines.png</file>
+        <file alias="pencil.svg">resources/pencil-alt.svg</file>
+        <file alias="piece.svg">resources/puzzle-piece.svg</file>
+        <file alias="replay.svg">resources/redo.svg</file>
+        <file alias="close.svg">resources/times.svg</file>
+        <file alias="map.svg">resources/book.svg</file>
     </qresource>
 </RCC>

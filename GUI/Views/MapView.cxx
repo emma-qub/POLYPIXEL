@@ -70,23 +70,22 @@ void MapView::InitView() {
         line->setLine(QLineF(startPosition, endPosition));
         startPosition = endPosition;
         break;
-      }
-      case Path::eUp: {
+      } case Path::eUp: {
         QPointF endPosition(startPosition.x(), startPosition.y()-verticalLineLength);
         line->setLine(QLineF(startPosition, endPosition));
         startPosition = endPosition;
         break;
-      }
-      case Path::eLeft: {
+      } case Path::eLeft: {
         QPointF endPosition(startPosition.x()-horizontalLineLength, startPosition.y());
         line->setLine(QLineF(startPosition, endPosition));
         startPosition = endPosition;
         break;
-      }
-      case Path::eDown: {
+      } case Path::eDown: {
         QPointF endPosition(startPosition.x(), startPosition.y()+verticalLineLength);
         line->setLine(QLineF(startPosition, endPosition));
         startPosition = endPosition;
+        break;
+      } default: {
         break;
       }
       }
@@ -118,6 +117,13 @@ void MapView::InitView() {
   connect(m_player, &PlayerItem::Enter, this, &MapView::DisplayGameStart);
 
   m_viewInitialized = true;
+}
+
+void MapView::MoveToNextLevel() {
+  Path::Directions direction = m_currentWorld->FindDirectionToNextLevel(m_currentLevel);
+  MovePlayer(static_cast<PlayerItem::Direction>(direction));
+
+  connect(this, &MapView::PlayerReachedDestination, this, &MapView::DisplayGameStart);
 }
 
 void MapView::InitWorld1() {
@@ -209,7 +215,7 @@ void MapView::MovePlayer(PlayerItem::Direction p_direction) {
       m_currentDirections = path.m_directionsList;
       m_playerIsMoving = true;
       AnimatePlayer();
-      connect(this, &MapView::PlayerReadchedDestination, this, [this, path](){
+      connect(this, &MapView::PlayerReachedDestination, this, [this, path](){
         m_playerIsMoving = false;
         m_currentLevel = path.m_endLevel;
       });
@@ -219,7 +225,7 @@ void MapView::MovePlayer(PlayerItem::Direction p_direction) {
 
 void MapView::AnimatePlayer() {
   if (m_currentDirections.isEmpty()) {
-    Q_EMIT(PlayerReadchedDestination());
+    Q_EMIT(PlayerReachedDestination());
     return;
   }
 
@@ -231,24 +237,22 @@ void MapView::AnimatePlayer() {
   case Path::eRight: {
     endValue.rx() += width()/10;
     break;
-  }
-  case Path::eUp: {
+  } case Path::eUp: {
     endValue.ry() -= height()/10;
     break;
-  }
-  case Path::eLeft: {
+  } case Path::eLeft: {
     endValue.rx() -= width()/10;
     break;
-  }
-  case Path::eDown: {
+  } case Path::eDown: {
     endValue.ry() += height()/10;
+    break;
+  } default: {
     break;
   }
   }
   m_currentDirections.pop_front();
   animation->setEndValue(endValue);
   animation->setDuration(500);
-  //animation->setEasingCurve(QEasingCurve::InOutQuint);
   connect(animation, &QPropertyAnimation::finished, this, &MapView::AnimatePlayer);
 
   animation->start(QAbstractAnimation::DeleteWhenStopped);
@@ -282,6 +286,8 @@ void MapView::OpenMessageBoxTest() {
 }
 
 void MapView::DisplayGameStart() {
+  disconnect(this, &MapView::PlayerReachedDestination, this, &MapView::DisplayGameStart);
+
   // Create GameStart item
   m_gameStartItem = new GameStartItem(0, 0, width()/4, 2*height()/3, 20);
   scene()->addItem(m_gameStartItem);
@@ -312,9 +318,7 @@ World::World(int p_worldNumber, const QString& p_worldName):
   m_worldName(p_worldName),
   m_positionByLevel(),
   m_levelsList(),
-  m_pathsList(),
-  m_previousLevel(nullptr),
-  m_nextLevel(nullptr) {
+  m_pathsList() {
 }
 
 World::~World() {
@@ -341,4 +345,15 @@ QList<Path> World::GetPathsFromStartLevel(Level* p_startLevel) const
   }
 
   return paths;
+}
+
+Path::Directions World::FindDirectionToNextLevel(Level* p_level) {
+  for (auto const& path: m_pathsList) {
+    auto otherLevel = path.FindNextLevel(p_level);
+    if (otherLevel && otherLevel->m_levelNumber >= p_level->m_levelNumber+1) {
+      return path.m_directionsList.at(0);
+    }
+  }
+
+  return Path::eNone;
 }
