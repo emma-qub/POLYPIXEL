@@ -7,11 +7,13 @@
 #include "Core/Segment.hxx"
 #include "Core/Polygon.hxx"
 #include "Objects/Obstacles/Tape.hxx"
+#include "Objects/Obstacles/OneWay.hxx"
 #include "Objects/Deviations/Mirror.hxx"
 #include "Objects/Deviations/Portal.hxx"
 
 using PolygonList = QList<ppxl::Polygon>;
 using TapeList = QList<Tape>;
+using OneWayList = QList<OneWay>;
 using MirrorList = QList<Mirror>;
 using PortalList = QList<Portal>;
 
@@ -25,7 +27,7 @@ public:
   int GetInt(QDomElement const& p_element, QString const& p_attributeName) const;
   double GetDouble(QDomElement const& p_element, QString const& p_attributeName) const;
   int GetIntValue(QString const& p_tagName, QString const& p_attributeName = "value") const;
-  QDomElement GetElementById(QDomElement const& parent, QString const& p_name, int p_id) const;
+  QDomElement GetElementById(QDomElement const& p_parent, QString const& p_name, int p_id) const;
   inline QDomDocument GetDoc() const { return m_doc; }
 
   // Game Infos
@@ -44,17 +46,22 @@ public:
   inline int GetPolygonNodesCount() const { return m_polygonNodesCount; }
 
   // Tape
-  Tape GetTape(QDomElement const& element) const;
+  Tape GetTape(QDomElement const& p_element) const;
   QDomElement GetTapeById(int p_id) const;
   TapeList GetTapeList();
 
+  // OneWay
+  OneWay GetOneWay(QDomElement const& p_element) const;
+  QDomElement GetOneWayById(int p_id) const;
+  OneWayList GetOneWayList() const;
+
   // Mirror
-  Mirror GetMirror(QDomElement const& element) const;
+  Mirror GetMirror(QDomElement const& p_element) const;
   QDomElement GetMirrorById(int p_id) const;
   MirrorList GetMirrorList() const;
 
   // Portal
-  Portal GetPortal(QDomElement const& element) const;
+  Portal GetPortal(QDomElement const& p_element) const;
   QDomElement GetPortalById(int p_id) const;
   PortalList GetPortalList() const;
 
@@ -65,13 +72,13 @@ private:
   QDomElement m_polygons;
   QDomElement m_lineModifiers;
   QDomElement m_tapes;
+  QDomElement m_oneWays;
   QDomElement m_mirrors;
   QDomElement m_portals;
-  QDomElement m_refractors;
-  QDomElement m_hints;
 
   int m_polygonNodesCount;
   int m_tapeNodesCount;
+  int m_oneWayNodesCount;
   int m_mirrorNodesCount;
   int m_portalNodesCount;
 };

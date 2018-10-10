@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-Mirror::Mirror(int p_xa, int p_ya, int p_xb, int p_yb):
+Mirror::Mirror(double p_xa, double p_ya, double p_xb, double p_yb):
   Deviation(),
   m_mirrorLine(p_xa, p_ya, p_xb, p_yb) {
 }
@@ -12,7 +12,7 @@ Mirror::Mirror(int p_xa, int p_ya, int p_xb, int p_yb):
 Mirror::~Mirror() = default;
 
 std::string Mirror::GetName() const {
-  return "mirror";
+  return "Mirror";
 }
 
 QList<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {

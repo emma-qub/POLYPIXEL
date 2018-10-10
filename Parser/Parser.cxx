@@ -20,12 +20,14 @@ Parser::Parser(QString const& p_xmlFileName):
   }
 
   m_polygons = m_doc.firstChildElement("level").firstChildElement("polygons");
-  m_tapes = m_doc.firstChildElement("level").firstChildElement("linemodifiers").firstChildElement("tapes");
-  m_mirrors = m_doc.firstChildElement("level").firstChildElement("linemodifiers").firstChildElement("mirrors");
-  m_portals = m_doc.firstChildElement("level").firstChildElement("linemodifiers").firstChildElement("portals");
+  m_tapes = m_doc.firstChildElement("level").firstChildElement("objects").firstChildElement("obstacles").firstChildElement("tapes");
+  m_oneWays = m_doc.firstChildElement("level").firstChildElement("objects").firstChildElement("obstacles").firstChildElement("oneways");
+  m_mirrors = m_doc.firstChildElement("level").firstChildElement("objects").firstChildElement("deviations").firstChildElement("mirrors");
+  m_portals = m_doc.firstChildElement("level").firstChildElement("objects").firstChildElement("deviations").firstChildElement("portals");
 
   m_polygonNodesCount = m_polygons.elementsByTagName("polygon").count();
   m_tapeNodesCount = m_tapes.elementsByTagName("tape").count();
+  m_oneWayNodesCount = m_oneWays.elementsByTagName("oneway").count();
   m_mirrorNodesCount = m_mirrors.elementsByTagName("mirror").count();
   m_portalNodesCount = m_portals.elementsByTagName("portal").count();
 
@@ -54,8 +56,8 @@ int Parser::GetIntValue(QString const& p_tagName, QString const& p_attributeName
   return GetInt(element, p_attributeName);
 }
 
-QDomElement Parser::GetElementById(QDomElement const& parent, QString const& p_name, int p_id) const  {
-  QDomNodeList nodeList = parent.elementsByTagName(p_name);
+QDomElement Parser::GetElementById(QDomElement const& p_parent, QString const& p_name, int p_id) const  {
+  QDomNodeList nodeList = p_parent.elementsByTagName(p_name);
   for (int k = 0; k < nodeList.size(); k++) {
     QDomElement element = nodeList.at(k).toElement();
     if (element.attribute("id").toInt() == p_id) {
@@ -137,12 +139,12 @@ PolygonList Parser::GetPolygonList() const {
 
 // Tape
 
-Tape Parser::GetTape(QDomElement const& element) const {
+Tape Parser::GetTape(QDomElement const& p_element) const {
   return Tape(
-    element.attribute("x", "-1").toInt(),
-    element.attribute("y", "-1").toInt(),
-    element.attribute("w", "-1").toInt(),
-    element.attribute("h", "-1").toInt()
+    p_element.attribute("x", "-1.").toDouble(),
+    p_element.attribute("y", "-1.").toDouble(),
+    p_element.attribute("w", "-1.").toDouble(),
+    p_element.attribute("h", "-1.").toDouble()
   );
 }
 
@@ -159,14 +161,40 @@ TapeList Parser::GetTapeList() {
 }
 
 
+// One Way
+
+OneWay Parser::GetOneWay(QDomElement const& p_element) const {
+  return OneWay(
+    p_element.attribute("xa", "-1.").toDouble(),
+    p_element.attribute("ya", "-1.").toDouble(),
+    p_element.attribute("xb", "-1.").toDouble(),
+    p_element.attribute("yb", "-1.").toDouble(),
+    p_element.attribute("xd", "-1.").toDouble(),
+    p_element.attribute("yd", "-1").toDouble()
+  );
+}
+
+QDomElement Parser::GetOneWayById(int p_id) const {
+  return GetElementById(m_oneWays, "oneway", p_id);
+}
+
+OneWayList Parser::GetOneWayList() const {
+  OneWayList oneWayList;
+  for (int k = 0; k < m_oneWayNodesCount; ++k)
+    oneWayList << GetOneWay(GetOneWayById(k));
+
+  return oneWayList;
+}
+
+
 // Mirror
 
-Mirror Parser::GetMirror(QDomElement const& element) const {
+Mirror Parser::GetMirror(QDomElement const& p_element) const {
   return Mirror(
-    element.attribute("xa", "-1").toInt(),
-    element.attribute("ya", "-1").toInt(),
-    element.attribute("xb", "-1").toInt(),
-    element.attribute("yb", "-1").toInt()
+    p_element.attribute("xa", "-1.").toDouble(),
+    p_element.attribute("ya", "-1.").toDouble(),
+    p_element.attribute("xb", "-1.").toDouble(),
+    p_element.attribute("yb", "-1.").toDouble()
   );
 }
 
@@ -185,16 +213,16 @@ MirrorList Parser::GetMirrorList() const {
 
 // Portal
 
-Portal Parser::GetPortal(QDomElement const& element) const {
+Portal Parser::GetPortal(QDomElement const& p_element) const {
   return Portal(
-      element.attribute("xaIn", "-1").toInt(),
-      element.attribute("yaIn", "-1").toInt(),
-      element.attribute("xbIn", "-1").toInt(),
-      element.attribute("ybIn", "-1").toInt(),
-      element.attribute("xaOut", "-1").toInt(),
-      element.attribute("yaOut", "-1").toInt(),
-      element.attribute("xbOut", "-1").toInt(),
-      element.attribute("ybOut", "-1").toInt()
+    p_element.attribute("xaIn", "-1.").toDouble(),
+    p_element.attribute("yaIn", "-1.").toDouble(),
+    p_element.attribute("xbIn", "-1.").toDouble(),
+    p_element.attribute("ybIn", "-1.").toDouble(),
+    p_element.attribute("xaOut", "-1.").toDouble(),
+    p_element.attribute("yaOut", "-1.").toDouble(),
+    p_element.attribute("xbOut", "-1.").toDouble(),
+    p_element.attribute("ybOut", "-1").toDouble()
   );
 }
 

@@ -7,16 +7,16 @@
 class Portal: public Deviation {
 
 public:
-  Portal(int p_xaIn = -1, int p_yaIn = -1, int p_xbIn = -1, int p_ybIn = -1, int p_xaOut = -1, int p_yaOut = -1, int p_xbOut = -1, int p_ybOut = -1);
+  Portal(double p_xaIn = -1, double p_yaIn = -1, double p_xbIn = -1, double p_ybIn = -1, double p_xaOut = -1, double p_yaOut = -1, double p_xbOut = -1, double p_ybOut = -1);
   Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out);
-  virtual ~Portal();
+  ~Portal() override;
 
   inline ppxl::Segment GetIn() const { return m_in; }
   inline ppxl::Segment GetOut() const { return m_out; }
   inline ppxl::Vector GetNormalIn() const { return m_normalIn; }
   inline ppxl::Vector GetNormalOut() const { return m_normalOut; }
 
-  std::string GetName() const;
+  std::string GetName() const override;
   QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const final;
   QList<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
 

@@ -1,17 +1,21 @@
 #include "OneWay.hxx"
 
-OneWay::OneWay(ppxl::Point const& A, ppxl::Point const& B, ppxl::Point const& O, ppxl::Point const& D):
+OneWay::OneWay(double p_xa, double p_ya, double p_xb, double p_yb, double p_xd, double p_yd):
   Obstacle(),
-  m_diodeLine(A, B),
-  m_diodeDirection(O, D) {
+  m_line(p_xa, p_ya, p_xb, p_yb),
+  m_direction(p_xd, p_yd) {
 }
 
 OneWay::~OneWay() = default;
 
-bool OneWay::Crossing(ppxl::Segment const& line) const {
-  if (line.ComputeIntersection(m_diodeLine) == ppxl::Segment::Regular) {
-    auto lineVector = ppxl::Vector::FromSegment(line);
-    return (lineVector * m_diodeDirection) >= 0.;
+std::string OneWay::GetName() const {
+  return "OneWay";
+}
+
+bool OneWay::Crossing(ppxl::Segment const& p_line) const {
+  if (p_line.ComputeIntersection(m_line) == ppxl::Segment::Regular) {
+    auto lineVector = ppxl::Vector::FromSegment(p_line);
+    return (lineVector * m_direction) >= 0.;
   }
 
   return true;

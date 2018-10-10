@@ -57,6 +57,11 @@ SOURCES += \
     Objects/Deviations/Deviation.cxx \
     Objects/Deviations/Mirror.cxx \
     Objects/Deviations/Portal.cxx \
+    Objects/Mutables/Countdown.cxx \
+    Objects/Mutables/Mutable.cxx \
+    Objects/Mutables/Disposable.cxx \
+    Objects/Mutables/Switch.cxx \
+    Objects/Mutables/Transfer.cxx \
     Objects/Obstacles/Tape.cxx \
     Objects/Obstacles/Obstacle.cxx \
     Objects/Obstacles/OneWay.cxx \
@@ -107,6 +112,11 @@ HEADERS += \
     Objects/Deviations/Deviation.hxx \
     Objects/Deviations/Mirror.hxx \
     Objects/Deviations/Portal.hxx \
+    Objects/Mutables/Countdown.hxx \
+    Objects/Mutables/Mutable.hxx \
+    Objects/Mutables/Disposable.hxx \
+    Objects/Mutables/Switch.hxx \
+    Objects/Mutables/Transfer.hxx \
     Objects/Obstacles/Tape.hxx \
     Objects/Obstacles/Obstacle.hxx \
     Objects/Obstacles/OneWay.hxx \

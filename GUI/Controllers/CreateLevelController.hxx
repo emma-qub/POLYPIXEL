@@ -56,4 +56,4 @@ private:
   QUndoStack* m_undoStack;
 };
 
-#endif // CREATELEVELCONTROLLER_HXX
+#endif

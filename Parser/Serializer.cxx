@@ -7,9 +7,10 @@ Serializer::Serializer(QString const& p_xmlFileName):
   m_xmlFileName(p_xmlFileName),
   m_doc(QDomDocument("PPXLML")),
   m_polygons(m_doc.createElement("polygons")),
-  //m_tapes(m_doc.createElement("tapes")),
-  //m_mirrors(m_doc.createElement("mirrors")),
-  //m_portals(m_doc.createElement("portals")),
+  m_tapes(m_doc.createElement("tapes")),
+  m_oneWays(m_doc.createElement("oneways")),
+  m_mirrors(m_doc.createElement("mirrors")),
+  m_portals(m_doc.createElement("portals")),
   m_linesGoal(m_doc.createElement("linesgoal")),
   m_partsGoal(m_doc.createElement("partsgoal")),
   m_maxGapToWin(m_doc.createElement("maxgaptowin")),
@@ -33,15 +34,16 @@ void Serializer::WriteXML(int p_indent) {
   m_doc.appendChild(root);
   root.appendChild(m_polygons);
 
-//  auto objectsElement = m_doc.createElement("objects");
-//  root.appendChild(objectsElement);
-//  auto deviationsElement = m_doc.createElement("deviations");
-//  objectsElement.appendChild(deviationsElement);
-//  deviationsElement.appendChild(m_mirrors);
-//  deviationsElement.appendChild(m_portals);
-//  auto obstaclesElement = m_doc.createElement("obstacles");
-//  objectsElement.appendChild(obstaclesElement);
-//  objectsElement.appendChild(m_tapes);
+  auto objectsElement = m_doc.createElement("objects");
+  root.appendChild(objectsElement);
+  auto obstaclesElement = m_doc.createElement("obstacles");
+  objectsElement.appendChild(obstaclesElement);
+  objectsElement.appendChild(m_tapes);
+  objectsElement.appendChild(m_oneWays);
+  auto deviationsElement = m_doc.createElement("deviations");
+  objectsElement.appendChild(deviationsElement);
+  deviationsElement.appendChild(m_mirrors);
+  deviationsElement.appendChild(m_portals);
 
   root.appendChild(m_linesGoal);
   root.appendChild(m_partsGoal);
@@ -117,14 +119,14 @@ void Serializer::SetPolygonsList(QList<ppxl::Polygon> const& p_polygons) {
 
 // Tape
 
-QDomElement Serializer::TapeToNode(Tape const& tape, int id) {
+QDomElement Serializer::TapeToNode(Tape const& p_tape, int p_id) {
   QDomElement element(m_doc.createElement("tape"));
-  element.setAttribute("id", id);
+  element.setAttribute("id", p_id);
 
-  element.setAttribute("x", tape.getX());
-  element.setAttribute("y", tape.getY());
-  element.setAttribute("w", tape.getW());
-  element.setAttribute("h", tape.getH());
+  element.setAttribute("x", p_tape.getX());
+  element.setAttribute("y", p_tape.getY());
+  element.setAttribute("w", p_tape.getW());
+  element.setAttribute("h", p_tape.getH());
 
   return element;
 }
@@ -139,6 +141,38 @@ void Serializer::SetTapeList(QList<Tape> const& p_tapes) {
     AppendTape(tape, id);
     ++id;
   }
+}
+
+
+// OneWay
+
+QDomElement Serializer::OneWayToNode(OneWay const& p_oneWay, int p_id) {
+  QDomElement element(m_doc.createElement("oneway"));
+  element.setAttribute("id", p_id);
+
+  ppxl::Segment line(p_oneWay.GetLine());
+  element.setAttribute("xa", line.GetA().GetX());
+  element.setAttribute("ya", line.GetA().GetY());
+  element.setAttribute("xb", line.GetB().GetX());
+  element.setAttribute("yb", line.GetB().GetY());
+
+  ppxl::Vector direction(p_oneWay.GetDirection());
+  element.setAttribute("xd", direction.GetX());
+  element.setAttribute("yd", direction.GetY());
+
+  return element;
+}
+
+void Serializer::SetOneWaysList(const QList<OneWay>& p_oneWays) {
+  int id = 0;
+  for (auto const& oneWay: p_oneWays) {
+    AppendOneWay(oneWay, id);
+    ++id;
+  }
+}
+
+void Serializer::AppendOneWay(OneWay const& p_oneWay, int p_id) {
+  m_oneWays.appendChild(OneWayToNode(p_oneWay, p_id));
 }
 
 
@@ -172,17 +206,17 @@ void Serializer::SetMirrorsList(QList<Mirror> const& p_mirrors) {
 
 // Portal
 
-QDomElement Serializer::PortalToNode(Portal const& portal, int id) {
+QDomElement Serializer::PortalToNode(Portal const& p_portal, int p_id) {
   QDomElement element(m_doc.createElement("portal"));
-  element.setAttribute("id", id);
+  element.setAttribute("id", p_id);
 
-  ppxl::Segment portalLineIn(portal.GetIn());
+  ppxl::Segment portalLineIn(p_portal.GetIn());
   element.setAttribute("xaIn", portalLineIn.GetA().GetX());
   element.setAttribute("yaIn", portalLineIn.GetA().GetY());
   element.setAttribute("xbIn", portalLineIn.GetB().GetX());
   element.setAttribute("ybIn", portalLineIn.GetB().GetY());
 
-  ppxl::Segment portalLineOut(portal.GetOut());
+  ppxl::Segment portalLineOut(p_portal.GetOut());
   element.setAttribute("xaOut", portalLineOut.GetA().GetX());
   element.setAttribute("yaOut", portalLineOut.GetA().GetY());
   element.setAttribute("xbOut", portalLineOut.GetB().GetX());

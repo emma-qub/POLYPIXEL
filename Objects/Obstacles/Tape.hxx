@@ -21,11 +21,12 @@ public:
   inline double getH() const { return m_h; }
   inline void setH(double p_h) { m_h = p_h; }
 
-  QList<ppxl::Point> getTapeVertices() const;
-  QList<ppxl::Segment> getTapeEdges() const;
-
-  std::string GetName() const;
+  std::string GetName() const override;
   bool Crossing(ppxl::Segment const& line) const final;
+
+protected:
+  std::vector<ppxl::Point> getTapeVertices() const;
+  std::vector<ppxl::Segment> getTapeEdges() const;
 
 private:
   double m_x;

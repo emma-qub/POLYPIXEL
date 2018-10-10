@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Portal::Portal(int xaIn, int p_yaIn, int p_xbIn, int p_ybIn, int p_xaOut, int p_yaOut, int p_xbOut, int p_ybOut):
+Portal::Portal(double xaIn, double p_yaIn, double p_xbIn, double p_ybIn, double p_xaOut, double p_yaOut, double p_xbOut, double p_ybOut):
   Deviation(),
   m_in(ppxl::Segment(xaIn, p_yaIn, p_xbIn, p_ybIn)),
   m_out(ppxl::Segment(p_xaOut, p_yaOut, p_xbOut, p_ybOut)),
@@ -21,7 +21,7 @@ Portal::Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out):
 Portal::~Portal() = default;
 
 std::string Portal::GetName() const {
-  return "portal";
+  return "Portal";
 }
 
 QList<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {

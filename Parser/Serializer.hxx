@@ -7,6 +7,7 @@
 #include "Core/Segment.hxx"
 #include "Core/Polygon.hxx"
 #include "Objects/Obstacles/Tape.hxx"
+#include "Objects/Obstacles/OneWay.hxx"
 #include "Objects/Deviations/Mirror.hxx"
 #include "Objects/Deviations/Portal.hxx"
 
@@ -34,9 +35,14 @@ public:
   void SetPolygonsList(const QList<ppxl::Polygon>& p_polygons);
 
   // Tape
-  QDomElement TapeToNode(Tape const& tape, int id);
+  QDomElement TapeToNode(Tape const& p_tape, int p_id);
   void AppendTape(Tape const& p_tape, int p_id);
   void SetTapeList(QList<Tape> const& p_tapes);
+
+  // OneWay
+  QDomElement OneWayToNode(OneWay const& p_oneWay, int p_id);
+  void AppendOneWay(OneWay const& p_oneWay, int p_id);
+  void SetOneWaysList(QList<OneWay> const& p_oneWays);
 
   // Mirror
   QDomElement MirrorToNode(Mirror const& p_mirror, int p_id);
@@ -44,7 +50,7 @@ public:
   void SetMirrorsList(QList<Mirror> const& p_mirrors);
 
   // Portal
-  QDomElement PortalToNode(Portal const& portal, int id);
+  QDomElement PortalToNode(Portal const& p_portal, int p_id);
   void AppendPortal(Portal const& p_portal, int p_id);
   void SetPortalsList(QList<Portal> const& p_portals);
 
@@ -54,6 +60,7 @@ private:
 
   QDomElement m_polygons;
   QDomElement m_tapes;
+  QDomElement m_oneWays;
   QDomElement m_mirrors;
   QDomElement m_portals;
   QDomElement m_linesGoal;
