@@ -36,7 +36,6 @@ SOURCES += \
     Objects/Obstacle.cxx \
     Objects/Mirror.cxx \
     Objects/Portal.cxx \
-    Objects/Polarisator.cxx \
     Objects/Tape.cxx \
     GUI/Controllers/CreateLevelController.cxx \
     GUI/Models/PolygonModel.cxx \
@@ -86,7 +85,6 @@ HEADERS += \
     Objects/Obstacle.hxx \
     Objects/Mirror.hxx \
     Objects/Portal.hxx \
-    Objects/Polarisator.hxx \
     Objects/Tape.hxx \
     GUI/Controllers/CreateLevelController.hxx \
     GUI/Models/PolygonModel.hxx \
