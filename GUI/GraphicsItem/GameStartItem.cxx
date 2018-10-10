@@ -11,16 +11,9 @@
 #include "GUI/GraphicsItem/GraphicsStarsItem.hxx"
 #include "GUI/GraphicsItem/GraphicsGoalItem.hxx"
 
-
-
-#include <QDebug>
-
-
-
-
-GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height, qreal p_radius, QGraphicsItem* p_parent):
+GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height, QGraphicsItem* p_parent):
   QObject(),
-  GraphicsRoundedRectItem(p_x, p_y, p_width, p_height, p_radius, p_radius, p_parent),
+  GraphicsPixelRectItem(p_x, p_y, p_width, p_height, p_parent),
   m_levelNumberItem(nullptr),
   m_levelLinesGoalItem(nullptr),
   m_levelPartsGoalItem(nullptr),
@@ -30,24 +23,39 @@ GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height
   m_font(":/fonts/PICOPIXEL.ttf", 36) {
 
   setBrush(QBrush(QColor("#ffffff")));
-  setPen(Qt::NoPen);
+  SetBorderBrush(QBrush(QColor("#3e3a4f")));
+  //8f8299
+  SetShadowBrush(QBrush(QColor("#cac7cc")));
+
 
   QRectF closeRect(0, 3.*p_height/4., p_width/4., p_height/4.);
   QRectF playRect(p_width/4., 3.*p_height/4., 3.*p_width/4., p_height/4.);
 
-  auto topRect = new GraphicsTopRoundedRectItem(0, 0, p_width, p_height/3., p_radius, p_radius, this);
-  topRect->setBrush(QBrush(QColor("#993aef")));
-  topRect->setPen(Qt::NoPen);
+  auto topRect = new GraphicsPixelRectItem(0, 0, p_width, p_height/3., this);
+  topRect->setBrush(QBrush(QColor("#3e3a4f")));
+  topRect->SetBorderBrush(QBrush(QColor("#3e3a4f")));
+  topRect->SetShadowBrush(QBrush(QColor("#cac7cc")));
+  topRect->SetRadiusPositions(GraphicsPixelRectItem::eTopRadius);
+  topRect->SetBorderPositions(GraphicsPixelRectItem::eNoBottomBorder);
+  topRect->SetIsInnerRect(true);
 
-  auto bottomCloseRect = new GraphicsBottomLeftRoundedRectItem(0, 0, p_width/4., p_height/4., p_radius, p_radius, this);
-  bottomCloseRect->setBrush(QBrush(QColor("#c95489")));
+  auto bottomCloseRect = new GraphicsPixelRectItem(0, 0, p_width/4., p_height/4., this);
+  bottomCloseRect->setBrush(QBrush(QColor("#da89a5")));
   bottomCloseRect->setPen(Qt::NoPen);
   bottomCloseRect->setPos(closeRect.topLeft());
+  bottomCloseRect->SetRadiusPositions(GraphicsPixelRectItem::eBottomLeftRadius);
+  bottomCloseRect->SetBorderPositions(GraphicsPixelRectItem::eBottomLeftBorder);
+  bottomCloseRect->SetBorderBrush(QBrush(QColor("#3e3a4f")));
+  bottomCloseRect->SetHasShadows(false);
 
-  auto bottomPlayRect = new GraphicsBottomRightRoundedRectItem(0, 0, 3.*p_width/4., p_height/4., p_radius, p_radius, this);
-  bottomPlayRect->setBrush(QBrush(QColor("#ef3a89")));
+  auto bottomPlayRect = new GraphicsPixelRectItem(0, 0, 3.*p_width/4., p_height/4., this);
+  bottomPlayRect->setBrush(QBrush(QColor("#da6c92")));
   bottomPlayRect->setPen(Qt::NoPen);
   bottomPlayRect->setPos(playRect.topLeft());
+  bottomPlayRect->SetRadiusPositions(GraphicsPixelRectItem::eBottomRightRadius);
+  bottomPlayRect->SetBorderPositions(GraphicsPixelRectItem::eBottomRightBorder);
+  bottomPlayRect->SetBorderBrush(QBrush(QColor("#3e3a4f")));
+  bottomPlayRect->SetHasShadows(false);
 
   QString buttonStyle =
     "QPushButton {"
@@ -55,7 +63,6 @@ GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height
     "  font-style: normal;"
     "  font-size: 36px;"
     "}";
-  auto cancelButton = new QPushButton("X");
 
   auto playButton = new QPushButton("Let's play");
   playButton->setFlat(true);
@@ -67,6 +74,7 @@ GameStartItem::GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height
 
   connect(playButton, &QPushButton::clicked, this, &GameStartItem::CloseToPlay);
 
+  auto cancelButton = new QPushButton("X");
   cancelButton->setFlat(true);
   cancelButton->setStyleSheet(buttonStyle);
   cancelButton->setFixedSize(static_cast<int>(closeRect.height())/2, static_cast<int>(closeRect.height())/2);
@@ -94,35 +102,6 @@ void GameStartItem::SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_parts
 
   m_levelStarsItem = new GraphicsStarsItem(p_starsMax, this);
   m_levelStarsItem->setPos(rect().center() - m_levelStarsItem->boundingRect().center());
-
-//  auto pixelRectItem = new GraphicsPixelRectItem(0, 0, 100, 200, this);
-//  pixelRectItem->setPos(0, 0);
-//  pixelRectItem->SetRadiusType(GraphicsPixelRectItem::eFlatRadius);
-//  pixelRectItem->SetRadiusPositions(GraphicsPixelRectItem::eTopLeftRadius);
-//  pixelRectItem->setBrush(QColor("#e63ab7"));
-//  pixelRectItem->setPen(Qt::NoPen);
-
-//  auto pixelRectItem2 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
-//  pixelRectItem2->setPos(101, 0);
-//  pixelRectItem2->SetRadiusType(GraphicsPixelRectItem::eSmallRadius);
-//  pixelRectItem2->SetRadiusPositions(GraphicsPixelRectItem::eTopLeftRadius);
-//  pixelRectItem2->setBrush(QColor("#28e6d6"));
-//  pixelRectItem2->setPen(Qt::NoPen);
-
-//  auto pixelRectItem3 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
-//  pixelRectItem3->setPos(0, 201);
-//  pixelRectItem3->SetRadiusType(GraphicsPixelRectItem::eMediumRadius);
-//  pixelRectItem3->SetRadiusPositions(GraphicsPixelRectItem::eLeftRadius);
-//  pixelRectItem3->setBrush(QColor("#70e51a"));
-//  pixelRectItem3->setPen(Qt::NoPen);
-
-//  auto pixelRectItem4 = new GraphicsPixelRectItem(0, 0, 100, 200, this);
-//  pixelRectItem4->setPos(101, 201);
-//  pixelRectItem4->SetRadiusType(GraphicsPixelRectItem::eLargeRadius);
-//  pixelRectItem4->SetRadiusPositions(GraphicsPixelRectItem::eRightRadius);
-//  pixelRectItem4->setBrush(QColor("#8a2dcc"));
-//  pixelRectItem4->setPen(Qt::NoPen);
-
 }
 
 GameStartItem::~GameStartItem() = default;
@@ -164,8 +143,4 @@ void GameStartItem::CloseToCancel() {
   connect(animation, &QPropertyAnimation::finished, this, &GameStartItem::CancelLevelRequested);
 
   animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void GameStartItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* p_event) {
-  qDebug() << scene()->itemAt(p_event->scenePos(), QTransform());
 }

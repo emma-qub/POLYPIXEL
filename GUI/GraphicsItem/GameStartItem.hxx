@@ -2,7 +2,7 @@
 #define GAMESTARTITEM_HXX
 
 #include <QObject>
-#include "GraphicsRoundedRectItem.hxx"
+#include "GraphicsPixelRectItem.hxx"
 #include <QPen>
 #include <QMouseEvent>
 #include <QFont>
@@ -11,12 +11,12 @@ class GraphicsStarsItem;
 class GraphicsGoalItem;
 
 
-class GameStartItem: public QObject, public GraphicsRoundedRectItem {
+class GameStartItem: public QObject, public GraphicsPixelRectItem {
   Q_OBJECT
   Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
-  GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height, qreal p_radius, QGraphicsItem *p_parent = nullptr);
+  GameStartItem(qreal p_x, qreal p_y, qreal p_width, qreal p_height, QGraphicsItem *p_parent = nullptr);
   ~GameStartItem() override;
 
   void SetLevelInfo(int p_levelNumber, int p_linesGoal, int p_partsGoal, int p_starsMax);
@@ -28,9 +28,6 @@ public:
 signals:
   void StartLevelRequested();
   void CancelLevelRequested();
-
-protected:
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent* p_event) override;
 
 private:
   QGraphicsRectItem* m_overlayItem;

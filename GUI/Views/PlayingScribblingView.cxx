@@ -17,7 +17,7 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
   m_gameOverItem(nullptr),
   m_gameStartItem(nullptr),
   m_overlayItem(nullptr),
-  m_overlayBrush(QColor(0, 0, 0, 192)),
+  m_overlayBrush(QColor(0, 0, 0, 127)),
   m_levelNumber(-1),
   m_linesGoal(-1),
   m_partsGoal(-1),
@@ -31,7 +31,7 @@ void PlayingScribblingView::InitView() {
   AbstractScribblingView2::InitView();
 
   m_gameOverItem = new GameOverItem(0, 0, width()/3, 2*height()/3);
-  m_gameStartItem = new GameStartItem(0, 0, width()/4, 2*height()/3, 20);
+  m_gameStartItem = new GameStartItem(0, 0, width()/4, 2*height()/3);
 
   connect(m_gameStartItem, &GameStartItem::StartLevelRequested, this, &PlayingScribblingView::FadeOutOverlay);
   connect(this, &PlayingScribblingView::FadeOutOverlayDone, this, &PlayingScribblingView::StartLevelRequested);
@@ -110,7 +110,7 @@ void PlayingScribblingView::FadeInOverlay() {
   auto* animation = new QPropertyAnimation(effect, "opacity", this);
 
   animation->setStartValue(0.);
-  animation->setEndValue(192./255.);
+  animation->setEndValue(0.5);
   animation->setDuration(200);
 
   connect(animation, &QPropertyAnimation::finished, this, &PlayingScribblingView::FadeInOverlayDone);
@@ -124,7 +124,7 @@ void PlayingScribblingView::FadeOutOverlay() {
 
   auto* animation = new QPropertyAnimation(effect, "opacity", this);
 
-  animation->setStartValue(192./255.);
+  animation->setStartValue(0.5);
   animation->setEndValue(0.);
   animation->setDuration(200);
 
