@@ -1,7 +1,7 @@
 #ifndef OBSTACLE_HXX
 #define OBSTACLE_HXX
 
-#include "Object.hxx"
+#include "Objects/Object.hxx"
 #include "Core/Segment.hxx"
 
 class Obstacle: public Object {
