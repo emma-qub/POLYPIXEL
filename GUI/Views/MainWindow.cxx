@@ -116,7 +116,10 @@ MainWindow::MainWindow(QWidget* p_parent):
 
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
     if (m_centralWidget->currentWidget() == m_createLevelView) {
+      m_createLevelView->InitView();
       m_createLevelController->Redraw();
+    } else if (m_centralWidget->currentWidget() == m_testLevelView) {
+      m_testLevelView->InitView();
     } else if (m_centralWidget->currentWidget() == m_gameView) {
       m_gameView->InitView();
       m_gameView->PlayLevel(m_currentLevel);

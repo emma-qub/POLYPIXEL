@@ -54,7 +54,7 @@ void PlayingController::SetStartPoint(QPoint const& p_startPoint) {
 
 void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
   QPoint endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
-  QCursor::setPos(endPoint);
+  QCursor::setPos(m_view->mapToGlobal(endPoint));
   SetStartPoint(p_cursorPosition);
   ComputeSlicingLines(endPoint);
 }

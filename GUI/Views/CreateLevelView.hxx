@@ -23,6 +23,8 @@ class CreateLevelView: public QWidget {
 public:
   explicit CreateLevelView(QWidget* parent = nullptr);
 
+  void InitView();
+
   int GetLinesGoal() const;
   void SetLinesGoal(int p_value);
   int GetPartsGoal() const;

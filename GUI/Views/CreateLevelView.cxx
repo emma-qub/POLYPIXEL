@@ -94,6 +94,10 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_scribblingView->setFocusPolicy(Qt::StrongFocus);
 }
 
+void CreateLevelView::InitView() {
+  m_scribblingView->InitView();
+}
+
 int CreateLevelView::GetLinesGoal() const {
   return m_linesGoalSpinBox->value();
 }

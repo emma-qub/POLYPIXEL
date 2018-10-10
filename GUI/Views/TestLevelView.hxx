@@ -15,6 +15,8 @@ class TestLevelView: public QWidget {
 public:
   explicit TestLevelView(QWidget* p_parent = nullptr);
 
+  void InitView();
+
   void SetModel(PolygonModel* p_model);
   void SetLinesGoal(int p_linesGoal);
   void SetPartsGoal(int p_partsGoal);

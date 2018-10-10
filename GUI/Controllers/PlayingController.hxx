@@ -101,6 +101,7 @@ protected:
 private:
   PlayingView* m_view;
   ppxl::Point m_startPoint;
+  QPoint m_startQPoint;
 };
 
 bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B);
