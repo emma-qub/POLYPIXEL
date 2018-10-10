@@ -22,12 +22,12 @@ public:
 
 };
 
-class AbstractScribblingView2: public QGraphicsView {
+class AbstractScribblingView: public QGraphicsView {
   Q_OBJECT
 
 public:
-  AbstractScribblingView2(QWidget* p_parent = nullptr);
-  ~AbstractScribblingView2() override;
+  AbstractScribblingView(QWidget* p_parent = nullptr);
+  ~AbstractScribblingView() override;
 
   virtual void InitView();
 

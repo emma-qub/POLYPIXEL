@@ -42,7 +42,6 @@ SOURCES += \
     GUI/Controllers/CreateLevelController.cxx \
     GUI/Models/PolygonModel.cxx \
     GUI/Views/CreateLevelScribblingView.cxx \
-    GUI/Views/AbstractScribblingView.cxx \
     GUI/Models/CreateLevelModel.cxx \
     GUI/Delegates/PolygonItemDelegate.cxx \
     GUI/Controllers/TestLevelController.cxx \
@@ -57,13 +56,13 @@ SOURCES += \
     GUI/Views/MapView.cxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.cxx \
     GUI/GraphicsItem/PlayerItem.cxx \
-    GUI/Views/AbstractScribblingView2.cxx \
     GUI/GraphicsItem/GameOverItem.cxx \
     GUI/GraphicsItem/GameStartItem.cxx \
     GUI/GraphicsItem/GraphicsStarsItem.cxx \
     GUI/GraphicsItem/GraphicsGoalItem.cxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.cxx \
-    GUI/GraphicsItem/GraphicsPixelLine.cxx
+    GUI/GraphicsItem/GraphicsPixelLine.cxx \
+    GUI/Views/AbstractScribblingView.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -93,7 +92,6 @@ HEADERS += \
     GUI/Controllers/CreateLevelController.hxx \
     GUI/Models/PolygonModel.hxx \
     GUI/Views/CreateLevelScribblingView.hxx \
-    GUI/Views/AbstractScribblingView.hxx \
     GUI/Models/CreateLevelModel.hxx \
     GUI/Delegates/PolygonItemDelegate.hxx \
     GUI/Controllers/TestLevelController.hxx \
@@ -108,13 +106,13 @@ HEADERS += \
     GUI/Views/MapView.hxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.hxx \
     GUI/GraphicsItem/PlayerItem.hxx \
-    GUI/Views/AbstractScribblingView2.hxx \
     GUI/GraphicsItem/GameOverItem.hxx \
     GUI/GraphicsItem/GameStartItem.hxx \
     GUI/GraphicsItem/GraphicsStarsItem.hxx \
     GUI/GraphicsItem/GraphicsGoalItem.hxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.hxx \
-    GUI/GraphicsItem/GraphicsPixelLine.hxx
+    GUI/GraphicsItem/GraphicsPixelLine.hxx \
+    GUI/Views/AbstractScribblingView.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

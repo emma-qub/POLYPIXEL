@@ -21,7 +21,7 @@ const int CreateLevelScribblingView::PEN_WIDTH = 3;
 const QColor CreateLevelScribblingView::NOT_SELECTED_COLOR = QColor("#CCCCCC");
 
 CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
-  AbstractScribblingView2(p_parent),
+  AbstractScribblingView(p_parent),
   m_gripPixmap(),
   m_model(nullptr),
   m_selectionModel(nullptr),
@@ -80,7 +80,7 @@ void CreateLevelScribblingView::InitView() {
     return;
   }
 
-  AbstractScribblingView2::InitView();
+  AbstractScribblingView::InitView();
 
   int margin = 0;
   int xMin = margin, xMax = width()-margin;
@@ -122,7 +122,7 @@ void CreateLevelScribblingView::InitView() {
 }
 
 void CreateLevelScribblingView::SetModel(PolygonModel* p_model) {
-  AbstractScribblingView2::SetModel(p_model);
+  AbstractScribblingView::SetModel(p_model);
   m_model = static_cast<CreateLevelModel*>(p_model);
 }
 

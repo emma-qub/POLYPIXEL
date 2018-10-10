@@ -1,13 +1,13 @@
 #ifndef GAMESCRIBBLINGVIEW_HXX
 #define GAMESCRIBBLINGVIEW_HXX
 
-#include "GUI/Views/AbstractScribblingView2.hxx"
+#include "GUI/Views/AbstractScribblingView.hxx"
 
 class PolygonModel;
 class GameOverItem;
 class GraphicsRoundedRectItem;
 
-class PlayingScribblingView: public AbstractScribblingView2 {
+class PlayingScribblingView: public AbstractScribblingView {
   Q_OBJECT
 
 public:

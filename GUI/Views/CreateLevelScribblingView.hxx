@@ -1,7 +1,7 @@
 #ifndef CREATELEVELSCRIBBLINGVIEW_HXX
 #define CREATELEVELSCRIBBLINGVIEW_HXX
 
-#include "GUI/Views/AbstractScribblingView2.hxx"
+#include "GUI/Views/AbstractScribblingView.hxx"
 #include "Core/Point.hxx"
 #include "Core/Vector.hxx"
 #include "Core/Polygon.hxx"
@@ -10,7 +10,7 @@ class CreateLevelModel;
 class QItemSelectionModel;
 class QStandardItem;
 
-class CreateLevelScribblingView: public AbstractScribblingView2 {
+class CreateLevelScribblingView: public AbstractScribblingView {
   Q_OBJECT
 
 public:

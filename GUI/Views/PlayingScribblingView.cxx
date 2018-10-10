@@ -14,7 +14,7 @@
 #include <QObject>
 
 PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
-  AbstractScribblingView2(p_parent),
+  AbstractScribblingView(p_parent),
   m_scribbling(false),
   m_cursorPosition(0, 0),
   m_gameOverItem(nullptr),
@@ -33,7 +33,7 @@ PlayingScribblingView::PlayingScribblingView(QWidget* p_parent):
 }
 
 void PlayingScribblingView::InitView() {
-  AbstractScribblingView2::InitView();
+  AbstractScribblingView::InitView();
 
   m_gameOverItem = new GameOverItem(0, 0, width()/3, 700, 20.);
 }

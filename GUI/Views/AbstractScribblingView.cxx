@@ -1,4 +1,4 @@
-#include "AbstractScribblingView2.hxx"
+#include "AbstractScribblingView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
 #include "Core/Point.hxx"
@@ -9,7 +9,7 @@
 
 #include <QGraphicsLineItem>
 
-AbstractScribblingView2::AbstractScribblingView2(QWidget* p_parent):
+AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
   QGraphicsView(p_parent),
   m_scene(nullptr),
   m_penWidth(5),
@@ -21,7 +21,7 @@ AbstractScribblingView2::AbstractScribblingView2(QWidget* p_parent):
   m_pen = (QPen(QBrush(QColor("#000000")), m_penWidth));
 }
 
-void AbstractScribblingView2::InitView() {
+void AbstractScribblingView::InitView() {
   if (m_viewInitialized) {
     return;
   }
@@ -38,19 +38,19 @@ void AbstractScribblingView2::InitView() {
   m_viewInitialized = true;
 }
 
-void AbstractScribblingView2::SetModel(PolygonModel* p_model) {
+void AbstractScribblingView::SetModel(PolygonModel* p_model) {
   m_model = p_model;
 }
 
-void AbstractScribblingView2::SetCanScribble(bool p_value) {
+void AbstractScribblingView::SetCanScribble(bool p_value) {
   m_canScribble = p_value;
 }
 
-bool AbstractScribblingView2::GetCanScribble() const {
+bool AbstractScribblingView::GetCanScribble() const {
   return m_canScribble;
 }
 
-void AbstractScribblingView2::ClearImage() {
+void AbstractScribblingView::ClearImage() {
   for (auto* item: m_scene->items()) {
     m_scene->removeItem(item);
   }
@@ -58,7 +58,7 @@ void AbstractScribblingView2::ClearImage() {
   update();
 }
 
-void AbstractScribblingView2::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
+void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   if (m_canScribble) {
     ppxl::Point p_startPoint(p_line.GetA());
     ppxl::Point p_endPoint(p_line.GetB());
@@ -74,7 +74,7 @@ void AbstractScribblingView2::DrawLine(ppxl::Segment const& p_line, QColor const
   }
 }
 
-void AbstractScribblingView2::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, ppxl::Vector const& shiftVector) {
+void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, ppxl::Vector const& shiftVector) {
   QFont font("", 12, p_weight);
   QFontMetrics fm(font);
   auto vertexSize = fm.size(Qt::TextSingleLine, p_text);
@@ -89,7 +89,7 @@ void AbstractScribblingView2::DrawText(ppxl::Point p_position, const QString& p_
   m_scene->addText(p_text, font)->setPos(boundingRect.topLeft());
 }
 
-void AbstractScribblingView2::DrawFromModel() {
+void AbstractScribblingView::DrawFromModel() {
   if (!m_model || !m_canScribble)
   {
     return;
@@ -114,14 +114,14 @@ void AbstractScribblingView2::DrawFromModel() {
   }
 }
 
-void AbstractScribblingView2::DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color) {
+void AbstractScribblingView::DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color) {
   m_pen.setColor(p_color);
   m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
 }
 
-void AbstractScribblingView2::DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color) {
+void AbstractScribblingView::DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color) {
   m_pen.setColor(p_color);
   m_scene->addLine(QLineF(p_startPoint, p_endPoint), m_pen);
 }
 
-AbstractScribblingView2::~AbstractScribblingView2() = default;
+AbstractScribblingView::~AbstractScribblingView() = default;
