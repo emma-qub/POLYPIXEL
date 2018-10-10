@@ -38,7 +38,6 @@ SOURCES += \
     Objects/Portal.cxx \
     Objects/Polarisator.cxx \
     Objects/Tape.cxx \
-    Objects/Diode.cxx \
     GUI/Controllers/CreateLevelController.cxx \
     GUI/Models/PolygonModel.cxx \
     GUI/Views/CreateLevelScribblingView.cxx \
@@ -62,7 +61,8 @@ SOURCES += \
     GUI/GraphicsItem/GraphicsGoalItem.cxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.cxx \
     GUI/GraphicsItem/GraphicsPixelLine.cxx \
-    GUI/Views/AbstractScribblingView.cxx
+    GUI/Views/AbstractScribblingView.cxx \
+    Objects/OneWay.cxx
 
 HEADERS += \
     GUI/Views/AchievementsView.hxx \
@@ -88,7 +88,6 @@ HEADERS += \
     Objects/Portal.hxx \
     Objects/Polarisator.hxx \
     Objects/Tape.hxx \
-    Objects/Diode.hxx \
     GUI/Controllers/CreateLevelController.hxx \
     GUI/Models/PolygonModel.hxx \
     GUI/Views/CreateLevelScribblingView.hxx \
@@ -112,7 +111,8 @@ HEADERS += \
     GUI/GraphicsItem/GraphicsGoalItem.hxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.hxx \
     GUI/GraphicsItem/GraphicsPixelLine.hxx \
-    GUI/Views/AbstractScribblingView.hxx
+    GUI/Views/AbstractScribblingView.hxx \
+    Objects/OneWay.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

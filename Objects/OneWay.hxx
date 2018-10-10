@@ -5,12 +5,12 @@
 #include "Core/Vector.hxx"
 #include "Core/Point.hxx"
 
-class Diode: public Obstacle {
+class OneWay: public Obstacle {
 
 public:
-  Diode(ppxl::Point const& A = ppxl::Point(), ppxl::Point const& B = ppxl::Point(),
+  OneWay(ppxl::Point const& A = ppxl::Point(), ppxl::Point const& B = ppxl::Point(),
     ppxl::Point const& O = ppxl::Point(), ppxl::Point const& D = ppxl::Point());
-  ~Diode() override;
+  ~OneWay() override;
 
   bool Crossing(ppxl::Segment const& line) const final;
 
