@@ -51,7 +51,7 @@ public:
   void Redraw();
 
 signals:
-  void CancelLevelRequested();
+  void GoToMapRequested(bool p_moveToNextLevel);
 
 protected:
   virtual void UpdateViewFromGameInfo();
@@ -79,9 +79,8 @@ protected:
 
   QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
   double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
-  QList<ppxl::Vector> ComputeShiftVectorsList();
+  QList<ppxl::Vector> ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter);
   ppxl::Point ComputeGlobalBarycenter() const;
-  void TranslatePolygons(QList<ppxl::Vector> const& p_shiftVectors);
   int ComputeStarsCount(double p_gap);
   void UpdateStarsMax(int starsMaxCount);
 
@@ -102,6 +101,7 @@ protected:
 private:
   PlayingView* m_view;
   ppxl::Point m_startPoint;
+  QPoint m_startQPoint;
 };
 
 bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B);

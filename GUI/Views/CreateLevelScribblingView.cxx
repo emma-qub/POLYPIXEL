@@ -22,8 +22,10 @@ const QColor CreateLevelScribblingView::NOT_SELECTED_COLOR = QColor("#CCCCCC");
 
 CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   AbstractScribblingView(p_parent),
+  m_gripPixmap(),
   m_model(nullptr),
   m_selectionModel(nullptr),
+  m_viewInitialized(false),
   m_isStuck(false),
   m_nextToVertex(false),
   m_nextToBarycenter(false),
@@ -73,6 +75,52 @@ CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
 
 CreateLevelScribblingView::~CreateLevelScribblingView() = default;
 
+void CreateLevelScribblingView::InitView() {
+  if (m_viewInitialized) {
+    return;
+  }
+
+  AbstractScribblingView::InitView();
+
+  int margin = 0;
+  int xMin = margin, xMax = width()-margin;
+  int yMin = margin, yMax = height()-margin;
+  int subSubCaseSize = 10;
+  QPen dashLinePen(Qt::lightGray, 1, Qt::DashLine);
+  QPen solidPen(Qt::gray, 1, Qt::SolidLine);
+  QPen thickPen(Qt::darkGray, 1);
+
+  for (int i = xMin; i <= xMax; i += subSubCaseSize) {
+    scene()->addLine(QLineF(i, yMin, i, yMax), dashLinePen);
+  }
+  for (int j = yMin; j <= yMax; j += subSubCaseSize) {
+    scene()->addLine(QLineF(xMin, j, xMax, j), dashLinePen);
+  }
+
+  int subCaseSize = 50;
+  for (int i = xMin; i <= xMax; i += subCaseSize) {
+    scene()->addLine(QLineF(i, yMin, i, yMax), solidPen);
+  }
+  for (int j = yMin; j <= yMax; j += subCaseSize) {
+    scene()->addLine(QLineF(xMin, j, xMax, j), solidPen);
+  }
+
+  int caseSize = 100;
+  for (int i = xMin; i <= xMax; i += caseSize) {
+    scene()->addLine(QLineF(i, yMin, i, yMax), thickPen);
+  }
+  for (int j = yMin; j <= yMax; j += caseSize) {
+    scene()->addLine(QLineF(xMin, j, xMax, j), thickPen);
+  }
+
+  m_gripPixmap = grab(sceneRect().toRect());
+
+  scene()->clear();
+  DrawGrid();
+
+  m_viewInitialized = true;
+}
+
 void CreateLevelScribblingView::SetModel(PolygonModel* p_model) {
   AbstractScribblingView::SetModel(p_model);
   m_model = static_cast<CreateLevelModel*>(p_model);
@@ -88,37 +136,7 @@ void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selecti
 }
 
 void CreateLevelScribblingView::DrawGrid() {
-  QPainter painter(&GetImage());
-
-  int margin = 0;
-  int xMin = margin, xMax = width()-margin;
-  int yMin = margin, yMax = height()-margin;
-  int subSubCaseSize = 10;
-  painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
-  for (int i = xMin; i <= xMax; i += subSubCaseSize) {
-    painter.drawLine(QPoint(i, yMin), QPoint(i, yMax));
-  }
-  for (int j = yMin; j <= yMax; j += subSubCaseSize) {
-    painter.drawLine(QPoint(xMin, j), QPoint(xMax, j));
-  }
-
-  int subCaseSize = 50;
-  painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
-  for (int i = xMin; i <= xMax; i += subCaseSize) {
-    painter.drawLine(QPoint(i, yMin), QPoint(i, yMax));
-  }
-  for (int j = yMin; j <= yMax; j += subCaseSize) {
-    painter.drawLine(QPoint(xMin, j), QPoint(xMax, j));
-  }
-
-  int caseSize = 100;
-  painter.setPen(QPen(Qt::darkGray, 1));
-  for (int i = xMin; i <= xMax; i += caseSize) {
-    painter.drawLine(QPoint(i, yMin), QPoint(i, yMax));
-  }
-  for (int j = yMin; j <= yMax; j += caseSize) {
-    painter.drawLine(QPoint(xMin, j), QPoint(xMax, j));
-  }
+  scene()->addPixmap(m_gripPixmap);
 }
 
 ppxl::Polygon* CreateLevelScribblingView::GetCurrentPolygon() const {
@@ -347,11 +365,7 @@ void CreateLevelScribblingView::Remove() {
 }
 
 void CreateLevelScribblingView::DrawPoint(QPoint const& p_point, QColor const& p_color) {
-  QPainter painter(&GetImage());
-  painter.setPen(QPen(p_color, PEN_WIDTH*3, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-  painter.drawPoint(p_point);
-
-  update();
+  scene()->addEllipse(p_point.x(), p_point.y(), 3, 3, Qt::NoPen, QBrush(p_color));
 }
 
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
@@ -557,12 +571,6 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
     }
     setCursor(Qt::OpenHandCursor);
   }
-}
-
-void CreateLevelScribblingView::paintEvent(QPaintEvent* p_event) {
-  QPainter painter(this);
-  QRect dirtyRect = p_event->rect();
-  painter.drawImage(dirtyRect, GetImage(), dirtyRect);
 }
 
 bool CreateLevelScribblingView::ConfirmClear() {

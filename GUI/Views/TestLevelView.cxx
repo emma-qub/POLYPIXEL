@@ -33,6 +33,10 @@ TestLevelView::TestLevelView(QWidget* p_parent):
   connect(m_amendLevelButton, &QPushButton::clicked, this, &TestLevelView::AmendLevelRequested);
 }
 
+void TestLevelView::InitView() {
+  m_view->InitView();
+}
+
 void TestLevelView::SetModel(PolygonModel* p_model) {
   m_controller->SetPolygonsItem(p_model);
 }

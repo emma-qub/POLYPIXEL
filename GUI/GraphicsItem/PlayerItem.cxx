@@ -3,13 +3,6 @@
 #include <QTimer>
 #include <QKeyEvent>
 
-
-
-#include <QDebug>
-
-
-
-
 PlayerItem::PlayerItem(QGraphicsItem* p_parent):
   QGraphicsPixmapItem(p_parent),
   m_animationStep(1) {

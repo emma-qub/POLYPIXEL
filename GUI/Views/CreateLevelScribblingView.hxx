@@ -17,6 +17,8 @@ public:
   CreateLevelScribblingView(QWidget* parent = nullptr);
   ~CreateLevelScribblingView() override;
 
+  void InitView() override;
+
   void SetModel(PolygonModel* p_model) override;
   void SetSelectionModel(QItemSelectionModel* p_selectionModel);
   inline QItemSelectionModel* GetSelectionModel() const { return m_selectionModel; }
@@ -45,7 +47,6 @@ protected:
   void mousePressEvent(QMouseEvent* p_event) override;
   void mouseMoveEvent(QMouseEvent* p_event) override;
   void mouseReleaseEvent(QMouseEvent* p_event) override;
-  void paintEvent(QPaintEvent* p_event) override;
   bool ConfirmClear();
   void ConfirmNewLevel();
   void ConfirmOpenLevel();
@@ -56,8 +57,10 @@ protected:
   void DrawPolygonFromModel(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
 
 private:
+  QPixmap m_gripPixmap;
   CreateLevelModel* m_model;
   QItemSelectionModel* m_selectionModel;
+  bool m_viewInitialized;
   bool m_isStuck;
   bool m_nextToVertex;
   bool m_nextToBarycenter;

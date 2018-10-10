@@ -6,9 +6,9 @@
 #include "Core/Point.hxx"
 #include "Core/Segment.hxx"
 #include "Core/Polygon.hxx"
-#include "Objects/Tape.hxx"
-#include "Objects/Mirror.hxx"
-#include "Objects/Portal.hxx"
+#include "Objects/Obstacles/Tape.hxx"
+#include "Objects/Deviations/Mirror.hxx"
+#include "Objects/Deviations/Portal.hxx"
 
 using PolygonList = QList<ppxl::Polygon>;
 using TapeList = QList<Tape>;

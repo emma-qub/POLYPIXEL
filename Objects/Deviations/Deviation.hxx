@@ -1,7 +1,7 @@
 #ifndef DEVIATION_HXX
 #define DEVIATION_HXX
 
-#include "Object.hxx"
+#include "Objects/Object.hxx"
 
 #include "Core/Segment.hxx"
 

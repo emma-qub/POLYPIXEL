@@ -1,18 +1,42 @@
 #include "AbstractScribblingView.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
+#include "Core/Point.hxx"
 
-#include <QPainter>
-#include <QMouseEvent>
+#include "GUI/GraphicsItem/GraphicsPixelLine.hxx"
+
+
+
+#include <QGraphicsLineItem>
 
 AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
-  QWidget(p_parent),
+  QGraphicsView(p_parent),
+  m_scene(nullptr),
+  m_penWidth(5),
   m_model(nullptr),
-  m_myPenWidth(5),
-  m_canScribble(false) {
+  m_penColor(),
+  m_canScribble(false),
+  m_viewInitialized(false) {
+
+  m_pen = (QPen(QBrush(QColor("#000000")), m_penWidth));
 }
 
-AbstractScribblingView::~AbstractScribblingView() = default;
+void AbstractScribblingView::InitView() {
+  if (m_viewInitialized) {
+    return;
+  }
+
+  // Hide scrollbars
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+  // Set scene
+  m_scene = new QGraphicsScene(this);
+  setScene(m_scene);
+  m_scene->setSceneRect(0, 0, width(), height());
+
+  m_viewInitialized = true;
+}
 
 void AbstractScribblingView::SetModel(PolygonModel* p_model) {
   m_model = p_model;
@@ -26,16 +50,31 @@ bool AbstractScribblingView::GetCanScribble() const {
   return m_canScribble;
 }
 
+void AbstractScribblingView::ClearImage() {
+  for (auto* item: m_scene->items()) {
+    m_scene->removeItem(item);
+  }
+
+  update();
+}
+
 void AbstractScribblingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   if (m_canScribble) {
     ppxl::Point p_startPoint(p_line.GetA());
     ppxl::Point p_endPoint(p_line.GetB());
-    DrawLine(p_startPoint, p_endPoint, p_color, p_penStyle);
+
+    m_pen.setColor(p_color);
+    m_pen.setStyle(p_penStyle);
+
+    auto line = new GraphicsPixelLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), 5);
+    line->setBrush(p_color);
+    m_scene->addItem(line);
+
+    //m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
   }
 }
 
 void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, ppxl::Vector const& shiftVector) {
-  QPainter painter(&GetImage());
   QFont font("", 12, p_weight);
   QFontMetrics fm(font);
   auto vertexSize = fm.size(Qt::TextSingleLine, p_text);
@@ -46,8 +85,8 @@ void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_t
   bottomRight.Move(vertexSize.width()/2., vertexSize.height()/2.);
   bottomRight.Translated(shiftVector*10);
   QRectF boundingRect(QPointF(topLeft.GetX(), topLeft.GetY()), QPointF(bottomRight.GetX(), bottomRight.GetY()));
-  painter.setFont(font);
-  painter.drawText(boundingRect, p_text);
+
+  m_scene->addText(p_text, font)->setPos(boundingRect.topLeft());
 }
 
 void AbstractScribblingView::DrawFromModel() {
@@ -56,60 +95,33 @@ void AbstractScribblingView::DrawFromModel() {
     return;
   }
 
-  // Draw every polygon in model color
+  m_graphicsPolygonList.clear();
+  m_pen.setStyle(Qt::SolidLine);
   auto polygonItems = m_model->GetPolygonsItem();
-
   for (int polygonRow = 0; polygonRow < polygonItems->rowCount(); ++polygonRow) {
     auto polygonItem = polygonItems->child(polygonRow, 0);
-    for (int row = 0; row < polygonItem->rowCount(); ++row) {
-      int indexA = row;
-      int indexB =(row+1)%polygonItem->rowCount();
-      ppxl::Point A(polygonItem->child(indexA, 1)->text().toDouble(),
-                    polygonItem->child(indexA, 2)->text().toDouble());
-      ppxl::Point B(polygonItem->child(indexB, 1)->text().toDouble(),
-                    polygonItem->child(indexB, 2)->text().toDouble());
-      auto color = polygonItem->data(Qt::DecorationRole).value<QColor>();
-      DrawLine(A, B, color);
+    m_penColor =  polygonItem->data(Qt::DecorationRole).value<QColor>();
+    m_pen.setColor(m_penColor);
+    auto* polygon = polygonItem->data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+    QVector<QPointF> verticesList;
+    for (auto const& vertex: polygon->GetVertices()) {
+      verticesList << QPointF(vertex.GetX(), vertex.GetY());
     }
+    auto graphicsPolygonItem = new GraphicsPolygonItem(QPolygonF(verticesList));
+    graphicsPolygonItem->setPen(m_pen);
+    m_scene->addItem(graphicsPolygonItem);
+    m_graphicsPolygonList << graphicsPolygonItem;
   }
 }
 
-void AbstractScribblingView::ClearImage() {
-  m_image.fill(Qt::white);
-  update();
+void AbstractScribblingView::DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color) {
+  m_pen.setColor(p_color);
+  m_scene->addLine(p_startPoint.GetX(), p_startPoint.GetY(), p_endPoint.GetX(), p_endPoint.GetY(), m_pen);
 }
 
-void AbstractScribblingView::DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle) {
-  QPoint startPoint(static_cast<int>(p_startPoint.GetX()), static_cast<int>(p_startPoint.GetY()));
-  QPoint endPoint(static_cast<int>(p_endPoint.GetX()), static_cast<int>(p_endPoint.GetY()));
-  DrawLine(startPoint, endPoint, p_color, p_penStyle);
+void AbstractScribblingView::DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color) {
+  m_pen.setColor(p_color);
+  m_scene->addLine(QLineF(p_startPoint, p_endPoint), m_pen);
 }
 
-void AbstractScribblingView::DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle) {
-  QPainter painter(&m_image);
-  painter.setPen(QPen(p_color, m_myPenWidth, p_penStyle, Qt::RoundCap, Qt::BevelJoin));
-  painter.drawLine(p_startPoint, p_endPoint);
-}
-
-void AbstractScribblingView::ResizeImage(QImage* p_image, const QSize& p_newSize) {
-  if (p_image->size() == p_newSize)
-  {
-    return;
-  }
-
-  QImage newImage(p_newSize, QImage::Format_RGB32);
-  newImage.fill(qRgb(255, 255, 255));
-  QPainter painter(&newImage);
-  painter.drawImage(QPoint(0, 0), *p_image);
-  *p_image = newImage;
-}
-
-void AbstractScribblingView::resizeEvent(QResizeEvent* p_event) {
-  if (width() > m_image.width() || height() > m_image.height()) {
-    int newWidth = qMax(width() + 128, m_image.width());
-    int newHeight = qMax(height() + 128, m_image.height());
-    ResizeImage(&m_image, QSize(newWidth, newHeight));
-    update();
-  }
-  QWidget::resizeEvent(p_event);
-}
+AbstractScribblingView::~AbstractScribblingView() = default;

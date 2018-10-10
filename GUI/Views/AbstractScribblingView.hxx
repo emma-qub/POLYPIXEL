@@ -1,23 +1,40 @@
-#ifndef ABSTRACTSCRIBBLINGVIEW_HXX
-#define ABSTRACTSCRIBBLINGVIEW_HXX
+#ifndef ABSTRACTSCRIBBLINGVIEW2_HXX
+#define ABSTRACTSCRIBBLINGVIEW2_HXX
 
-#include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsPolygonItem>
 
 #include "Core/Segment.hxx"
 #include "Core/Vector.hxx"
 
 class PolygonModel;
 
-class AbstractScribblingView: public QWidget {
+class GraphicsPolygonItem: public QObject, public QGraphicsPolygonItem {
+  Q_OBJECT
+  Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+
+public:
+  explicit GraphicsPolygonItem(QGraphicsItem* p_parent = nullptr): QGraphicsPolygonItem(p_parent) {}
+  explicit GraphicsPolygonItem(QPolygonF const& p_polygon, QGraphicsItem* p_parent = nullptr):
+    QGraphicsPolygonItem(p_polygon, p_parent) {}
+
+  ~GraphicsPolygonItem() override = default;
+
+};
+
+class AbstractScribblingView: public QGraphicsView {
   Q_OBJECT
 
 public:
-  explicit AbstractScribblingView(QWidget* p_parent = nullptr);
+  AbstractScribblingView(QWidget* p_parent = nullptr);
   ~AbstractScribblingView() override;
+
+  virtual void InitView();
 
   virtual void SetModel(PolygonModel* p_model);
   void SetCanScribble(bool p_value);
   bool GetCanScribble() const;
+  inline QList<GraphicsPolygonItem*> GetGraphicsPolygonList() const { return m_graphicsPolygonList; }
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, const ppxl::Vector& shiftVector = ppxl::Vector());
@@ -25,26 +42,22 @@ public:
   void ClearImage();
 
 protected:
-  inline QImage& GetImage() { return m_image; }
   inline PolygonModel* GetModel() const { return m_model; }
-  inline void setPenWidth(int p_width) { m_myPenWidth = p_width; }
+  inline void setPenWidth(int p_width) { m_penWidth = p_width; }
+  inline QGraphicsScene* GetScene() const { return m_scene; }
 
-  void DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
-  void DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
-  void ResizeImage(QImage* image, const QSize& newSize);
-
-  void mousePressEvent(QMouseEvent* event) override = 0;
-  void mouseMoveEvent(QMouseEvent* event) override = 0;
-  void mouseReleaseEvent(QMouseEvent* event) override = 0;
-  void paintEvent(QPaintEvent* event) override = 0;
-  void resizeEvent(QResizeEvent* event) override;
+  void DrawLine(ppxl::Point const& p_startPoint, ppxl::Point const& p_endPoint, QColor const& p_color);
+  void DrawLine(QPoint const& p_startPoint, QPoint const& p_endPoint, QColor const& p_color);
 
 private:
+  QGraphicsScene* m_scene;
+  int m_penWidth;
   PolygonModel* m_model;
-  int m_myPenWidth;
-  QColor m_myPenColor;
-  QImage m_image;
+  QColor m_penColor;
+  QPen m_pen;
   bool m_canScribble;
+  bool m_viewInitialized;
+  QList<GraphicsPolygonItem*> m_graphicsPolygonList;
 };
 
 #endif
