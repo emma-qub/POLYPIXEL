@@ -11,7 +11,8 @@ public:
 
   inline int GetCounter() const { return m_counter; }
 
-  Type GetType() const override;
+  CategoryType GetCategoryType() const override;
+  ObjectType GetObjectType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

@@ -13,6 +13,8 @@
         <file alias="W1_L08.ppxl">worlds/W1_L08.ppxl</file>
         <file alias="W1_L09.ppxl">worlds/W1_L09.ppxl</file>
         <file alias="W1_L10.ppxl">worlds/W1_L10.ppxl</file>
+        <file alias="W1_L12.ppxl">worlds/W1_L12.ppxl</file>
+        <file alias="W1_L11.ppxl">worlds/W1_L11.ppxl</file>
     </qresource>
     <qresource prefix="/sprites/player">
         <file alias="player2.png">resources/player2.png</file>

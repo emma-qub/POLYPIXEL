@@ -4,11 +4,15 @@ Switch::Switch(double p_x, double p_y, Object* p_object):
   Mutable(p_x, p_y, p_object) {
 }
 
-Object::Type Switch::GetType() const {
-  return eMutable;
+Switch::~Switch() = default;
+
+Object::ObjectType Switch::GetObjectType() const {
+  return eSwitch;
 }
 
-Switch::~Switch() = default;
+Object::CategoryType Switch::GetCategoryType() const {
+  return eMutable;
+}
 
 std::string Switch::GetName() const {
   return "Switch";

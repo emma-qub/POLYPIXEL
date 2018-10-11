@@ -70,7 +70,6 @@ private:
   QDomDocument m_doc;
 
   QDomElement m_polygons;
-  QDomElement m_lineModifiers;
   QDomElement m_tapes;
   QDomElement m_oneWays;
   QDomElement m_mirrors;

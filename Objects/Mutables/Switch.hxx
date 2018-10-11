@@ -9,7 +9,8 @@ public:
   Switch(double p_x, double p_y, Object* p_object = nullptr);
   ~Switch() override;
 
-  Type GetType() const override;
+  CategoryType GetCategoryType() const override;
+  ObjectType GetObjectType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

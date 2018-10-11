@@ -154,8 +154,9 @@ QDomElement Parser::GetTapeById(int p_id) const {
 
 TapesList Parser::GetTapesList() {
   TapesList tapeList;
-  for (int k = 0; k < m_tapeNodesCount; ++k)
+  for (int k = 0; k < m_tapeNodesCount; ++k) {
     tapeList << GetTape(GetTapeById(k));
+  }
 
   return tapeList;
 }
@@ -168,9 +169,7 @@ OneWay Parser::GetOneWay(QDomElement const& p_element) const {
     p_element.attribute("xa", "-1.").toDouble(),
     p_element.attribute("ya", "-1.").toDouble(),
     p_element.attribute("xb", "-1.").toDouble(),
-    p_element.attribute("yb", "-1.").toDouble(),
-    p_element.attribute("xd", "-1.").toDouble(),
-    p_element.attribute("yd", "-1").toDouble()
+    p_element.attribute("yb", "-1.").toDouble()
   );
 }
 
@@ -180,8 +179,9 @@ QDomElement Parser::GetOneWayById(int p_id) const {
 
 OneWaysList Parser::GetOneWaysList() const {
   OneWaysList oneWayList;
-  for (int k = 0; k < m_oneWayNodesCount; ++k)
+  for (int k = 0; k < m_oneWayNodesCount; ++k) {
     oneWayList << GetOneWay(GetOneWayById(k));
+  }
 
   return oneWayList;
 }
@@ -204,8 +204,9 @@ QDomElement Parser::GetMirrorById(int p_id) const {
 
 MirrorsList Parser::GetMirrorsList() const {
   MirrorsList mirrorList;
-  for (int k = 0; k < m_mirrorNodesCount; ++k)
+  for (int k = 0; k < m_mirrorNodesCount; ++k) {
     mirrorList << GetMirror(GetMirrorById(k));
+  }
 
   return mirrorList;
 }
@@ -232,8 +233,9 @@ QDomElement Parser::GetPortalById(int p_id) const {
 
 PortalsList Parser::GetPortalsList() const {
   PortalsList portalList;
-  for (int k = 0; k < m_portalNodesCount; ++k)
+  for (int k = 0; k < m_portalNodesCount; ++k) {
     portalList << GetPortal(GetPortalById(k));
+  }
 
   return portalList;
 }

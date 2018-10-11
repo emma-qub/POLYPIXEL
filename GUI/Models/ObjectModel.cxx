@@ -262,10 +262,10 @@ TapeModel::~TapeModel() {
 void TapeModel::AddTape(Tape const& p_tape) {
   m_tapesList << new Tape(p_tape);
 
-  auto left = p_tape.getX();
-  auto top = p_tape.getY();
-  auto right = left + p_tape.getW();
-  auto bottom = top + p_tape.getH();
+  auto left = p_tape.GetX();
+  auto top = p_tape.GetY();
+  auto right = left + p_tape.GetW();
+  auto bottom = top + p_tape.GetH();
   auto tapeItem = new QStandardItem(tr("%1 #%2").arg(p_tape.GetName().c_str()).arg(m_tapesList.size()));
   tapeItem->appendRow(QList<QStandardItem*>()
     << new QStandardItem(QString::number(left))

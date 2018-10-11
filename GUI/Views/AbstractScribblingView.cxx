@@ -1,10 +1,13 @@
 #include "AbstractScribblingView.hxx"
 
-#include "GUI/Models/PolygonModel.hxx"
 #include "Core/Point.hxx"
-
+#include "GUI/Models/PolygonModel.hxx"
 #include "GUI/GraphicsItem/GraphicsPixelLine.hxx"
-
+#include "Objects/Object.hxx"
+#include "Objects/Obstacles/Tape.hxx"
+#include "Objects/Obstacles/OneWay.hxx"
+#include "Objects/Deviations/Mirror.hxx"
+#include "Objects/Deviations/Portal.hxx"
 
 
 #include <QGraphicsLineItem>
@@ -13,7 +16,7 @@ AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
   QGraphicsView(p_parent),
   m_scene(nullptr),
   m_penWidth(5),
-  m_model(nullptr),
+  m_polygonModel(nullptr),
   m_penColor(),
   m_canScribble(false),
   m_viewInitialized(false) {
@@ -39,7 +42,12 @@ void AbstractScribblingView::InitView() {
 }
 
 void AbstractScribblingView::SetModel(PolygonModel* p_model) {
-  m_model = p_model;
+  m_polygonModel = p_model;
+}
+
+void AbstractScribblingView::SetObjectsList(const QList<Object*>& p_objectsList) {
+  m_objectsList.clear();
+  m_objectsList << p_objectsList;
 }
 
 void AbstractScribblingView::SetCanScribble(bool p_value) {
@@ -90,14 +98,14 @@ void AbstractScribblingView::DrawText(ppxl::Point p_position, const QString& p_t
 }
 
 void AbstractScribblingView::DrawFromModel() {
-  if (!m_model || !m_canScribble)
+  if (!m_polygonModel || !m_canScribble)
   {
     return;
   }
 
   m_graphicsPolygonList.clear();
   m_pen.setStyle(Qt::SolidLine);
-  auto polygonItems = m_model->GetPolygonsItem();
+  auto polygonItems = m_polygonModel->GetPolygonsItem();
   for (int polygonRow = 0; polygonRow < polygonItems->rowCount(); ++polygonRow) {
     auto polygonItem = polygonItems->child(polygonRow, 0);
     m_penColor =  polygonItem->data(Qt::DecorationRole).value<QColor>();
@@ -111,6 +119,46 @@ void AbstractScribblingView::DrawFromModel() {
     graphicsPolygonItem->setPen(m_pen);
     m_scene->addItem(graphicsPolygonItem);
     m_graphicsPolygonList << graphicsPolygonItem;
+  }
+}
+
+void AbstractScribblingView::DrawObjects() {
+  for (auto* object: m_objectsList) {
+    auto objectType = object->GetObjectType();
+    switch (objectType) {
+    case Object::eTape: {
+      auto tape = static_cast<Tape*>(object);
+      scene()->addRect(tape->getX(), tape->getY(), tape->getW(), tape->getH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
+      break;
+    } case Object::eOneWay: {
+      auto oneWay = static_cast<OneWay*>(object);
+      auto oneWayLine = oneWay->GetLine();
+      auto oneWayLineA = oneWayLine.GetA();
+      auto oneWayLineB = oneWayLine.GetB();
+      scene()->addLine(oneWayLineA.GetX(), oneWayLineA.GetY(), oneWayLineB.GetX(), oneWayLineB.GetY(), QPen(QBrush(QColor("#cccccc")), 7));
+      break;
+    } case Object::eMirror: {
+      auto mirror = static_cast<Mirror*>(object);
+      auto mirrorLine = mirror->GetMirrorLine();
+      auto mirrorLineA = mirrorLine.GetA();
+      auto mirrorLineB = mirrorLine.GetB();
+      scene()->addLine(mirrorLineA.GetX(), mirrorLineA.GetY(), mirrorLineB.GetX(), mirrorLineB.GetY(), QPen(QBrush(QColor("#0033ff")), 7));
+      break;
+    } case Object::ePortal: {
+      auto portal = static_cast<Portal*>(object);
+      auto portalIn = portal->GetIn();
+      auto portalInA = portalIn.GetA();
+      auto portalInB = portalIn.GetB();
+      scene()->addLine(portalInA.GetX(), portalInA.GetY(), portalInB.GetX(), portalInB.GetY(), QPen(QBrush(QColor("#ff9a00")), 7));
+      auto portalOut = portal->GetOut();
+      auto portalOutA = portalOut.GetA();
+      auto portalOutB = portalOut.GetB();
+      scene()->addLine(portalOutA.GetX(), portalOutA.GetY(), portalOutB.GetX(), portalOutB.GetY(), QPen(QBrush(QColor("#27a7d8")), 7));
+      break;
+    } default: {
+      break;
+    }
+    }
   }
 }
 

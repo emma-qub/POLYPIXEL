@@ -1,16 +1,20 @@
 #include "OneWay.hxx"
 
-OneWay::OneWay(double p_xa, double p_ya, double p_xb, double p_yb, double p_xd, double p_yd):
+OneWay::OneWay(double p_xa, double p_ya, double p_xb, double p_yb):
   Obstacle(),
   m_line(p_xa, p_ya, p_xb, p_yb),
-  m_direction(p_xd, p_yd) {
-}
-
-Object::Type OneWay::GetType() const {
-  return eObstacle;
+  m_direction(m_line.GetNormal()) {
 }
 
 OneWay::~OneWay() = default;
+
+Object::ObjectType OneWay::GetObjectType() const {
+  return eOneWay;
+}
+
+Object::CategoryType OneWay::GetCategoryType() const {
+  return eObstacle;
+}
 
 std::string OneWay::GetName() const {
   return "OneWay";
@@ -22,5 +26,5 @@ bool OneWay::Crossing(ppxl::Segment const& p_line) const {
     return (lineVector * m_direction) >= 0.;
   }
 
-  return true;
+  return false;
 }

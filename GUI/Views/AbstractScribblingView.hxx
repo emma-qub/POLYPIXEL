@@ -8,6 +8,7 @@
 #include "Core/Vector.hxx"
 
 class PolygonModel;
+class Object;
 
 class GraphicsPolygonItem: public QObject, public QGraphicsPolygonItem {
   Q_OBJECT
@@ -32,6 +33,7 @@ public:
   virtual void InitView();
 
   virtual void SetModel(PolygonModel* p_model);
+  virtual void SetObjectsList(QList<Object*> const& p_objectsList);
   void SetCanScribble(bool p_value);
   bool GetCanScribble() const;
   inline QList<GraphicsPolygonItem*> GetGraphicsPolygonList() const { return m_graphicsPolygonList; }
@@ -39,10 +41,12 @@ public:
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight, const ppxl::Vector& shiftVector = ppxl::Vector());
   virtual void DrawFromModel();
+  void DrawObjects();
+
   void ClearImage();
 
 protected:
-  inline PolygonModel* GetModel() const { return m_model; }
+  inline PolygonModel* GetModel() const { return m_polygonModel; }
   inline void setPenWidth(int p_width) { m_penWidth = p_width; }
   inline QGraphicsScene* GetScene() const { return m_scene; }
 
@@ -52,7 +56,8 @@ protected:
 private:
   QGraphicsScene* m_scene;
   int m_penWidth;
-  PolygonModel* m_model;
+  PolygonModel* m_polygonModel;
+  QList<Object*> m_objectsList;
   QColor m_penColor;
   QPen m_pen;
   bool m_canScribble;

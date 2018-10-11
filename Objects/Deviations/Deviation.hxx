@@ -11,7 +11,7 @@ public:
   Deviation();
   ~Deviation() override;
 
-  virtual QList<ppxl::Segment> DeviateLine(ppxl::Segment const& line) const = 0;
+  virtual QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const = 0;
 };
 
 #endif

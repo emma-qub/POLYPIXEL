@@ -9,6 +9,7 @@
 class QLabel;
 class PolygonModel;
 class PlayingScribblingView;
+class Object;
 
 class PlayingView: public QWidget {
   Q_OBJECT
@@ -19,9 +20,11 @@ public:
   void InitView();
 
   void SetModel(PolygonModel* p_playingModel);
+  void SetObjectsList(QList<Object*> const& p_objectsList);
 
   void DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle = Qt::SolidLine);
   void DrawFromModel();
+  void DrawObjects();
   void SetAreasData(QList<double> const& p_areas, QList<ppxl::Vector> p_shiftVectors, ppxl::Point const& p_figureCenter);
   void ClearImage();
 

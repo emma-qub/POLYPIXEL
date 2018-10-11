@@ -9,11 +9,15 @@ Mirror::Mirror(double p_xa, double p_ya, double p_xb, double p_yb):
   m_mirrorLine(p_xa, p_ya, p_xb, p_yb) {
 }
 
-Object::Type Mirror::GetType() const {
-  return eDeviation;
+Mirror::~Mirror() = default;
+
+Object::ObjectType Mirror::GetObjectType() const {
+  return eMirror;
 }
 
-Mirror::~Mirror() = default;
+Object::CategoryType Mirror::GetCategoryType() const {
+  return eDeviation;
+}
 
 std::string Mirror::GetName() const {
   return "Mirror";

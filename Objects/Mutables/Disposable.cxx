@@ -5,15 +5,19 @@ Disposable::Disposable(double p_x, double p_y, Object* p_object):
   m_objectUsed(false) {
 }
 
+Disposable::~Disposable() = default;
+
 void Disposable::UseObject() {
   m_objectUsed = true;
 }
 
-Object::Type Disposable::GetType() const {
-  return eMutable;
+Object::ObjectType Disposable::GetObjectType() const {
+  return eDisposable;
 }
 
-Disposable::~Disposable() = default;
+Object::CategoryType Disposable::GetCategoryType() const {
+  return eMutable;
+}
 
 std::string Disposable::GetName() const {
   return "Disposable";

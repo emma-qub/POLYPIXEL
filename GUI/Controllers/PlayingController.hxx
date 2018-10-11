@@ -8,6 +8,18 @@
 
 class PolygonModel;
 class PlayingView;
+class MirrorModel;
+class PortalModel;
+class CountdownModel;
+class DisposableModel;
+class SwitchModel;
+class TransferModel;
+class OneWayModel;
+class TapeModel;
+class Deviation;
+class Mutable;
+class Obstacle;
+class Object;
 
 struct GameInfo {
   GameInfo(int p_linesCount = -1, int p_linesGoal = 1, int p_partsCount = -1, int p_partsGoal = -1,
@@ -86,14 +98,27 @@ protected:
 
   void DisplayGameOver();
 
-  //  Deviation* getNearestDeviation(ppxl::Segment const& line) const;
-  //  void computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const;
+  Deviation* GetNearestDeviation(ppxl::Segment const& line) const;
+  void ComputeDeviateLines(double firstLineLength, ppxl::Segment const& line, QList<ppxl::Segment>& lines) const;
+
   //  void replay();
   //  void undoSliceIt();
   //  void clearGame();
 
 protected:
   PolygonModel* m_polygonModel;
+  MirrorModel* m_mirrorModel;
+  PortalModel* m_portalModel;
+  CountdownModel* m_countdownModel;
+  DisposableModel* m_disposableModel;
+  SwitchModel* m_switchModel;
+  TransferModel* m_transferModel;
+  OneWayModel* m_oneWayModel;
+  TapeModel* m_tapeModel;
+  QList<Object*> m_objectsList;
+  QList<Object*> m_deviationsList;
+  QList<Object*> m_mutablesList;
+  QList<Object*> m_obstaclesList;
   GameInfo m_gameInfo;
   QString m_levelPath;
   double m_orientedAreaTotal;

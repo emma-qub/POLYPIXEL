@@ -1,0 +1,36 @@
+<!DOCTYPE PPXLML>
+<level>
+  <polygons>
+    <polygon id="0">
+      <vertex x="350" y="100"/>
+      <vertex x="950" y="100"/>
+      <vertex x="950" y="700"/>
+      <vertex x="350" y="700"/>
+    </polygon>
+  </polygons>
+  <linesgoal value="1"/>
+  <partsgoal value="3"/>
+  <maxgaptowin value="100"/>
+  <tolerance value="0"/>
+  <starscount value="1"/>
+  <objects>
+    <obstacles>
+      <tapes>
+        <tape id="0" x="340" y="90" w="20" h="20" />
+        <tape id="1" x="940" y="690" w="20" h="20" />
+      </tapes>
+      <oneways>
+        <oneway id="0" xa="650" ya="200" xb="650" yb="350" />
+        <oneway id="1" xa="650" ya="600" xb="650" yb="450" />
+      </oneways>
+    </obstacles>
+    <deviations>
+      <mirrors>
+        <mirror id="0" xa="1000" ya="300" xb="1000" yb="500" />
+      </mirrors>
+      <portals>
+        <portal id="0" xaIn="500" yaIn="800" xbIn="800" ybIn="800" xaOut="250" yaOut="550" xbOut="250" ybOut="250" />
+      </portals>
+    </deviations>
+  </objects>
+</level>

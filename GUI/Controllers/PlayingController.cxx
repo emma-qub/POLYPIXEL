@@ -2,6 +2,7 @@
 
 #include "Core/Vector.hxx"
 #include "GUI/Models/PolygonModel.hxx"
+#include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/PlayingView.hxx"
 #include "Parser/Parser.hxx"
 #include "Parser/Serializer.hxx"
@@ -11,6 +12,14 @@
 PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_polygonModel(new PolygonModel(this)),
+  m_mirrorModel(new MirrorModel(this)),
+  m_portalModel(new PortalModel(this)),
+  m_countdownModel(new CountdownModel(this)),
+  m_disposableModel(new DisposableModel(this)),
+  m_switchModel(new SwitchModel(this)),
+  m_transferModel(new TransferModel(this)),
+  m_oneWayModel(new OneWayModel(this)),
+  m_tapeModel(new TapeModel(this)),
   m_gameInfo(),
   m_levelPath(""),
   m_orientedAreaTotal(0.0),
@@ -45,6 +54,7 @@ void PlayingController::RestartLevel() {
 void PlayingController::Redraw() {
   m_view->ClearImage();
   m_view->DrawFromModel();
+  m_view->DrawObjects();
 }
 
 void PlayingController::SetStartPoint(QPoint const& p_startPoint) {
@@ -63,7 +73,8 @@ QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endP
   QList<ppxl::Segment> lines;
 
   ppxl::Point endPoint(static_cast<double>(p_endPoint.x()), static_cast<double>(p_endPoint.y()));
-  lines << ppxl::Segment(m_startPoint, endPoint);
+  ppxl::Segment scribbledLine(m_startPoint, endPoint);
+  ComputeDeviateLines(-1, scribbledLine, lines);
 
   Redraw();
   auto linesColor = GetLinesColor(lines);
@@ -110,6 +121,12 @@ PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segm
       } else if (polygon->IsGoodSegment(line)) {
         goodCrossing = true;
       } else {
+        badCrossing = true;
+      }
+    }
+
+    for (auto const* obstacle: m_obstaclesList) {
+      if (static_cast<Obstacle const*>(obstacle)->Crossing(line)) {
         badCrossing = true;
       }
     }
@@ -327,11 +344,59 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
     return;
   }
 
-  // Prompt Level Info
+  // Parser
   Parser parser(p_levelPath);
+  
+  // Polygon model
   m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
+  
+  // Level Info
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
+
+  // Object models
+  for (auto const& mirror: parser.GetMirrorsList()) {
+    m_mirrorModel->AddMirror(mirror);
+  }
+  m_deviationsList.append(m_mirrorModel->GetMirrorsList());
+
+  for (auto const& portal: parser.GetPortalsList()) {
+    m_portalModel->AddPortal(portal);
+  }
+  m_deviationsList.append(m_portalModel->GetPortalsList());
+
+  //for (auto const& countdown: parser.GetCountdownsList()) {
+  //  m_countdownModel->AddCountdown(countdown);
+  //}
+  //m_mutablesList.append(m_countdownModel->GetCountdowsList());
+
+  //for (auto const& disposable: parser.GetDisposablesList()) {
+  //  m_disposableModel->AddDisposable(disposable);
+  //}
+  //m_mutablesList.append(m_disposableModel->GetDisposablesList());
+
+  //for (auto const& _switch: parser.GetSwitchesList()) {
+  //  m_switchModel->AddSwitch(_switch);
+  //}
+  //m_mutablesList.append(m_switchModel->GetSwitchesList());
+
+  //for (auto const& transfer: parser.GetTransfersList()) {
+  //  m_transferModel->AddTransfer(transfer);
+  //}
+  //m_mutablesList.append(m_transferModel->GetTransfersList());
+
+  for (auto const& oneWay: parser.GetOneWaysList()) {
+    m_oneWayModel->AddOneWay(oneWay);
+  }
+  m_obstaclesList.append(m_oneWayModel->GetOneWaysList());
+
+  for (auto const& tape: parser.GetTapesList()) {
+    m_tapeModel->AddTape(tape);
+  }
+  m_obstaclesList.append(m_tapeModel->GetTapesList());
+
+  m_objectsList << m_deviationsList << m_mutablesList << m_obstaclesList;
+  m_view->SetObjectsList(m_objectsList);
 
   StartLevel();
 }
@@ -507,63 +572,64 @@ void PlayingController::clearGame() {
 
   emit update();
 }
+*/
 
-Deviation* PlayingController::getNearestDeviation(ppxl::Segment const& line) const {
-  DeviationList deviations = m_model->getDeviationList();
-
+Deviation* PlayingController::GetNearestDeviation(ppxl::Segment const& line) const {
   double minDist = -1.;
   Deviation* nearestDeviation = nullptr;
 
-  for (Deviation* deviation: deviations) {
-    QList<ppxl::Segment> deviateLines = deviation->deviateLine(line);
+  for (auto* deviation: m_deviationsList) {
+    auto deviationCast = static_cast<Deviation*>(deviation);
+    QList<ppxl::Segment> deviateLines = deviationCast->DeviateLine(line);
     // If there is at least one reflected line
     if (deviateLines.size() > 1) {
-      if (minDist == -1)
-        deviateLines.at(0).length();
-      else
-        qMin(minDist, deviateLines.at(0).length());
-      nearestDeviation = deviation;
+      if (minDist < 0.) {
+        deviateLines.at(0).Length();
+      } else {
+        qMin(minDist, deviateLines.at(0).Length());
+      }
+      nearestDeviation = deviationCast;
     }
   }
 
   return nearestDeviation;
 }
 
-void PlayingController::computeDeviateLines(double firstLineLength, const ppxl::Segment& line, QList<ppxl::Segment>& lines) const {
-  Deviation* nearestDeviation = getNearestDeviation(line);
+void PlayingController::ComputeDeviateLines(double firstLineLength, ppxl::Segment const& line, QList<ppxl::Segment>& lines) const {
+  Deviation* nearestDeviation = GetNearestDeviation(line);
 
   if (nearestDeviation) {
-    QList<ppxl::Segment> deviateLines = nearestDeviation->deviateLine(line);
+    QList<ppxl::Segment> deviateLines = nearestDeviation->DeviateLine(line);
     // Init firstLineLength
-    if (firstLineLength == -1.f)
-      firstLineLength = deviateLines.at(0).length();
+    if (firstLineLength < 0.) {
+      firstLineLength = deviateLines.at(0).Length();
+    }
 
     // At least two line has to be here: the line drawn and its reflexion
     assert(deviateLines.size() > 1);
 
     // Erase previous line, since it go through current mirror
-    if (lines.size() > 1)
+    if (lines.size() > 1) {
       lines.erase(lines.end()-1);
+    }
 
     // Get the mirrorLined the length of the firstLine
     ppxl::Segment deviateLine = deviateLines.at(1);
-    ppxl::Point A = deviateLine.getA();
-    ppxl::Point B = deviateLine.getB();
-    ppxl::Vector lu = firstLineLength*ppxl::Vector(A, B).normalize();
-    ppxl::Point BB(lu.getX(), lu.getY());
+    ppxl::Point A = deviateLine.GetA();
+    ppxl::Point B = deviateLine.GetB();
+    ppxl::Vector lu = firstLineLength*ppxl::Vector(A, B).Normalize();
+    ppxl::Point BB(lu.GetX(), lu.GetY());
     deviateLine.setB(A + BB);
 
     // Push line and its reflexion
-    lines << deviateLines.at(0));
-    lines << deviateLine);
+    lines << deviateLines.at(0);
+    lines << deviateLine;
 
-    computeDeviateLines(firstLineLength, deviateLine, lines);
+    ComputeDeviateLines(firstLineLength, deviateLine, lines);
   } else {
-    lines << line);
+    lines << line;
   }
 }
-
-*/
 
 
 bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B) {

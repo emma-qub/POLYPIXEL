@@ -123,10 +123,10 @@ QDomElement Serializer::TapeToNode(Tape const& p_tape, int p_id) {
   QDomElement element(m_doc.createElement("tape"));
   element.setAttribute("id", p_id);
 
-  element.setAttribute("x", p_tape.getX());
-  element.setAttribute("y", p_tape.getY());
-  element.setAttribute("w", p_tape.getW());
-  element.setAttribute("h", p_tape.getH());
+  element.setAttribute("x", p_tape.GetX());
+  element.setAttribute("y", p_tape.GetY());
+  element.setAttribute("w", p_tape.GetW());
+  element.setAttribute("h", p_tape.GetH());
 
   return element;
 }
@@ -155,10 +155,6 @@ QDomElement Serializer::OneWayToNode(OneWay const& p_oneWay, int p_id) {
   element.setAttribute("ya", line.GetA().GetY());
   element.setAttribute("xb", line.GetB().GetX());
   element.setAttribute("yb", line.GetB().GetY());
-
-  ppxl::Vector direction(p_oneWay.GetDirection());
-  element.setAttribute("xd", direction.GetX());
-  element.setAttribute("yd", direction.GetY());
 
   return element;
 }

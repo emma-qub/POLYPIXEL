@@ -46,12 +46,20 @@ void PlayingView::SetModel(PolygonModel* p_playingModel) {
   m_scribblingView->SetModel(p_playingModel);
 }
 
+void PlayingView::SetObjectsList(QList<Object*> const& p_objectsList) {
+  m_scribblingView->SetObjectsList(p_objectsList);
+}
+
 void PlayingView::DrawLine(ppxl::Segment const& p_line, QColor const& p_color, Qt::PenStyle p_penStyle) {
   m_scribblingView->DrawLine(p_line, p_color, p_penStyle);
 }
 
 void PlayingView::DrawFromModel() {
   m_scribblingView->DrawFromModel();
+}
+
+void PlayingView::DrawObjects() {
+  m_scribblingView->DrawObjects();
 }
 
 void PlayingView::SetAreasData(QList<double> const& p_areas, QList<ppxl::Vector> p_shiftVectors, ppxl::Point const& p_figureCenter) {

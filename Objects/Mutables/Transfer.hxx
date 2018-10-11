@@ -11,7 +11,8 @@ public:
 
   inline ppxl::Point GetPosition2() const { return m_position2; }
 
-  Type GetType() const override;
+  CategoryType GetCategoryType() const override;
+  ObjectType GetObjectType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

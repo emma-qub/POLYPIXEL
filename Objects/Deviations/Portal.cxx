@@ -18,11 +18,15 @@ Portal::Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out):
   m_normalOut(m_out.GetNormal()) {
 }
 
-Object::Type Portal::GetType() const {
-  return eDeviation;
+Portal::~Portal() = default;
+
+Object::ObjectType Portal::GetObjectType() const {
+  return ePortal;
 }
 
-Portal::~Portal() = default;
+Object::CategoryType Portal::GetCategoryType() const {
+  return eDeviation;
+}
 
 std::string Portal::GetName() const {
   return "Portal";

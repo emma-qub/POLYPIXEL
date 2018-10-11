@@ -58,7 +58,7 @@ protected:
 
 private:
   QPixmap m_gripPixmap;
-  CreateLevelModel* m_model;
+  CreateLevelModel* m_polygonModel;
   QItemSelectionModel* m_selectionModel;
   bool m_viewInitialized;
   bool m_isStuck;
