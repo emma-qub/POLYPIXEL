@@ -9,6 +9,9 @@ public:
   Countdown(int p_counter, double p_x, double p_y, Object* p_object = nullptr);
   ~Countdown() override;
 
+  inline int GetCounter() const { return m_counter; }
+
+  Type GetType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

@@ -21,6 +21,7 @@ public:
   inline double getH() const { return m_h; }
   inline void setH(double p_h) { m_h = p_h; }
 
+  Type GetType() const override;
   std::string GetName() const override;
   bool Crossing(ppxl::Segment const& line) const final;
 

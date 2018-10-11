@@ -11,6 +11,7 @@ public:
 
   void UseObject();
 
+  Type GetType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

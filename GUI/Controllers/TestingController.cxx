@@ -17,18 +17,18 @@ TestingController::TestingController(TestingView* p_view, QObject* p_parent):
 
 void TestingController::SetPolygonsItem(PolygonModel* p_model) {
   m_polygonsList.clear();
-  m_model->InitColor();
+  m_polygonModel->InitColor();
 
   for (auto* polygon: p_model->GetPolygonsList()) {
     m_polygonsList << ppxl::Polygon(*polygon);
   }
 
-  m_model->SetPolygonsList(m_polygonsList);
-  m_view->SetModel(m_model);
+  m_polygonModel->SetPolygonsList(m_polygonsList);
+  m_view->SetModel(m_polygonModel);
 }
 
 void TestingController::ResetPolygonList() {
-  m_model->SetPolygonsList(m_polygonsList);
+  m_polygonModel->SetPolygonsList(m_polygonsList);
 }
 
 void TestingController::SetLinesGoal(int p_linesGoal) {
@@ -58,18 +58,18 @@ void TestingController::PlayLevel() {
   m_levelPath = "";
   m_orientedAreaTotal = 0.;
   m_gameInfo.m_linesCount = 0;
-  m_gameInfo.m_partsCount = m_model->GetPolygonsCount();
+  m_gameInfo.m_partsCount = m_polygonModel->GetPolygonsCount();
   m_gameInfo.m_stars = 0;
   m_view->SetSaveButtonEnable(false);
 
-  for (auto const* polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
   }
   UpdateViewFromGameInfo();
   m_view->StartLevel();
   Redraw();
 
-  connect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
+  connect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
   connect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
 }
 
@@ -117,7 +117,7 @@ void TestingController::CheckWinning() {
     //m_view->DrawAreas(areasList);
     m_view->EndLevel();
 
-    disconnect(m_model, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
+    disconnect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
     disconnect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
   }
 }

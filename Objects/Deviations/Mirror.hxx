@@ -11,6 +11,7 @@ public:
 
   inline ppxl::Segment GetMirrorLine() const { return m_mirrorLine; }
 
+  Type GetType() const override;
   std::string GetName() const override;
   QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const final;
 

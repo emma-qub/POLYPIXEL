@@ -93,7 +93,7 @@ protected:
   //  void clearGame();
 
 protected:
-  PolygonModel* m_model;
+  PolygonModel* m_polygonModel;
   GameInfo m_gameInfo;
   QString m_levelPath;
   double m_orientedAreaTotal;

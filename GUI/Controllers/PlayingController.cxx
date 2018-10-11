@@ -10,13 +10,13 @@
 
 PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   QObject(p_parent),
-  m_model(new PolygonModel(this)),
+  m_polygonModel(new PolygonModel(this)),
   m_gameInfo(),
   m_levelPath(""),
   m_orientedAreaTotal(0.0),
   m_view(p_view) {
 
-  m_view->SetModel(m_model);
+  m_view->SetModel(m_polygonModel);
 
   connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
   connect(m_view, &PlayingView::Moving, this, &PlayingController::ComputeSlicingLines);
@@ -32,7 +32,7 @@ void PlayingController::InitView() {
 }
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
-  m_model->InitColor();
+  m_polygonModel->InitColor();
   m_levelPath = p_levelPath;
   OpenLevel(p_levelPath);
 }
@@ -102,7 +102,7 @@ PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segm
   bool goodCrossing = false;
   bool badCrossing = false;
 
-  auto polygonList = m_model->GetPolygonsList();
+  auto polygonList = m_polygonModel->GetPolygonsList();
   for (ppxl::Segment const& line: p_lines) {
     for (auto const& polygon: polygonList) {
       if (!polygon->IsCrossing(line) && !polygon->IsPointInside(line.GetA())) {
@@ -113,7 +113,6 @@ PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segm
         badCrossing = true;
       }
     }
-    // Handle tape here
   }
 
   if (badCrossing) {
@@ -136,11 +135,11 @@ void PlayingController::SliceIt(QPoint const& p_endPoint) {
     for (ppxl::Segment const& line: lines) {
       // Browse every polygon and slice it!
       ComputeNewPolygonList(newPolygonList, line);
-      m_model->SetPolygonsList(newPolygonList);
+      m_polygonModel->SetPolygonsList(newPolygonList);
     }
 
     ++m_gameInfo.m_linesCount;
-    m_gameInfo.m_partsCount = m_model->GetPolygonsCount();
+    m_gameInfo.m_partsCount = m_polygonModel->GetPolygonsCount();
     UpdateViewFromGameInfo();
 
     CheckWinning();
@@ -156,7 +155,7 @@ void PlayingController::UpdateViewFromGameInfo() {
 
 
 void PlayingController::ComputeNewPolygonList(QList<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const {
-  for (auto const* polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
     std::vector<ppxl::Point*> globalVertices;
     std::vector<ppxl::Point*> intersections;
     GetVerticesAndIntersections(p_line, *polygon, globalVertices, intersections);
@@ -330,8 +329,8 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
 
   // Prompt Level Info
   Parser parser(p_levelPath);
-  m_model->SetPolygonsList(parser.GetPolygonsList());
-  m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
+  m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
+  m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
   StartLevel();
@@ -344,12 +343,12 @@ void PlayingController::StartLevel() {
 
   UpdateViewFromGameInfo();
 
-  for (auto const* polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
     m_orientedAreaTotal += polygon->OrientedArea();
   }
   Redraw();
 
-  connect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
+  connect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
 }
 
 QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxArea) {
@@ -358,7 +357,7 @@ QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxAr
   p_maxArea = 0.;
 
   double areaCumul = 0.;
-  auto polygonsList = m_model->GetPolygonsList();
+  auto polygonsList = m_polygonModel->GetPolygonsList();
   for (int row = 0; row < polygonsList.size(); ++row) {
     auto polygon = polygonsList.at(row);
     double currArea = 0.;
@@ -381,7 +380,7 @@ QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxAr
 QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter) {
   QList<ppxl::Vector> shiftVectors;
 
-  for (auto const* polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
     ppxl::Vector currShift(p_globalBarycenter, polygon->Barycenter());
     double currShiftLength = currShift.Norm();
     currShift.Normalize();
@@ -433,7 +432,7 @@ void PlayingController::CheckWinning() {
     m_view->AnimatePolygons();
     m_view->EndLevel();
 
-    disconnect(m_model, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
+    disconnect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
   }
 }
 
@@ -441,7 +440,7 @@ ppxl::Point PlayingController::ComputeGlobalBarycenter() const {
   ppxl::Point globalBarycenter;
   unsigned int polygonCount = 0;
 
-  for (auto const* polygon: m_model->GetPolygonsList()) {
+  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
     globalBarycenter += polygon->Barycenter();
     ++polygonCount;
   }

@@ -9,6 +9,9 @@ public:
   Transfer(double p_x1, double p_y1, double p_x2, double p_y2, Object* p_object = nullptr);
   ~Transfer() override;
 
+  inline ppxl::Point GetPosition2() const { return m_position2; }
+
+  Type GetType() const override;
   std::string GetName() const override;
   ppxl::Point GetObjectPosition() const override;
 

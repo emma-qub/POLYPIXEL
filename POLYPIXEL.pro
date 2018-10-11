@@ -67,7 +67,8 @@ SOURCES += \
     Objects/Obstacles/OneWay.cxx \
     Objects/Object.cxx \
     Parser/Parser.cxx \
-    Parser/Serializer.cxx
+    Parser/Serializer.cxx \
+    GUI/Models/ObjectModel.cxx
 
 HEADERS += \
     Core/Point.hxx \
@@ -122,7 +123,8 @@ HEADERS += \
     Objects/Obstacles/OneWay.hxx \
     Objects/Object.hxx \
     Parser/Parser.hxx \
-    Parser/Serializer.hxx
+    Parser/Serializer.hxx \
+    GUI/Models/ObjectModel.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

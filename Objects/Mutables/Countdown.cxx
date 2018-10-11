@@ -5,6 +5,10 @@ Countdown::Countdown(int p_counter, double p_x, double p_y, Object* p_object):
   m_counter(p_counter) {
 }
 
+Object::Type Countdown::GetType() const {
+  return eMutable;
+}
+
 Countdown::~Countdown() = default;
 
 std::string Countdown::GetName() const {

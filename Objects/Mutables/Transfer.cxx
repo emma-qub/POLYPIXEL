@@ -5,6 +5,10 @@ Transfer::Transfer(double p_x1, double p_y1, double p_x2, double p_y2, Object* p
   m_position2(p_x2, p_y2) {
 }
 
+Object::Type Transfer::GetType() const {
+  return eMutable;
+}
+
 Transfer::~Transfer() = default;
 
 std::string Transfer::GetName() const {

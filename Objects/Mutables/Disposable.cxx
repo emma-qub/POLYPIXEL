@@ -9,6 +9,10 @@ void Disposable::UseObject() {
   m_objectUsed = true;
 }
 
+Object::Type Disposable::GetType() const {
+  return eMutable;
+}
+
 Disposable::~Disposable() = default;
 
 std::string Disposable::GetName() const {

@@ -16,6 +16,7 @@ public:
   inline ppxl::Vector GetNormalIn() const { return m_normalIn; }
   inline ppxl::Vector GetNormalOut() const { return m_normalOut; }
 
+  Type GetType() const override;
   std::string GetName() const override;
   QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const final;
   QList<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;

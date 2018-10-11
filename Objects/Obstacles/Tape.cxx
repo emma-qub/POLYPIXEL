@@ -8,6 +8,10 @@ Tape::Tape(double p_x, double p_y, double p_w, double p_h):
   m_h(p_h) {
 }
 
+Object::Type Tape::GetType() const {
+  return eObstacle;
+}
+
 Tape::~Tape() = default;
 
 std::string Tape::GetName() const {

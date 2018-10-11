@@ -6,6 +6,10 @@ OneWay::OneWay(double p_xa, double p_ya, double p_xb, double p_yb, double p_xd, 
   m_direction(p_xd, p_yd) {
 }
 
+Object::Type OneWay::GetType() const {
+  return eObstacle;
+}
+
 OneWay::~OneWay() = default;
 
 std::string OneWay::GetName() const {

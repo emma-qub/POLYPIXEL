@@ -16,6 +16,7 @@ public:
   inline ppxl::Vector GetDirection() const { return m_direction; }
   inline void SetDirection(const ppxl::Vector& p_direction) { m_direction = p_direction; }
 
+  Type GetType() const override;
   std::string GetName() const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
