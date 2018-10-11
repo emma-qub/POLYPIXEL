@@ -330,7 +330,7 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
 
   // Prompt Level Info
   Parser parser(p_levelPath);
-  m_model->SetPolygonsList(parser.GetPolygonList());
+  m_model->SetPolygonsList(parser.GetPolygonsList());
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_model->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
@@ -462,7 +462,7 @@ void PlayingController::UpdateStarsMax(int starsMaxCount) {
   int currentStarsCount = parser.GetStarsCount();
 
   if (currentStarsCount < starsMaxCount) {
-    serializer.SetPolygonsList(parser.GetPolygonList());
+    serializer.SetPolygonsList(parser.GetPolygonsList());
     serializer.SetLinesGoal(m_gameInfo.m_linesGoal);
     serializer.SetPartsGoal(m_gameInfo.m_partsGoal);
     serializer.SetMaxGapToWin(m_gameInfo.m_maxGapToWin);

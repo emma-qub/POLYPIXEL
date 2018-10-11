@@ -11,11 +11,11 @@
 #include "Objects/Deviations/Mirror.hxx"
 #include "Objects/Deviations/Portal.hxx"
 
-using PolygonList = QList<ppxl::Polygon>;
-using TapeList = QList<Tape>;
-using OneWayList = QList<OneWay>;
-using MirrorList = QList<Mirror>;
-using PortalList = QList<Portal>;
+using PolygonsList = QList<ppxl::Polygon>;
+using TapesList = QList<Tape>;
+using OneWaysList = QList<OneWay>;
+using MirrorsList = QList<Mirror>;
+using PortalsList = QList<Portal>;
 
 class Parser {
 public:
@@ -42,28 +42,28 @@ public:
   ppxl::Segment GetSegment(QDomElement const& p_element) const;
   ppxl::Polygon GetPolygon(QDomElement const& p_element) const;
   QDomElement GetPolygonById(int p_id) const;
-  PolygonList GetPolygonList() const;
+  PolygonsList GetPolygonsList() const;
   inline int GetPolygonNodesCount() const { return m_polygonNodesCount; }
 
   // Tape
   Tape GetTape(QDomElement const& p_element) const;
   QDomElement GetTapeById(int p_id) const;
-  TapeList GetTapeList();
+  TapesList GetTapesList();
 
   // OneWay
   OneWay GetOneWay(QDomElement const& p_element) const;
   QDomElement GetOneWayById(int p_id) const;
-  OneWayList GetOneWayList() const;
+  OneWaysList GetOneWaysList() const;
 
   // Mirror
   Mirror GetMirror(QDomElement const& p_element) const;
   QDomElement GetMirrorById(int p_id) const;
-  MirrorList GetMirrorList() const;
+  MirrorsList GetMirrorsList() const;
 
   // Portal
   Portal GetPortal(QDomElement const& p_element) const;
   QDomElement GetPortalById(int p_id) const;
-  PortalList GetPortalList() const;
+  PortalsList GetPortalsList() const;
 
 private:
   QString m_xmlFileName;

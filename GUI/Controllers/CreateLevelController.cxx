@@ -205,7 +205,7 @@ void CreateLevelController::OpenLevel(const QString& p_fileName) {
   m_view->SetPartsGoal(parser.GetPartsGoal());
   m_view->SetMaxGapToWin(parser.GetMaxGapToWin());
   m_view->SetTolerance(parser.GetTolerance());
-  m_model->SetPolygonsList(parser.GetPolygonList());
+  m_model->SetPolygonsList(parser.GetPolygonsList());
 
   Redraw();
 }
