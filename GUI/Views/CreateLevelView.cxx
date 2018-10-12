@@ -89,13 +89,11 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_toleranceSpinBox->setFixedWidth(150);
   m_toleranceSpinBox->setPrefix("perfect ");
   ResetGameInfo();
-
-  // Get back focus from spin box when playing on scribble view
-  m_scribblingView->setFocusPolicy(Qt::StrongFocus);
 }
 
 void CreateLevelView::InitView() {
   m_scribblingView->InitView();
+  m_scribblingView->setFocus();
 }
 
 int CreateLevelView::GetLinesGoal() const {

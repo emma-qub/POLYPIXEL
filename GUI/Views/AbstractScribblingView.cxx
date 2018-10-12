@@ -128,7 +128,7 @@ void AbstractScribblingView::DrawObjects() {
     switch (objectType) {
     case Object::eTape: {
       auto tape = static_cast<Tape*>(object);
-      scene()->addRect(tape->getX(), tape->getY(), tape->getW(), tape->getH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
+      scene()->addRect(tape->GetX(), tape->GetY(), tape->GetW(), tape->GetH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
       break;
     } case Object::eOneWay: {
       auto oneWay = static_cast<OneWay*>(object);

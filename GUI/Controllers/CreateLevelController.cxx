@@ -8,12 +8,14 @@
 #include <QUndoStack>
 #include <QAction>
 #include <QItemSelectionModel>
+#include <QToolBar>
 
 CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_model(p_model),
   m_view(p_view),
-  m_undoStack(new QUndoStack(this)) {
+  m_undoStack(new QUndoStack(this)),
+  m_toolbar(nullptr) {
 
   m_view->SetModel(m_model);
   connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
@@ -54,6 +56,38 @@ CreateLevelController::~CreateLevelController() {
   // When QUndoStack is deleted, it emits a last indexChanged, calling Redraw
   // from the scribbling view, whose model is already deleted, so disconnect.
   disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+}
+
+void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
+  m_toolbar = p_toolbar;
+
+  auto groupAction = new QActionGroup(m_toolbar);
+
+  auto polygonAction = new QAction("P", groupAction);
+  m_toolbar->addAction(polygonAction);
+  polygonAction->setCheckable(true);
+  connect(polygonAction, &QAction::toggled, this, [](bool b){qDebug() << "TOGGLED" << b;});
+  connect(polygonAction, &QAction::triggered, this, [](bool b){qDebug() << "TRIGGERED" << b;});
+
+  auto tapeAction = new QAction("T", groupAction);
+  m_toolbar->addAction(tapeAction);
+  tapeAction->setCheckable(true);
+  tapeAction->setShortcut(QKeySequence(Qt::Key_T));
+
+  auto mirrorAction = new QAction("M", groupAction);
+  m_toolbar->addAction(mirrorAction);
+  mirrorAction->setCheckable(true);
+  mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
+
+  auto oneWayAction = new QAction("O", groupAction);
+  m_toolbar->addAction(oneWayAction);
+  oneWayAction->setCheckable(true);
+  oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
+
+  auto portalAction = new QAction("P", groupAction);
+  m_toolbar->addAction(portalAction);
+  portalAction->setCheckable(true);
+  portalAction->setShortcut(QKeySequence(Qt::Key_R));
 }
 
 int CreateLevelController::GetLinesGoal() const {

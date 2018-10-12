@@ -10,6 +10,7 @@ class CreateLevelView;
 class CreateLevelModel;
 class QUndoStack;
 class QStandardItem;
+class QToolBar;
 
 class CreateLevelController: public QObject {
   Q_OBJECT
@@ -17,6 +18,8 @@ class CreateLevelController: public QObject {
 public:
   explicit CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
+
+  void SetToolBar(QToolBar* p_toolbar);
 
   inline CreateLevelModel* GetModel() const { return m_model; }
   int GetLinesGoal() const;
@@ -54,6 +57,7 @@ private:
   CreateLevelModel* m_model;
   CreateLevelView* m_view;
   QUndoStack* m_undoStack;
+  QToolBar* m_toolbar;
 };
 
 #endif

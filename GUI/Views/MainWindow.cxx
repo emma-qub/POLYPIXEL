@@ -25,6 +25,7 @@
 
 #include <QStackedWidget>
 #include <QFontDatabase>
+#include <QToolBar>
 
 MainWindow::MainWindow(QWidget* p_parent):
   QMainWindow(p_parent),
@@ -43,6 +44,15 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_testLevelView(new TestLevelView),
   m_testLevelController(new TestLevelController(m_testLevelView, this)),
   m_mapView(new MapView) {
+
+  m_toolbar = new QToolBar;
+  addToolBar(m_toolbar);
+  m_toolbar->setOrientation(Qt::Vertical);
+  m_toolbar->setAllowedAreas(Qt::NoToolBarArea);
+  m_toolbar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+  m_toolbar->move(20, 50);
+
+  m_createLevelController->SetToolBar(m_toolbar);
 
   QFontDatabase::addApplicationFont(":/fonts/PICOPIXEL.ttf");
 
@@ -118,13 +128,18 @@ MainWindow::MainWindow(QWidget* p_parent):
     if (m_centralWidget->currentWidget() == m_createLevelView) {
       m_createLevelView->InitView();
       m_createLevelController->Redraw();
-    } else if (m_centralWidget->currentWidget() == m_testLevelView) {
-      m_testLevelView->InitView();
-    } else if (m_centralWidget->currentWidget() == m_gameView) {
-      m_gameView->InitView();
-      m_gameView->PlayLevel(m_currentLevel);
-    } else if (m_centralWidget->currentWidget() == m_mapView) {
-      m_mapView->InitView();
+      m_toolbar->show();
+    } else {
+      m_toolbar->hide();
+
+      if (m_centralWidget->currentWidget() == m_testLevelView) {
+        m_testLevelView->InitView();
+      } else if (m_centralWidget->currentWidget() == m_gameView) {
+        m_gameView->InitView();
+        m_gameView->PlayLevel(m_currentLevel);
+      } else if (m_centralWidget->currentWidget() == m_mapView) {
+        m_mapView->InitView();
+      }
     }
   });
 

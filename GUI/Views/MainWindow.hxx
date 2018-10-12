@@ -51,6 +51,8 @@ private:
   MapView* m_mapView;
 
   QString m_currentLevel;
+
+  QToolBar* m_toolbar;
 };
 
 #endif

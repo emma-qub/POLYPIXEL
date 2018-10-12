@@ -12,6 +12,7 @@ public:
   ~Mutable() override;
 
   void SetObject(Object* p_object);
+  inline Object* GetObject() const { return m_object; }
   void AddRound();
   int GetRoundNumber() const;
   ppxl::Point GetPosition() const;
