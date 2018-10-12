@@ -129,10 +129,6 @@ void CreateLevelScribblingView::SetModel(PolygonModel* p_model) {
 void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selectionModel) {
   m_selectionModel = p_selectionModel;
   m_selectionModel->setCurrentIndex(m_polygonModel->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-
-  connect(m_selectionModel, &QItemSelectionModel::selectionChanged, this, [this] () {
-    Q_EMIT(PolygonSelected());
-  });
 }
 
 void CreateLevelScribblingView::DrawGrid() {

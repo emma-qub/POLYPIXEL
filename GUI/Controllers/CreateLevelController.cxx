@@ -35,7 +35,7 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
 
   /// REWORK THIS PART: THE PolygonSelected SIGNAL IS EMITTED TOO SOON, LEADING TO A MISMATCH BETWEEN POLYGON ITEM AND ITS CORE POLYGON
-  //connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
+  connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
   connect(m_view, &CreateLevelView::NewLevelRequested, this, &CreateLevelController::NewLevel);
@@ -63,31 +63,53 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
 
   auto groupAction = new QActionGroup(m_toolbar);
 
-  auto polygonAction = new QAction("P", groupAction);
-  m_toolbar->addAction(polygonAction);
-  polygonAction->setCheckable(true);
-  connect(polygonAction, &QAction::toggled, this, [](bool b){qDebug() << "TOGGLED" << b;});
-  connect(polygonAction, &QAction::triggered, this, [](bool b){qDebug() << "TRIGGERED" << b;});
+  m_polygonAction = new QAction("P", groupAction);
+  m_toolbar->addAction(m_polygonAction);
+  m_polygonAction->setCheckable(true);
+  connect(m_polygonAction, &QAction::triggered, m_view, &CreateLevelView::ActivatePolygonTool);
 
-  auto tapeAction = new QAction("T", groupAction);
-  m_toolbar->addAction(tapeAction);
-  tapeAction->setCheckable(true);
-  tapeAction->setShortcut(QKeySequence(Qt::Key_T));
+  m_tapeAction = new QAction("T", groupAction);
+  m_toolbar->addAction(m_tapeAction);
+  m_tapeAction->setCheckable(true);
+  connect(m_tapeAction, &QAction::triggered, m_view, &CreateLevelView::ActivateTapeTool);
 
-  auto mirrorAction = new QAction("M", groupAction);
-  m_toolbar->addAction(mirrorAction);
-  mirrorAction->setCheckable(true);
-  mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
+  m_mirrorAction = new QAction("M", groupAction);
+  m_toolbar->addAction(m_mirrorAction);
+  m_mirrorAction->setCheckable(true);
+  connect(m_mirrorAction, &QAction::triggered, m_view, &CreateLevelView::ActivateMirrorTool);
 
-  auto oneWayAction = new QAction("O", groupAction);
-  m_toolbar->addAction(oneWayAction);
-  oneWayAction->setCheckable(true);
-  oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
+  m_oneWayAction = new QAction("O", groupAction);
+  m_toolbar->addAction(m_oneWayAction);
+  m_oneWayAction->setCheckable(true);
+  connect(m_oneWayAction, &QAction::triggered, m_view, &CreateLevelView::ActivateOneWayTool);
 
-  auto portalAction = new QAction("P", groupAction);
-  m_toolbar->addAction(portalAction);
-  portalAction->setCheckable(true);
-  portalAction->setShortcut(QKeySequence(Qt::Key_R));
+  m_portalAction = new QAction("R", groupAction);
+  m_toolbar->addAction(m_portalAction);
+  m_portalAction->setCheckable(true);
+  connect(m_portalAction, &QAction::triggered, m_view, &CreateLevelView::ActivatePortalTool);
+
+  connect(m_view, &CreateLevelView::ToolActivated, this, &CreateLevelController::SelectTool);
+}
+
+void CreateLevelController::SelectTool(CreateLevelView::Tool p_tool) {
+  switch(p_tool) {
+  case CreateLevelView::ePolygonTool: {
+    m_polygonAction->trigger();
+    break;
+  } case CreateLevelView::eTapeTool: {
+    m_tapeAction->trigger();
+    break;
+  } case CreateLevelView::eMirrorTool: {
+    m_mirrorAction->trigger();
+    break;
+  } case CreateLevelView::eOneWayTool: {
+    m_oneWayAction->trigger();
+    break;
+  } case CreateLevelView::ePortalTool: {
+    m_portalAction->trigger();
+    break;
+  }
+  }
 }
 
 int CreateLevelController::GetLinesGoal() const {

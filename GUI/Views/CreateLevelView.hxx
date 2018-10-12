@@ -21,6 +21,14 @@ class CreateLevelView: public QWidget {
   Q_OBJECT
 
 public:
+  enum Tool {
+    ePolygonTool,
+    eTapeTool,
+    eMirrorTool,
+    eOneWayTool,
+    ePortalTool
+  };
+
   explicit CreateLevelView(QWidget* parent = nullptr);
 
   void InitView();
@@ -46,6 +54,12 @@ public:
 
   void SetTestAvailable(bool p_enable);
 
+  void ActivatePolygonTool();
+  void ActivateTapeTool();
+  void ActivateMirrorTool();
+  void ActivateOneWayTool();
+  void ActivatePortalTool();
+
 signals:
   void TestLevelRequested();
   void Done();
@@ -63,6 +77,7 @@ signals:
   void SnappedToGrid();
   void NewLevelRequested();
   void OpenLevelRequested(QString const& p_fileName);
+  void ToolActivated(Tool p_tool);
 
 protected:
   void UpdateMaxGapToWinPrefix(int p_value);

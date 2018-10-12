@@ -5,8 +5,8 @@
 
 #include "Core/Polygon.hxx"
 #include "Core/Point.hxx"
+#include "GUI/Views/CreateLevelView.hxx"
 
-class CreateLevelView;
 class CreateLevelModel;
 class QUndoStack;
 class QStandardItem;
@@ -53,11 +53,19 @@ protected:
   void NewLevel();
   void OpenLevel(QString const& p_fileName);
 
+  void SelectTool(CreateLevelView::Tool p_tool);
+
 private:
   CreateLevelModel* m_model;
   CreateLevelView* m_view;
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;
+
+  QAction* m_polygonAction;
+  QAction* m_tapeAction;
+  QAction* m_mirrorAction;
+  QAction* m_oneWayAction;
+  QAction* m_portalAction;
 };
 
 #endif

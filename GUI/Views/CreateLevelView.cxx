@@ -11,6 +11,7 @@
 #include <QUndoStack>
 #include <QHeaderView>
 #include <QSpinBox>
+#include <QAction>
 
 CreateLevelView::CreateLevelView(QWidget* parent):
   QWidget(parent),
@@ -60,7 +61,6 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::VertexInserted, this, &CreateLevelView::VertexInserted);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelView::VertexRemoved);
   connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::PolygonSelected, this, &CreateLevelView::PolygonSelected);
   connect(m_scribblingView, &CreateLevelScribblingView::SnappedToGrid, this, &CreateLevelView::SnappedToGrid);
   connect(m_scribblingView, &CreateLevelScribblingView::NewLevelRequested, this, &CreateLevelView::NewLevelRequested);
   connect(m_scribblingView, &CreateLevelScribblingView::OpenLevelRequested, this, &CreateLevelView::OpenLevelRequested);
@@ -71,6 +71,8 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelView::ValueYChanged);
   connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
   connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
+
+  connect(m_treeView, &QTreeView::clicked, this, &CreateLevelView::PolygonSelected);
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateMaxGapToWinPrefix);
@@ -89,6 +91,31 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_toleranceSpinBox->setFixedWidth(150);
   m_toleranceSpinBox->setPrefix("perfect ");
   ResetGameInfo();
+
+  auto polygonAction = new QAction("Polygon Tool (P)", this);
+  polygonAction->setShortcut(QKeySequence(Qt::Key_P));
+  addAction(polygonAction);
+  connect(polygonAction, &QAction::triggered, this, [this](){Q_EMIT(ToolActivated(ePolygonTool));});
+
+  auto tapeAction = new QAction("Tape Tool (T)", this);
+  tapeAction->setShortcut(QKeySequence(Qt::Key_T));
+  addAction(tapeAction);
+  connect(tapeAction, &QAction::triggered, this, [this](){Q_EMIT(ToolActivated(eTapeTool));});
+
+  auto mirrorAction = new QAction("Mirror Tool (M)", this);
+  mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
+  addAction(mirrorAction);
+  connect(mirrorAction, &QAction::triggered, this, [this](){Q_EMIT(ToolActivated(eMirrorTool));});
+
+  auto oneWayAction = new QAction("One Way Tool (O)", this);
+  oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
+  addAction(oneWayAction);
+  connect(oneWayAction, &QAction::triggered, this, [this](){Q_EMIT(ToolActivated(eOneWayTool));});
+
+  auto portalAction = new QAction("Portal Tool (R)", this);
+  portalAction->setShortcut(QKeySequence(Qt::Key_R));
+  addAction(portalAction);
+  connect(portalAction, &QAction::triggered, this, [this](){Q_EMIT(ToolActivated(ePortalTool));});
 }
 
 void CreateLevelView::InitView() {
@@ -133,6 +160,26 @@ void CreateLevelView::ResetGameInfo() {
   m_partsGoalSpinBox->setValue(2);
   m_maxGapToWinSpinBox->setValue(50);
   m_toleranceSpinBox->setValue(10);
+}
+
+void CreateLevelView::ActivatePolygonTool() {
+  qDebug() << "Polygon";
+}
+
+void CreateLevelView::ActivateTapeTool() {
+  qDebug() << "Tape";
+}
+
+void CreateLevelView::ActivateMirrorTool() {
+  qDebug() << "Miror";
+}
+
+void CreateLevelView::ActivateOneWayTool() {
+  qDebug() << "One Way";
+}
+
+void CreateLevelView::ActivatePortalTool() {
+  qDebug() << "Portal";
 }
 
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
