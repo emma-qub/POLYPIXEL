@@ -23,7 +23,7 @@ public:
   void SetToolBar(QToolBar* p_toolbar);
 
   inline CreateLevelModel* GetPolygonModel() const { return m_polygonModel; }
-  inline QList<ObjectModel*> GetObjectModelsList() const { return m_objectsModelList; }
+  inline QList<ObjectModel*> GetObjectModelsList() const { return m_objectModelsList; }
   int GetLinesGoal() const;
   int GetPartsGoal() const;
   int GetMaxGapToWin() const;
@@ -59,7 +59,7 @@ protected:
 
 private:
   CreateLevelModel* m_polygonModel;
-  QList<ObjectModel*> m_objectsModelList;
+  QList<ObjectModel*> m_objectModelsList;
   CreateLevelView* m_view;
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;

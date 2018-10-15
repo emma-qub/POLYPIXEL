@@ -13,7 +13,6 @@ public:
   TestingController(TestingView* p_view, QObject* p_parent);
 
   void SetPolygonsItem(PolygonModel* p_model);
-  void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
 
   void SetLinesGoal(int p_linesGoal);
   void SetPartsGoal(int p_partsGoal);

@@ -19,14 +19,14 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
   m_toolbar(nullptr) {
 
   m_view->SetPolygonModel(m_polygonModel);
-  m_objectsModelList
+  m_objectModelsList
     << new TapeModel(this)
     << new MirrorModel(this)
     << new OneWayModel(this)
     << new PortalModel(this);
-  m_view->SetObjectModelsList(m_objectsModelList);
+  m_view->SetObjectModelsList(m_objectModelsList);
   connect(m_polygonModel, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
-  for (auto* objectModel: m_objectsModelList) {
+  for (auto* objectModel: m_objectModelsList) {
     connect(objectModel, &ObjectModel::dataChanged, m_view, &CreateLevelView::Redraw);
   }
 

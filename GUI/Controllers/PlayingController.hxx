@@ -7,6 +7,7 @@
 #include "Core/Polygon.hxx"
 
 class PolygonModel;
+class ObjectModel;
 class PlayingView;
 class MirrorModel;
 class PortalModel;
@@ -58,6 +59,8 @@ public:
 
   void InitView();
 
+  void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
+
   void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
   void Redraw();
@@ -107,14 +110,7 @@ protected:
 
 protected:
   PolygonModel* m_polygonModel;
-  MirrorModel* m_mirrorModel;
-  PortalModel* m_portalModel;
-  CountdownModel* m_countdownModel;
-  DisposableModel* m_disposableModel;
-  SwitchModel* m_switchModel;
-  TransferModel* m_transferModel;
-  OneWayModel* m_oneWayModel;
-  TapeModel* m_tapeModel;
+  QList<ObjectModel*> m_objectModelsList;
   QList<Object*> m_objectsList;
   QList<Object*> m_deviationsList;
   QList<Object*> m_mutablesList;

@@ -12,20 +12,18 @@
 PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   QObject(p_parent),
   m_polygonModel(new PolygonModel(this)),
-  m_mirrorModel(new MirrorModel(this)),
-  m_portalModel(new PortalModel(this)),
-  m_countdownModel(new CountdownModel(this)),
-  m_disposableModel(new DisposableModel(this)),
-  m_switchModel(new SwitchModel(this)),
-  m_transferModel(new TransferModel(this)),
-  m_oneWayModel(new OneWayModel(this)),
-  m_tapeModel(new TapeModel(this)),
   m_gameInfo(),
   m_levelPath(""),
   m_orientedAreaTotal(0.0),
   m_view(p_view) {
 
   m_view->SetModel(m_polygonModel);
+
+  m_objectModelsList
+    << new TapeModel(this)
+    << new MirrorModel(this)
+    << new OneWayModel(this)
+    << new PortalModel(this);
 
   connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
   connect(m_view, &PlayingView::Moving, this, &PlayingController::ComputeSlicingLines);
@@ -38,6 +36,27 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
 
 void PlayingController::InitView() {
   m_view->InitView();
+}
+
+void PlayingController::SetObjectModelsList(const QList<ObjectModel*>& p_objectModelsList) {
+  QList<Object*> objectsList;
+  for (auto const* objectModel: p_objectModelsList) {
+    objectsList << objectModel->GetObjectsList();
+  }
+  m_view->SetObjectsList(objectsList);
+
+  m_objectModelsList.clear();
+  m_objectModelsList << p_objectModelsList;
+
+  m_deviationsList
+    << m_objectModelsList.at(ObjectModel::eMirrorModel)->GetObjectsList()
+    << m_objectModelsList.at(ObjectModel::ePortalModel)->GetObjectsList();
+
+  m_obstaclesList
+    << m_objectModelsList.at(ObjectModel::eOneWayModel)->GetObjectsList()
+    << m_objectModelsList.at(ObjectModel::eTapeModel)->GetObjectsList();
+
+  p_objectModelsList.at(ObjectModel::eMirrorModel);
 }
 
 void PlayingController::PlayLevel(QString const& p_levelPath) {
@@ -354,16 +373,21 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
 
+  auto mirrorModel = static_cast<MirrorModel*>(m_objectModelsList.at(ObjectModel::eMirrorModel));
+  auto portalModel = static_cast<PortalModel*>(m_objectModelsList.at(ObjectModel::ePortalModel));
+  auto oneWayModel = static_cast<OneWayModel*>(m_objectModelsList.at(ObjectModel::eOneWayModel));
+  auto tapeModel = static_cast<TapeModel*>(m_objectModelsList.at(ObjectModel::eTapeModel));
+
   // Object models
   for (auto const& mirror: parser.GetMirrorsList()) {
-    m_mirrorModel->AddMirror(mirror);
+    mirrorModel->AddMirror(mirror);
   }
-  m_deviationsList.append(m_mirrorModel->GetObjectsList());
+  m_deviationsList.append(mirrorModel->GetObjectsList());
 
   for (auto const& portal: parser.GetPortalsList()) {
-    m_portalModel->AddPortal(portal);
+    portalModel->AddPortal(portal);
   }
-  m_deviationsList.append(m_portalModel->GetObjectsList());
+  m_deviationsList.append(portalModel->GetObjectsList());
 
   //for (auto const& countdown: parser.GetCountdownsList()) {
   //  m_countdownModel->AddCountdown(countdown);
@@ -386,14 +410,14 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   //m_mutablesList.append(m_transferModel->GetTransfersList());
 
   for (auto const& oneWay: parser.GetOneWaysList()) {
-    m_oneWayModel->AddOneWay(oneWay);
+    oneWayModel->AddOneWay(oneWay);
   }
-  m_obstaclesList.append(m_oneWayModel->GetObjectsList());
+  m_obstaclesList.append(oneWayModel->GetObjectsList());
 
   for (auto const& tape: parser.GetTapesList()) {
-    m_tapeModel->AddTape(tape);
+    tapeModel->AddTape(tape);
   }
-  m_obstaclesList.append(m_tapeModel->GetObjectsList());
+  m_obstaclesList.append(tapeModel->GetObjectsList());
 
   m_objectsList << m_deviationsList << m_mutablesList << m_obstaclesList;
   m_view->SetObjectsList(m_objectsList);
