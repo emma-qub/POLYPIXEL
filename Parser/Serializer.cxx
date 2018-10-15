@@ -38,8 +38,8 @@ void Serializer::WriteXML(int p_indent) {
   root.appendChild(objectsElement);
   auto obstaclesElement = m_doc.createElement("obstacles");
   objectsElement.appendChild(obstaclesElement);
-  objectsElement.appendChild(m_tapes);
-  objectsElement.appendChild(m_oneWays);
+  obstaclesElement.appendChild(m_tapes);
+  obstaclesElement.appendChild(m_oneWays);
   auto deviationsElement = m_doc.createElement("deviations");
   objectsElement.appendChild(deviationsElement);
   deviationsElement.appendChild(m_mirrors);
@@ -135,10 +135,10 @@ void Serializer::AppendTape(Tape const& p_tape, int p_id) {
   m_tapes.appendChild(TapeToNode(p_tape, p_id));
 }
 
-void Serializer::SetTapeList(QList<Tape> const& p_tapes) {
+void Serializer::SetTapeList(const QList<Tape*>& p_tapes) {
   int id = 0;
-  for (auto const& tape: p_tapes) {
-    AppendTape(tape, id);
+  for (auto const* tape: p_tapes) {
+    AppendTape(*tape, id);
     ++id;
   }
 }
@@ -151,18 +151,18 @@ QDomElement Serializer::OneWayToNode(OneWay const& p_oneWay, int p_id) {
   element.setAttribute("id", p_id);
 
   ppxl::Segment line(p_oneWay.GetLine());
-  element.setAttribute("xa", line.GetA().GetX());
-  element.setAttribute("ya", line.GetA().GetY());
-  element.setAttribute("xb", line.GetB().GetX());
-  element.setAttribute("yb", line.GetB().GetY());
+  element.setAttribute("xa", static_cast<int>(std::round(line.GetA().GetX())));
+  element.setAttribute("ya", static_cast<int>(std::round(line.GetA().GetY())));
+  element.setAttribute("xb", static_cast<int>(std::round(line.GetB().GetX())));
+  element.setAttribute("yb", static_cast<int>(std::round(line.GetB().GetY())));
 
   return element;
 }
 
-void Serializer::SetOneWaysList(const QList<OneWay>& p_oneWays) {
+void Serializer::SetOneWaysList(const QList<OneWay*>& p_oneWays) {
   int id = 0;
-  for (auto const& oneWay: p_oneWays) {
-    AppendOneWay(oneWay, id);
+  for (auto const* oneWay: p_oneWays) {
+    AppendOneWay(*oneWay, id);
     ++id;
   }
 }
@@ -179,10 +179,10 @@ QDomElement Serializer::MirrorToNode(Mirror const& p_mirror, int p_id) {
   element.setAttribute("id", p_id);
 
   ppxl::Segment mirrorLine(p_mirror.GetLine());
-  element.setAttribute("xa", mirrorLine.GetA().GetX());
-  element.setAttribute("ya", mirrorLine.GetA().GetY());
-  element.setAttribute("xb", mirrorLine.GetB().GetX());
-  element.setAttribute("yb", mirrorLine.GetB().GetY());
+  element.setAttribute("xa", static_cast<int>(std::round(mirrorLine.GetA().GetX())));
+  element.setAttribute("ya", static_cast<int>(std::round(mirrorLine.GetA().GetY())));
+  element.setAttribute("xb", static_cast<int>(std::round(mirrorLine.GetB().GetX())));
+  element.setAttribute("yb", static_cast<int>(std::round(mirrorLine.GetB().GetY())));
 
   return element;
 }
@@ -191,10 +191,10 @@ void Serializer::AppendMirror(Mirror const& p_mirror, int p_id) {
   m_mirrors.appendChild(MirrorToNode(p_mirror, p_id));
 }
 
-void Serializer::SetMirrorsList(QList<Mirror> const& p_mirrors) {
+void Serializer::SetMirrorsList(QList<Mirror*> const& p_mirrors) {
   int id = 0;
-  for (auto const& mirror: p_mirrors) {
-    AppendMirror(mirror, id);
+  for (auto const* mirror: p_mirrors) {
+    AppendMirror(*mirror, id);
     ++id;
   }
 }
@@ -207,16 +207,16 @@ QDomElement Serializer::PortalToNode(Portal const& p_portal, int p_id) {
   element.setAttribute("id", p_id);
 
   ppxl::Segment portalLineIn(p_portal.GetIn());
-  element.setAttribute("xaIn", portalLineIn.GetA().GetX());
-  element.setAttribute("yaIn", portalLineIn.GetA().GetY());
-  element.setAttribute("xbIn", portalLineIn.GetB().GetX());
-  element.setAttribute("ybIn", portalLineIn.GetB().GetY());
+  element.setAttribute("xaIn", static_cast<int>(std::round(portalLineIn.GetA().GetX())));
+  element.setAttribute("yaIn", static_cast<int>(std::round(portalLineIn.GetA().GetY())));
+  element.setAttribute("xbIn", static_cast<int>(std::round(portalLineIn.GetB().GetX())));
+  element.setAttribute("ybIn", static_cast<int>(std::round(portalLineIn.GetB().GetY())));
 
   ppxl::Segment portalLineOut(p_portal.GetOut());
-  element.setAttribute("xaOut", portalLineOut.GetA().GetX());
-  element.setAttribute("yaOut", portalLineOut.GetA().GetY());
-  element.setAttribute("xbOut", portalLineOut.GetB().GetX());
-  element.setAttribute("ybOut", portalLineOut.GetB().GetY());
+  element.setAttribute("xaOut", static_cast<int>(std::round(portalLineOut.GetA().GetX())));
+  element.setAttribute("yaOut", static_cast<int>(std::round(portalLineOut.GetA().GetY())));
+  element.setAttribute("xbOut", static_cast<int>(std::round(portalLineOut.GetB().GetX())));
+  element.setAttribute("ybOut", static_cast<int>(std::round(portalLineOut.GetB().GetY())));
 
   return element;
 }
@@ -225,10 +225,10 @@ void Serializer::AppendPortal(Portal const& p_portal, int p_id) {
   m_portals.appendChild(PortalToNode(p_portal, p_id));
 }
 
-void Serializer::SetPortalsList(QList<Portal> const& p_portals) {
+void Serializer::SetPortalsList(const QList<Portal*>& p_portals) {
   int id = 0;
-  for (auto const& portal: p_portals) {
-    AppendPortal(portal, id);
+  for (auto const* portal: p_portals) {
+    AppendPortal(*portal, id);
     ++id;
   }
 }

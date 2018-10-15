@@ -37,22 +37,22 @@ public:
   // Tape
   QDomElement TapeToNode(Tape const& p_tape, int p_id);
   void AppendTape(Tape const& p_tape, int p_id);
-  void SetTapeList(QList<Tape> const& p_tapes);
+  void SetTapeList(QList<Tape*> const& p_tapes);
 
   // OneWay
   QDomElement OneWayToNode(OneWay const& p_oneWay, int p_id);
   void AppendOneWay(OneWay const& p_oneWay, int p_id);
-  void SetOneWaysList(QList<OneWay> const& p_oneWays);
+  void SetOneWaysList(QList<OneWay*> const& p_oneWays);
 
   // Mirror
   QDomElement MirrorToNode(Mirror const& p_mirror, int p_id);
   void AppendMirror(Mirror const& p_mirror, int p_id);
-  void SetMirrorsList(QList<Mirror> const& p_mirrors);
+  void SetMirrorsList(QList<Mirror*> const& p_mirrors);
 
   // Portal
   QDomElement PortalToNode(Portal const& p_portal, int p_id);
   void AppendPortal(Portal const& p_portal, int p_id);
-  void SetPortalsList(QList<Portal> const& p_portals);
+  void SetPortalsList(QList<Portal*> const& p_portals);
 
 private:
   QString m_xmlFileName;

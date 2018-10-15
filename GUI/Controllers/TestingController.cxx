@@ -144,5 +144,17 @@ void TestingController::SaveLevel() {
   serializer.SetTolerance(m_gameInfo.m_tolerance);
   serializer.SetStarsCount(0);
 
+  auto tapeModel = static_cast<TapeModel*>(m_objectModelsList.at(ObjectModel::eTapeModel));
+  serializer.SetTapeList(tapeModel->GetTapesList());
+
+  auto mirrorModel = static_cast<MirrorModel*>(m_objectModelsList.at(ObjectModel::eMirrorModel));
+  serializer.SetMirrorsList(mirrorModel->GetMirrorsList());
+
+  auto oneWayModel = static_cast<OneWayModel*>(m_objectModelsList.at(ObjectModel::eOneWayModel));
+  serializer.SetOneWaysList(oneWayModel->GetOneWaysList());
+
+  auto portalModel = static_cast<PortalModel*>(m_objectModelsList.at(ObjectModel::ePortalModel));
+  serializer.SetPortalsList(portalModel->GetPortalsList());
+
   serializer.WriteXML();
 }
