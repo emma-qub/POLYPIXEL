@@ -178,7 +178,7 @@ QDomElement Serializer::MirrorToNode(Mirror const& p_mirror, int p_id) {
   QDomElement element(m_doc.createElement("mirror"));
   element.setAttribute("id", p_id);
 
-  ppxl::Segment mirrorLine(p_mirror.GetMirrorLine());
+  ppxl::Segment mirrorLine(p_mirror.GetLine());
   element.setAttribute("xa", mirrorLine.GetA().GetX());
   element.setAttribute("ya", mirrorLine.GetA().GetY());
   element.setAttribute("xb", mirrorLine.GetB().GetX());

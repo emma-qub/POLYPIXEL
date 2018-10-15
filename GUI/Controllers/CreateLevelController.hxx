@@ -8,6 +8,7 @@
 #include "GUI/Views/CreateLevelView.hxx"
 
 class CreateLevelModel;
+class ObjectModel;
 class QUndoStack;
 class QStandardItem;
 class QToolBar;
@@ -16,12 +17,13 @@ class CreateLevelController: public QObject {
   Q_OBJECT
 
 public:
-  explicit CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view,  QObject *parent = nullptr);
+  explicit CreateLevelController(CreateLevelView* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
 
   void SetToolBar(QToolBar* p_toolbar);
 
-  inline CreateLevelModel* GetModel() const { return m_model; }
+  inline CreateLevelModel* GetPolygonModel() const { return m_polygonModel; }
+  inline QList<ObjectModel*> GetObjectModelsList() const { return m_objectsModelList; }
   int GetLinesGoal() const;
   int GetPartsGoal() const;
   int GetMaxGapToWin() const;
@@ -56,7 +58,8 @@ protected:
   void SelectTool(CreateLevelView::Tool p_tool);
 
 private:
-  CreateLevelModel* m_model;
+  CreateLevelModel* m_polygonModel;
+  QList<ObjectModel*> m_objectsModelList;
   CreateLevelView* m_view;
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;

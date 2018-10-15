@@ -2,6 +2,7 @@
 
 #include "GUI/Views/TestingView.hxx"
 #include "GUI/Models/PolygonModel.hxx"
+#include "GUI/Models/ObjectModel.hxx"
 #include "Parser/Serializer.hxx"
 
 #include <QFileDialog>
@@ -25,6 +26,14 @@ void TestingController::SetPolygonsItem(PolygonModel* p_model) {
 
   m_polygonModel->SetPolygonsList(m_polygonsList);
   m_view->SetModel(m_polygonModel);
+}
+
+void TestingController::SetObjectModelsList(const QList<ObjectModel*>& p_objectModelsList) {
+  QList<Object*> objectsList;
+  for (auto const* objectModel: p_objectModelsList) {
+    objectsList << objectModel->GetObjectsList();
+  }
+  m_view->SetObjectsList(objectsList);
 }
 
 void TestingController::ResetPolygonList() {

@@ -1,6 +1,7 @@
 #include "CreateLevelController.hxx"
 
 #include "GUI/Models/CreateLevelModel.hxx"
+#include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
 #include "GUI/Commands/CreateLevelCommands.hxx"
 #include "Parser/Parser.hxx"
@@ -10,15 +11,24 @@
 #include <QItemSelectionModel>
 #include <QToolBar>
 
-CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLevelView* p_view, QObject* p_parent):
+CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p_parent):
   QObject(p_parent),
-  m_model(p_model),
+  m_polygonModel(new CreateLevelModel(this)),
   m_view(p_view),
   m_undoStack(new QUndoStack(this)),
   m_toolbar(nullptr) {
 
-  m_view->SetModel(m_model);
-  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
+  m_view->SetPolygonModel(m_polygonModel);
+  m_objectsModelList
+    << new TapeModel(this)
+    << new MirrorModel(this)
+    << new OneWayModel(this)
+    << new PortalModel(this);
+  m_view->SetObjectModelsList(m_objectsModelList);
+  connect(m_polygonModel, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
+  for (auto* objectModel: m_objectsModelList) {
+    connect(objectModel, &ObjectModel::dataChanged, m_view, &CreateLevelView::Redraw);
+  }
 
   m_view->SetUndoStack(m_undoStack);
 
@@ -34,7 +44,6 @@ CreateLevelController::CreateLevelController(CreateLevelModel* p_model, CreateLe
   connect(m_view, &CreateLevelView::EditionXDone, this, &CreateLevelController::TranslateXVertex);
   connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
 
-  /// REWORK THIS PART: THE PolygonSelected SIGNAL IS EMITTED TOO SOON, LEADING TO A MISMATCH BETWEEN POLYGON ITEM AND ITS CORE POLYGON
   connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
@@ -89,6 +98,8 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   connect(m_portalAction, &QAction::triggered, m_view, &CreateLevelView::ActivatePortalTool);
 
   connect(m_view, &CreateLevelView::ToolActivated, this, &CreateLevelController::SelectTool);
+
+  SelectTool(CreateLevelView::ePolygonTool);
 }
 
 void CreateLevelController::SelectTool(CreateLevelView::Tool p_tool) {
@@ -182,7 +193,7 @@ void CreateLevelController::SnapToGrid() {
 }
 
 void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex) {
-  auto* polygonItem = m_model->itemFromIndex(p_currentIndex);
+  auto* polygonItem = m_polygonModel->itemFromIndex(p_currentIndex);
 
   for (int row = 0; row < polygonItem->rowCount(); ++row) {
     auto oldX = polygonItem->child(row, 1)->data(Qt::DisplayRole).toInt();
@@ -213,7 +224,7 @@ void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_curren
 
 void CreateLevelController::CheckTestAvailable() {
   // Check if a polygon has less than 3 vertices
-  for (auto* polygon: m_model->GetPolygonsList()) {
+  for (auto* polygon: m_polygonModel->GetPolygonsList()) {
     if (!polygon->HasEnoughVertices()) {
       m_view->SetTestAvailable(false);
       return;
@@ -221,7 +232,7 @@ void CreateLevelController::CheckTestAvailable() {
   }
 
   // Check polygon one by one
-  for (auto* polygon: m_model->GetPolygonsList()) {
+  for (auto* polygon: m_polygonModel->GetPolygonsList()) {
     if (!polygon->IsGoodPolygon()) {
       m_view->SetTestAvailable(false);
       return;
@@ -229,8 +240,8 @@ void CreateLevelController::CheckTestAvailable() {
   }
 
   // Check intersections between polygons
-  for (auto* polygon1: m_model->GetPolygonsList()) {
-    for (auto* polygon2: m_model->GetPolygonsList()) {
+  for (auto* polygon1: m_polygonModel->GetPolygonsList()) {
+    for (auto* polygon2: m_polygonModel->GetPolygonsList()) {
       if (polygon1 == polygon2) {
         continue;
       }
@@ -248,7 +259,7 @@ void CreateLevelController::CheckTestAvailable() {
 
 void CreateLevelController::NewLevel() {
   m_undoStack->clear();
-  m_model->ClearPolygons();
+  m_polygonModel->ClearPolygons();
   m_view->ResetGameInfo();
   Redraw();
 }
@@ -261,7 +272,7 @@ void CreateLevelController::OpenLevel(const QString& p_fileName) {
   m_view->SetPartsGoal(parser.GetPartsGoal());
   m_view->SetMaxGapToWin(parser.GetMaxGapToWin());
   m_view->SetTolerance(parser.GetTolerance());
-  m_model->SetPolygonsList(parser.GetPolygonsList());
+  m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
 
   Redraw();
 }
@@ -278,19 +289,19 @@ void CreateLevelController::Redraw() {
 
 void CreateLevelController::UndoRedo() {
   auto selectionModel = m_view->GetSelectionModel();
-  auto selection = m_model->GetSelection();
+  auto selection = m_polygonModel->GetSelection();
   auto polygonRow = selection.last().first;
   auto vertexRow = selection.last().second;
 
-  auto polygonsIndex = m_model->index(0, 0);
+  auto polygonsIndex = m_polygonModel->index(0, 0);
   if (polygonRow == -1 && vertexRow == -1) {
     selectionModel->setCurrentIndex(polygonsIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
   } else {
-    auto polygonIndex = m_model->index(polygonRow, 0, polygonsIndex);
+    auto polygonIndex = m_polygonModel->index(polygonRow, 0, polygonsIndex);
     if (vertexRow == -1) {
       selectionModel->setCurrentIndex(polygonIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     } else {
-      auto vertexIndex = m_model->index(vertexRow, 0, polygonIndex);
+      auto vertexIndex = m_polygonModel->index(vertexRow, 0, polygonIndex);
       selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
   }
@@ -298,60 +309,60 @@ void CreateLevelController::UndoRedo() {
 }
 
 void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
-  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
+  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
   m_undoStack->push(addPolygonCommand);
 }
 
 void CreateLevelController::AppendPolygon(ppxl::Polygon const& p_polygon) {
-  InsertPolygon(m_model->rowCount(), p_polygon);
+  InsertPolygon(m_polygonModel->rowCount(), p_polygon);
 }
 
 void CreateLevelController::RemovePolygon(int p_polygonRow) {
   int newPolygonRow = p_polygonRow;
-  if (m_model->rowCount() == 0) {
+  if (m_polygonModel->rowCount() == 0) {
     newPolygonRow = -1;
   } else {
-    if (p_polygonRow == m_model->rowCount()-1) {
+    if (p_polygonRow == m_polygonModel->rowCount()-1) {
       newPolygonRow = p_polygonRow-1;
     }
   }
 
-  auto* polygon = m_model->GetPolygonsList().at(p_polygonRow);
+  auto* polygon = m_polygonModel->GetPolygonsList().at(p_polygonRow);
 
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
+  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
   m_undoStack->push(removePolygonCommand);
 }
 
 void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
+    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
     m_undoStack->push(movePolygonCommand);
   } else {
-    m_model->TranslatePolygon(p_polygonRow, p_direction);
+    m_polygonModel->TranslatePolygon(p_polygonRow, p_direction);
   }
 }
 
 void CreateLevelController::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* addVertexCommand = new AddVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
+  QUndoCommand* addVertexCommand = new AddVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
   m_undoStack->push(addVertexCommand);
 }
 
 void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_vertex) {
-  InsertVertex(p_polygonRow, m_model->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
+  InsertVertex(p_polygonRow, m_polygonModel->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
 }
 
 void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow) {
-  auto const& vertex = m_model->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
+  auto const& vertex = m_polygonModel->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
 
-  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
+  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
   m_undoStack->push(removeVertexCommand);
 }
 
 void CreateLevelController::MoveVertex(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
+    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
     m_undoStack->push(moverVertexCommand);
   } else {
-    m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
+    m_polygonModel->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
   }
 }

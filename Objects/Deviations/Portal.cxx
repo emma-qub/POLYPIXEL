@@ -20,6 +20,16 @@ Portal::Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out):
 
 Portal::~Portal() = default;
 
+void Portal::SetIn(ppxl::Segment const& p_in) {
+  m_in = p_in;
+  m_normalIn = m_in.GetNormal();
+}
+
+void Portal::SetOut(ppxl::Segment const& p_out) {
+  m_out = p_out;
+  m_normalOut = m_out.GetNormal();
+}
+
 Object::ObjectType Portal::GetObjectType() const {
   return ePortal;
 }

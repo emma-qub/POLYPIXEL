@@ -6,6 +6,7 @@
 #include "GUI/Controllers/GameController.hxx"
 
 class PolygonModel;
+class ObjectModel;
 class TestLevelView;
 
 class TestLevelController: public QObject {
@@ -14,7 +15,8 @@ class TestLevelController: public QObject {
 public:
   explicit TestLevelController(TestLevelView* p_view, QObject* p_parent = nullptr);
 
-  void SetModel(PolygonModel* p_model);
+  void SetPolygonModel(PolygonModel* p_polygonModel);
+  void SetObjectModelsList(const QList<ObjectModel*>& p_objectModelList);
   void SetLinesGoal(int p_linesGoal);
   void SetPartsGoal(int p_partsGoal);
   void SetMaxGapToWin(int p_maxGapToWin);

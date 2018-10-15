@@ -7,6 +7,7 @@
 #include "Core/Polygon.hxx"
 
 class CreateLevelModel;
+class ObjectModel;
 class QItemSelectionModel;
 class QStandardItem;
 
@@ -14,14 +15,24 @@ class CreateLevelScribblingView: public AbstractScribblingView {
   Q_OBJECT
 
 public:
+  enum ToolMode {
+    ePolygonMode,
+    eTapeMode,
+    eMirrorMode,
+    eOneWayMode,
+    ePortalMode
+  };
+
   CreateLevelScribblingView(QWidget* parent = nullptr);
   ~CreateLevelScribblingView() override;
 
   void InitView() override;
 
-  void SetModel(PolygonModel* p_model) override;
+  void SetPolygonModel(PolygonModel* p_model) override;
+  void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
   void SetSelectionModel(QItemSelectionModel* p_selectionModel);
-  inline QItemSelectionModel* GetSelectionModel() const { return m_selectionModel; }
+
+  inline void SetToolMode(ToolMode p_toolMode) { m_toolMode = p_toolMode; }
 
   void DrawGrid();
   void DrawFromModel() override;
@@ -46,19 +57,37 @@ protected:
   void mousePressEvent(QMouseEvent* p_event) override;
   void mouseMoveEvent(QMouseEvent* p_event) override;
   void mouseReleaseEvent(QMouseEvent* p_event) override;
-  bool ConfirmClear();
-  void ConfirmNewLevel();
-  void ConfirmOpenLevel();
 
   void DrawPolygonsFromCore();
   void DrawPolygonFromCore(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
   void DrawPolygonsFromModel();
   void DrawPolygonFromModel(QStandardItem* p_polygonItem, bool p_isSelectedPolygon);
+  void DrawObjectsFromModel();
+
+  void MousePressForPolygon(QMouseEvent* p_event);
+  void MouseMoveForPolygon(QMouseEvent* p_event);
+  void MouseReleaseForPolygon(QMouseEvent* p_event);
+
+  void MousePressForTape(QMouseEvent* p_event);
+  void MouseMoveForTape(QMouseEvent* p_event);
+  void MouseReleaseForTape(QMouseEvent* p_event);
+
+  void MousePressForObject(QMouseEvent* p_event);
+  void MouseMoveForObject(QMouseEvent* p_event);
+  void MouseReleaseForObject(QMouseEvent* p_event);
+
+  void GetDiscreteEnd(QMouseEvent* p_event, double& p_nx, double& p_ny);
+
+  bool ConfirmClear();
+  void ConfirmNewLevel();
+  void ConfirmOpenLevel();
 
 private:
   QPixmap m_gripPixmap;
   CreateLevelModel* m_polygonModel;
+  QList<ObjectModel*> m_objectModelsList;
   QItemSelectionModel* m_selectionModel;
+  ToolMode m_toolMode;
   bool m_viewInitialized;
   bool m_isStuck;
   bool m_nextToVertex;
@@ -78,8 +107,13 @@ private:
   int m_startShiftX;
   int m_startShiftY;
 
+  QPoint m_objectStartPoint;
+  bool m_drawingObject;
+
   static const int PEN_WIDTH;
   static const QColor NOT_SELECTED_COLOR;
 };
+
+double Distance(double p_ax, double p_ay, double p_bx, double p_by);
 
 #endif

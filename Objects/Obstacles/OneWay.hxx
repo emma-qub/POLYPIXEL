@@ -12,7 +12,7 @@ public:
   ~OneWay() override;
 
   inline ppxl::Segment GetLine() const { return m_line; }
-  inline void SetLine(ppxl::Segment const& p_line) { m_line = p_line; }
+  void SetLine(ppxl::Segment const& p_line) { m_line = p_line; m_direction = m_line.GetNormal(); }
   inline ppxl::Vector GetDirection() const { return m_direction; }
 
   CategoryType GetCategoryType() const override;

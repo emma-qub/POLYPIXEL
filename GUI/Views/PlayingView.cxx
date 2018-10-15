@@ -43,7 +43,7 @@ void PlayingView::InitView() {
 }
 
 void PlayingView::SetModel(PolygonModel* p_playingModel) {
-  m_scribblingView->SetModel(p_playingModel);
+  m_scribblingView->SetPolygonModel(p_playingModel);
 }
 
 void PlayingView::SetObjectsList(QList<Object*> const& p_objectsList) {

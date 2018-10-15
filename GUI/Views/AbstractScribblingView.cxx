@@ -41,7 +41,7 @@ void AbstractScribblingView::InitView() {
   m_viewInitialized = true;
 }
 
-void AbstractScribblingView::SetModel(PolygonModel* p_model) {
+void AbstractScribblingView::SetPolygonModel(PolygonModel* p_model) {
   m_polygonModel = p_model;
 }
 
@@ -139,7 +139,7 @@ void AbstractScribblingView::DrawObjects() {
       break;
     } case Object::eMirror: {
       auto mirror = static_cast<Mirror*>(object);
-      auto mirrorLine = mirror->GetMirrorLine();
+      auto mirrorLine = mirror->GetLine();
       auto mirrorLineA = mirrorLine.GetA();
       auto mirrorLineB = mirrorLine.GetB();
       scene()->addLine(mirrorLineA.GetX(), mirrorLineA.GetY(), mirrorLineB.GetX(), mirrorLineB.GetY(), QPen(QBrush(QColor("#0033ff")), 7));

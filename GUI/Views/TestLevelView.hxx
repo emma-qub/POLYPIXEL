@@ -3,11 +3,12 @@
 
 #include <QWidget>
 
-class QLabel;
-class QPushButton;
 class PolygonModel;
+class ObjectModel;
 class TestingView;
 class TestingController;
+class QLabel;
+class QPushButton;
 
 class TestLevelView: public QWidget {
   Q_OBJECT
@@ -17,7 +18,8 @@ public:
 
   void InitView();
 
-  void SetModel(PolygonModel* p_model);
+  void SetPolygonModel(PolygonModel* p_model);
+  void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
   void SetLinesGoal(int p_linesGoal);
   void SetPartsGoal(int p_partsGoal);
   void SetMaxGapToWin(int p_maxGapToWin);

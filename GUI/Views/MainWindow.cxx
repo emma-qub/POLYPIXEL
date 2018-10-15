@@ -32,9 +32,8 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_stateMachine(this),
   m_centralWidget(new QStackedWidget),
   m_achievementsView(new AchievementsView),
-  m_createLevelModel(new CreateLevelModel(this)),
   m_createLevelView(new CreateLevelView),
-  m_createLevelController(new CreateLevelController(m_createLevelModel, m_createLevelView, this)),
+  m_createLevelController(new CreateLevelController(m_createLevelView, this)),
   m_gameView(new GameView),
   m_gameController(new GameController(m_gameView, this)),
   m_loadingView(new LoadingView),
@@ -163,7 +162,8 @@ void MainWindow::SetModelsToTestController() {
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
   m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
   m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
-  m_testLevelController->SetModel(m_createLevelController->GetModel());
+  m_testLevelController->SetPolygonModel(m_createLevelController->GetPolygonModel());
+  m_testLevelController->SetObjectModelsList(m_createLevelController->GetObjectModelsList());
   m_testLevelController->PlayLevel();
 }
 

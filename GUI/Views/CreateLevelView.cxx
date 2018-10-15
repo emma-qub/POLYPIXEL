@@ -1,5 +1,6 @@
 #include "CreateLevelView.hxx"
 #include "GUI/Models/CreateLevelModel.hxx"
+#include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/CreateLevelScribblingView.hxx"
 #include "GUI/Delegates/PolygonItemDelegate.hxx"
 
@@ -12,6 +13,7 @@
 #include <QHeaderView>
 #include <QSpinBox>
 #include <QAction>
+#include <QStackedWidget>
 
 CreateLevelView::CreateLevelView(QWidget* parent):
   QWidget(parent),
@@ -19,14 +21,16 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   m_testLevelButton(new QPushButton("Test")),
   m_menuButton(new QPushButton("Menu")),
   m_scribblingView(new CreateLevelScribblingView),
-  m_treeView(new QTreeView),
+  m_polygonTreeView(new QTreeView),
+  m_objectsTreeView(new QTreeView),
+  m_treeViewStackWidget(new QStackedWidget),
   m_undoView(new QUndoView),
   m_linesGoalSpinBox(new QSpinBox),
   m_partsGoalSpinBox(new QSpinBox),
   m_maxGapToWinSpinBox(new QSpinBox),
   m_toleranceSpinBox(new QSpinBox) {
 
-  m_treeView->setHeaderHidden(true);
+  m_polygonTreeView->setHeaderHidden(true);
   m_testLevelButton->setEnabled(false);
 
   auto mainLayout = new QVBoxLayout;
@@ -41,7 +45,10 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   auto viewLayout = new QHBoxLayout;
   viewLayout->addWidget(m_scribblingView);
   auto rightViewLayout = new QVBoxLayout;
-  rightViewLayout->addWidget(m_treeView);
+  m_treeViewStackWidget->addWidget(m_polygonTreeView);
+  m_treeViewStackWidget->addWidget(m_objectsTreeView);
+  m_treeViewStackWidget->setCurrentWidget(m_polygonTreeView);
+  rightViewLayout->addWidget(m_treeViewStackWidget);
   rightViewLayout->addWidget(m_undoView);
   viewLayout->addLayout(rightViewLayout);
   viewLayout->setStretchFactor(m_scribblingView, 4);
@@ -65,14 +72,14 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::NewLevelRequested, this, &CreateLevelView::NewLevelRequested);
   connect(m_scribblingView, &CreateLevelScribblingView::OpenLevelRequested, this, &CreateLevelView::OpenLevelRequested);
 
-  auto itemDelegate = new PolygonItemDelegate(m_treeView);
-  m_treeView->setItemDelegate(itemDelegate);
+  auto itemDelegate = new PolygonItemDelegate(m_polygonTreeView);
+  m_polygonTreeView->setItemDelegate(itemDelegate);
   connect(itemDelegate, &PolygonItemDelegate::ValueXChanged, this, &CreateLevelView::ValueXChanged);
   connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelView::ValueYChanged);
   connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
   connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
 
-  connect(m_treeView, &QTreeView::clicked, this, &CreateLevelView::PolygonSelected);
+  connect(m_polygonTreeView, &QTreeView::clicked, this, &CreateLevelView::PolygonSelected);
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateMaxGapToWinPrefix);
@@ -163,23 +170,36 @@ void CreateLevelView::ResetGameInfo() {
 }
 
 void CreateLevelView::ActivatePolygonTool() {
-  qDebug() << "Polygon";
+  m_treeViewStackWidget->setCurrentWidget(m_polygonTreeView);
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::ePolygonMode);
 }
 
 void CreateLevelView::ActivateTapeTool() {
-  qDebug() << "Tape";
+  m_treeViewStackWidget->setCurrentWidget(m_objectsTreeView);
+  m_objectsTreeView->setModel(m_objectModelsList.at(ObjectModel::eTapeModel));
+  m_objectsTreeView->expandAll();
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::eTapeMode);
 }
 
 void CreateLevelView::ActivateMirrorTool() {
-  qDebug() << "Miror";
+  m_treeViewStackWidget->setCurrentWidget(m_objectsTreeView);
+  m_objectsTreeView->setModel(m_objectModelsList.at(ObjectModel::eMirrorModel));
+  m_objectsTreeView->expandAll();
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::eMirrorMode);
 }
 
 void CreateLevelView::ActivateOneWayTool() {
-  qDebug() << "One Way";
+  m_treeViewStackWidget->setCurrentWidget(m_objectsTreeView);
+  m_objectsTreeView->setModel(m_objectModelsList.at(ObjectModel::eOneWayModel));
+  m_objectsTreeView->expandAll();
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::eOneWayMode);
 }
 
 void CreateLevelView::ActivatePortalTool() {
-  qDebug() << "Portal";
+  m_treeViewStackWidget->setCurrentWidget(m_objectsTreeView);
+  m_objectsTreeView->setModel(m_objectModelsList.at(ObjectModel::ePortalModel));
+  m_objectsTreeView->expandAll();
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::ePortalMode);
 }
 
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
@@ -200,19 +220,35 @@ void CreateLevelView::UpdateTolerancePrefix(int p_value) {
   }
 }
 
-void CreateLevelView::SetModel(CreateLevelModel* p_model) {
-  m_model = p_model;
-  m_scribblingView->SetModel(p_model);
-  m_treeView->setModel(p_model);
-  m_treeView->header()->setMinimumSectionSize(50);
-  m_scribblingView->SetSelectionModel(m_treeView->selectionModel());
+void CreateLevelView::SetPolygonModel(CreateLevelModel* p_polygonModel) {
+  m_polygonModel = p_polygonModel;
+  m_scribblingView->SetPolygonModel(p_polygonModel);
+  m_polygonTreeView->setModel(p_polygonModel);
+  m_polygonTreeView->header()->setMinimumSectionSize(50);
+  m_scribblingView->SetSelectionModel(m_polygonTreeView->selectionModel());
 
-  connect(m_model, &CreateLevelModel::rowsInserted, this, [this]() {
-    m_treeView->expandAll();
-    for (int column = m_model->columnCount()-1; column > -1; --column) {
-      m_treeView->resizeColumnToContents(column);
+  connect(m_polygonModel, &CreateLevelModel::rowsInserted, this, [this]() {
+    m_polygonTreeView->expandAll();
+    for (int column = m_polygonModel->columnCount()-1; column > -1; --column) {
+      m_polygonTreeView->resizeColumnToContents(column);
     }
   });
+}
+
+void CreateLevelView::SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList) {
+  m_objectModelsList.clear();
+  m_objectModelsList << p_objectModelsList;
+  m_scribblingView->SetObjectModelsList(p_objectModelsList);
+  m_objectsTreeView->header()->setMinimumSectionSize(50);
+
+  for (auto const* objectModel: m_objectModelsList) {
+    connect(objectModel, &QStandardItemModel::rowsInserted, this, [this, objectModel]() {
+      m_objectsTreeView->expandAll();
+      for (int column = objectModel->columnCount()-1; column > -1; --column) {
+        m_objectsTreeView->resizeColumnToContents(column);
+      }
+    });
+  }
 }
 
 void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack) {
@@ -220,7 +256,7 @@ void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack) {
 }
 
 QItemSelectionModel* CreateLevelView::GetSelectionModel() const {
-  return m_treeView->selectionModel();
+  return m_polygonTreeView->selectionModel();
 }
 
 void CreateLevelView::DrawFromModel() {

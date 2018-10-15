@@ -48,7 +48,7 @@ void CreateLevelModel::InsertVertex(int p_polygonRow, int p_vertexRow, const ppx
 void CreateLevelModel::RemoveVertexAt(int p_polygonRow, int p_vertexRow) {
   // Update vertex
   auto* polygon = GetPolygonsList().at(p_polygonRow);
-  polygon->GetVertices().erase(polygon->GetVertices().begin());
+  polygon->GetVertices().erase(polygon->GetVertices().begin() + p_vertexRow);
 
   // Update vertex item
   GetPolygonsItem()->child(p_polygonRow)->removeRow(p_vertexRow);

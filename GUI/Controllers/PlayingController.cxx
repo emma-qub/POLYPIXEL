@@ -346,10 +346,10 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
 
   // Parser
   Parser parser(p_levelPath);
-  
+
   // Polygon model
   m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
-  
+
   // Level Info
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
     0, parser.GetStarsCount(), parser.GetMaxGapToWin(), parser.GetTolerance());
@@ -358,12 +358,12 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   for (auto const& mirror: parser.GetMirrorsList()) {
     m_mirrorModel->AddMirror(mirror);
   }
-  m_deviationsList.append(m_mirrorModel->GetMirrorsList());
+  m_deviationsList.append(m_mirrorModel->GetObjectsList());
 
   for (auto const& portal: parser.GetPortalsList()) {
     m_portalModel->AddPortal(portal);
   }
-  m_deviationsList.append(m_portalModel->GetPortalsList());
+  m_deviationsList.append(m_portalModel->GetObjectsList());
 
   //for (auto const& countdown: parser.GetCountdownsList()) {
   //  m_countdownModel->AddCountdown(countdown);
@@ -388,12 +388,12 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   for (auto const& oneWay: parser.GetOneWaysList()) {
     m_oneWayModel->AddOneWay(oneWay);
   }
-  m_obstaclesList.append(m_oneWayModel->GetOneWaysList());
+  m_obstaclesList.append(m_oneWayModel->GetObjectsList());
 
   for (auto const& tape: parser.GetTapesList()) {
     m_tapeModel->AddTape(tape);
   }
-  m_obstaclesList.append(m_tapeModel->GetTapesList());
+  m_obstaclesList.append(m_tapeModel->GetObjectsList());
 
   m_objectsList << m_deviationsList << m_mutablesList << m_obstaclesList;
   m_view->SetObjectsList(m_objectsList);

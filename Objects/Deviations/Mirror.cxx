@@ -6,7 +6,7 @@
 
 Mirror::Mirror(double p_xa, double p_ya, double p_xb, double p_yb):
   Deviation(),
-  m_mirrorLine(p_xa, p_ya, p_xb, p_yb) {
+  m_line(p_xa, p_ya, p_xb, p_yb) {
 }
 
 Mirror::~Mirror() = default;
@@ -26,14 +26,14 @@ std::string Mirror::GetName() const {
 QList<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
   QList<ppxl::Segment> deviatedLines;
 
-  if (m_mirrorLine.ComputeIntersection(p_line) == ppxl::Segment::Regular) {
-    ppxl::Point intersection(ppxl::Segment::IntersectionPoint(m_mirrorLine, p_line));
+  if (m_line.ComputeIntersection(p_line) == ppxl::Segment::Regular) {
+    ppxl::Point intersection(ppxl::Segment::IntersectionPoint(m_line, p_line));
 
     // mirror's bounds coordinates
-    double xc = m_mirrorLine.GetA().GetX();
-    double yc = m_mirrorLine.GetA().GetY();
-    double xd = m_mirrorLine.GetB().GetX();
-    double yd = m_mirrorLine.GetB().GetY();
+    double xc = m_line.GetA().GetX();
+    double yc = m_line.GetA().GetY();
+    double xd = m_line.GetB().GetX();
+    double yd = m_line.GetB().GetY();
 
     // Intersection's coordinates
     double xi = intersection.GetX();

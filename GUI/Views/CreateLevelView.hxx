@@ -8,6 +8,7 @@
 #include "Core/Polygon.hxx"
 
 class CreateLevelModel;
+class ObjectModel;
 class CreateLevelScribblingView;
 class QLabel;
 class QPushButton;
@@ -16,6 +17,7 @@ class QItemSelectionModel;
 class QUndoView;
 class QUndoStack;
 class QSpinBox;
+class QStackedWidget;
 
 class CreateLevelView: public QWidget {
   Q_OBJECT
@@ -43,7 +45,8 @@ public:
   void SetTolerance(int p_value);
   void ResetGameInfo();
 
-  void SetModel(CreateLevelModel* p_model);
+  void SetPolygonModel(CreateLevelModel* p_polygonModel);
+  void SetObjectModelsList(const QList<ObjectModel*>& p_objectModelsList);
   void SetUndoStack(QUndoStack* p_undoStack);
   QItemSelectionModel* GetSelectionModel() const;
 
@@ -87,9 +90,12 @@ private:
   QLabel* m_createLevelLabel;
   QPushButton* m_testLevelButton;
   QPushButton* m_menuButton;
-  CreateLevelModel* m_model;
+  CreateLevelModel* m_polygonModel;
+  QList<ObjectModel*> m_objectModelsList;
   CreateLevelScribblingView* m_scribblingView;
-  QTreeView* m_treeView;
+  QTreeView* m_polygonTreeView;
+  QTreeView* m_objectsTreeView;
+  QStackedWidget* m_treeViewStackWidget;
   QUndoView* m_undoView;
   QSpinBox* m_linesGoalSpinBox;
   QSpinBox* m_partsGoalSpinBox;

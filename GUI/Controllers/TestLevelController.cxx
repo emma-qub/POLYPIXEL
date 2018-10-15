@@ -8,8 +8,12 @@ TestLevelController::TestLevelController(TestLevelView* p_view, QObject* p_paren
   m_view(p_view) {
 }
 
-void TestLevelController::SetModel(PolygonModel* p_model) {
-  m_view->SetModel(p_model);
+void TestLevelController::SetPolygonModel(PolygonModel* p_polygonModel) {
+  m_view->SetPolygonModel(p_polygonModel);
+}
+
+void TestLevelController::SetObjectModelsList(QList<ObjectModel*> const& p_objectModelList) {
+  m_view->SetObjectModelsList(p_objectModelList);
 }
 
 void TestLevelController::SetLinesGoal(int p_linesGoal) {

@@ -12,7 +12,9 @@ public:
   ~Portal() override;
 
   inline ppxl::Segment GetIn() const { return m_in; }
+  void SetIn(ppxl::Segment const& p_in);
   inline ppxl::Segment GetOut() const { return m_out; }
+  void SetOut(ppxl::Segment const& p_out);
   inline ppxl::Vector GetNormalIn() const { return m_normalIn; }
   inline ppxl::Vector GetNormalOut() const { return m_normalOut; }
 

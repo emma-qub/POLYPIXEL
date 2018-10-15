@@ -37,8 +37,12 @@ void TestLevelView::InitView() {
   m_view->InitView();
 }
 
-void TestLevelView::SetModel(PolygonModel* p_model) {
+void TestLevelView::SetPolygonModel(PolygonModel* p_model) {
   m_controller->SetPolygonsItem(p_model);
+}
+
+void TestLevelView::SetObjectModelsList(const QList<ObjectModel*>& p_objectModelsList) {
+  m_controller->SetObjectModelsList(p_objectModelsList);
 }
 
 void TestLevelView::SetLinesGoal(int p_linesGoal) {

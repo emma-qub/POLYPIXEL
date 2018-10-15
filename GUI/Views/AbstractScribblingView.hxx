@@ -32,7 +32,7 @@ public:
 
   virtual void InitView();
 
-  virtual void SetModel(PolygonModel* p_model);
+  virtual void SetPolygonModel(PolygonModel* p_model);
   virtual void SetObjectsList(QList<Object*> const& p_objectsList);
   void SetCanScribble(bool p_value);
   bool GetCanScribble() const;

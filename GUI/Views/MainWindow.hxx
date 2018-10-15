@@ -37,7 +37,6 @@ private:
 
   QStackedWidget* m_centralWidget;
   AchievementsView* m_achievementsView;
-  CreateLevelModel* m_createLevelModel;
   CreateLevelView* m_createLevelView;
   CreateLevelController* m_createLevelController;
   GameView* m_gameView;
