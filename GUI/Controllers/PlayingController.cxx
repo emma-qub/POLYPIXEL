@@ -172,6 +172,7 @@ void PlayingController::SliceIt(QPoint const& p_endPoint) {
       // Browse every polygon and slice it!
       ComputeNewPolygonList(newPolygonList, line);
       m_polygonModel->SetPolygonsList(newPolygonList);
+      newPolygonList.clear();
     }
 
     ++m_gameInfo.m_linesCount;
@@ -632,12 +633,12 @@ void PlayingController::ComputeDeviateLines(double firstLineLength, ppxl::Segmen
     // At least two line has to be here: the line drawn and its reflexion
     assert(deviateLines.size() > 1);
 
-    // Erase previous line, since it go through current mirror
+    // Erase previous line, since it goes through current mirror
     if (lines.size() > 1) {
-      lines.erase(lines.end()-1);
+      lines.removeLast();
     }
 
-    // Get the mirrorLined the length of the firstLine
+    // Make the deviated line's length the same as the firstLine one
     ppxl::Segment deviateLine = deviateLines.at(1);
     ppxl::Point A = deviateLine.GetA();
     ppxl::Point B = deviateLine.GetB();
@@ -651,6 +652,9 @@ void PlayingController::ComputeDeviateLines(double firstLineLength, ppxl::Segmen
 
     ComputeDeviateLines(firstLineLength, deviateLine, lines);
   } else {
+    if (lines.size() > 1) {
+      lines.removeLast();
+    }
     lines << line;
   }
 }
