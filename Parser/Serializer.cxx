@@ -1,5 +1,7 @@
 #include "Serializer.hxx"
 
+#include <cmath>
+
 #include <QFile>
 #include <QDebug>
 
