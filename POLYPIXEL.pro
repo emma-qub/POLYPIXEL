@@ -68,7 +68,8 @@ SOURCES += \
     Objects/Object.cxx \
     Parser/Parser.cxx \
     Parser/Serializer.cxx \
-    GUI/Models/ObjectModel.cxx
+    GUI/Models/ObjectModel.cxx \
+    GUI/GraphicsItem/GraphicsObjectItem.cxx
 
 HEADERS += \
     Core/Point.hxx \
@@ -124,7 +125,8 @@ HEADERS += \
     Objects/Object.hxx \
     Parser/Parser.hxx \
     Parser/Serializer.hxx \
-    GUI/Models/ObjectModel.hxx
+    GUI/Models/ObjectModel.hxx \
+    GUI/GraphicsItem/GraphicsObjectItem.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
