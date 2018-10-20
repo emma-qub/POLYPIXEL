@@ -605,7 +605,7 @@ Deviation* PlayingController::GetNearestDeviation(ppxl::Segment const& line) con
 
   for (auto* deviation: m_deviationsList) {
     auto deviationCast = static_cast<Deviation*>(deviation);
-    QList<ppxl::Segment> deviateLines = deviationCast->DeviateLine(line);
+    std::vector<ppxl::Segment> deviateLines = deviationCast->DeviateLine(line);
     // If there is at least one reflected line
     if (deviateLines.size() > 1) {
       if (minDist < 0.) {
@@ -624,7 +624,7 @@ void PlayingController::ComputeDeviateLines(double firstLineLength, ppxl::Segmen
   Deviation* nearestDeviation = GetNearestDeviation(line);
 
   if (nearestDeviation) {
-    QList<ppxl::Segment> deviateLines = nearestDeviation->DeviateLine(line);
+    std::vector<ppxl::Segment> deviateLines = nearestDeviation->DeviateLine(line);
     // Init firstLineLength
     if (firstLineLength < 0.) {
       firstLineLength = deviateLines.at(0).Length();

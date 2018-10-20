@@ -21,8 +21,8 @@ public:
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
   std::string GetName() const override;
-  QList<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const override;
-  QList<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
+  std::vector<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const override;
+  std::vector<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
 
 private:
   ppxl::Segment m_in;

@@ -23,8 +23,8 @@ std::string Mirror::GetName() const {
   return "Mirror";
 }
 
-QList<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
-  QList<ppxl::Segment> deviatedLines;
+std::vector<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
+  std::vector<ppxl::Segment> deviatedLines;
 
   if (m_line.ComputeIntersection(p_line) == ppxl::Segment::Regular) {
     ppxl::Point intersection(ppxl::Segment::IntersectionPoint(m_line, p_line));
@@ -60,10 +60,10 @@ QList<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
     double yb = 2*yj - ya;
 
     // Add line and reflected line
-    deviatedLines << ppxl::Segment(p_line.GetA(), intersection);
-    deviatedLines << ppxl::Segment(intersection, ppxl::Point(xb, yb));
+    deviatedLines.push_back(ppxl::Segment(p_line.GetA(), intersection));
+    deviatedLines.push_back(ppxl::Segment(intersection, ppxl::Point(xb, yb)));
   } else {
-    deviatedLines << p_line;
+    deviatedLines.push_back(p_line);
   }
 
   return deviatedLines;

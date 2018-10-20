@@ -42,8 +42,8 @@ std::string Portal::GetName() const {
   return "Portal";
 }
 
-QList<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {
-  QList<ppxl::Segment> deviatedLines;
+std::vector<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {
+  std::vector<ppxl::Segment> deviatedLines;
 
   ppxl::Segment in(m_in);
   ppxl::Segment out(m_out);
@@ -74,17 +74,17 @@ QList<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {
     ppxl::Point P = J + ppxl::Point::Distance(p_line.GetA(), I)*w;
 
     // Add in line and out line
-    deviatedLines << ppxl::Segment(p_line.GetA(), I);
-    deviatedLines << ppxl::Segment(J, P);
+    deviatedLines.push_back(ppxl::Segment(p_line.GetA(), I));
+    deviatedLines.push_back(ppxl::Segment(J, P));
   } else {
-    deviatedLines << p_line;
+    deviatedLines.push_back(p_line);
   }
 
   return deviatedLines;
 }
 
-QList<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) const {
-  QList<ppxl::Segment> deviatedLines;
+std::vector<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) const {
+  std::vector<ppxl::Segment> deviatedLines;
 
   ppxl::Segment in(m_in);
   ppxl::Segment out(m_out);
@@ -114,10 +114,10 @@ QList<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) const {
     ppxl::Point A4 = A3.Translate(ppxl::Vector(J.GetX(), J.GetY()));
 
     // Add in line and out line
-    deviatedLines << ppxl::Segment(p_line.GetA(), I);
-    deviatedLines << ppxl::Segment(J, A4);
+    deviatedLines.push_back(ppxl::Segment(p_line.GetA(), I));
+    deviatedLines.push_back(ppxl::Segment(J, A4));
   } else {
-    deviatedLines << p_line;
+    deviatedLines.push_back(p_line);
   }
 
   return deviatedLines;
