@@ -15,10 +15,23 @@ CONFIG += c++14
 
 SOURCES += \
     main.cxx \
-    Core/Point.cxx \
-    Core/Polygon.cxx \
-    Core/Segment.cxx \
-    Core/Vector.cxx \
+    Core/Geometry/Point.cxx \
+    Core/Geometry/Polygon.cxx \
+    Core/Geometry/Segment.cxx \
+    Core/Geometry/Vector.cxx \
+    Core/Objects/Deviations/Deviation.cxx \
+    Core/Objects/Deviations/Mirror.cxx \
+    Core/Objects/Deviations/Portal.cxx \
+    Core/Objects/Mutables/Countdown.cxx \
+    Core/Objects/Mutables/Mutable.cxx \
+    Core/Objects/Mutables/Disposable.cxx \
+    Core/Objects/Mutables/Switch.cxx \
+    Core/Objects/Mutables/Transfer.cxx \
+    Core/Objects/Obstacles/Tape.cxx \
+    Core/Objects/Obstacles/Obstacle.cxx \
+    Core/Objects/Obstacles/OneWay.cxx \
+    Core/Objects/Object.cxx \
+    Core/Slicer.cxx \
     GUI/Commands/CreateLevelCommands.cxx \
     GUI/Commands/TestLevelCommands.cxx \
     GUI/Controllers/CreateLevelController.cxx \
@@ -31,6 +44,7 @@ SOURCES += \
     GUI/GraphicsItem/GameStartItem.cxx \
     GUI/GraphicsItem/GraphicsGoalItem.cxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.cxx \
+    GUI/GraphicsItem/GraphicsObjectItem.cxx \
     GUI/GraphicsItem/GraphicsPixelLine.cxx \
     GUI/GraphicsItem/GraphicsPixelRectItem.cxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.cxx \
@@ -38,6 +52,7 @@ SOURCES += \
     GUI/GraphicsItem/PlayerItem.cxx \
     GUI/Models/CreateLevelModel.cxx \
     GUI/Models/LineModel.cxx \
+    GUI/Models/ObjectModel.cxx \
     GUI/Models/PolygonModel.cxx \
     GUI/Views/AbstractScribblingView.cxx \
     GUI/Views/AchievementsView.cxx \
@@ -54,28 +69,27 @@ SOURCES += \
     GUI/Views/PlayingView.cxx \
     GUI/Views/TestingView.cxx \
     GUI/Views/TestLevelView.cxx \
-    Objects/Deviations/Deviation.cxx \
-    Objects/Deviations/Mirror.cxx \
-    Objects/Deviations/Portal.cxx \
-    Objects/Mutables/Countdown.cxx \
-    Objects/Mutables/Mutable.cxx \
-    Objects/Mutables/Disposable.cxx \
-    Objects/Mutables/Switch.cxx \
-    Objects/Mutables/Transfer.cxx \
-    Objects/Obstacles/Tape.cxx \
-    Objects/Obstacles/Obstacle.cxx \
-    Objects/Obstacles/OneWay.cxx \
-    Objects/Object.cxx \
     Parser/Parser.cxx \
-    Parser/Serializer.cxx \
-    GUI/Models/ObjectModel.cxx \
-    GUI/GraphicsItem/GraphicsObjectItem.cxx
+    Parser/Serializer.cxx
 
 HEADERS += \
-    Core/Point.hxx \
-    Core/Polygon.hxx \
-    Core/Segment.hxx \
-    Core/Vector.hxx \
+    Core/Geometry/Point.hxx \
+    Core/Geometry/Polygon.hxx \
+    Core/Geometry/Segment.hxx \
+    Core/Geometry/Vector.hxx \
+    Core/Objects/Deviations/Deviation.hxx \
+    Core/Objects/Deviations/Mirror.hxx \
+    Core/Objects/Deviations/Portal.hxx \
+    Core/Objects/Mutables/Countdown.hxx \
+    Core/Objects/Mutables/Mutable.hxx \
+    Core/Objects/Mutables/Disposable.hxx \
+    Core/Objects/Mutables/Switch.hxx \
+    Core/Objects/Mutables/Transfer.hxx \
+    Core/Objects/Obstacles/Tape.hxx \
+    Core/Objects/Obstacles/Obstacle.hxx \
+    Core/Objects/Obstacles/OneWay.hxx \
+    Core/Objects/Object.hxx \
+    Core/Slicer.hxx \
     GUI/Commands/CreateLevelCommands.hxx \
     GUI/Commands/TestLevelCommands.hxx \
     GUI/Controllers/CreateLevelController.hxx \
@@ -88,6 +102,7 @@ HEADERS += \
     GUI/GraphicsItem/GameStartItem.hxx \
     GUI/GraphicsItem/GraphicsGoalItem.hxx \
     GUI/GraphicsItem/GraphicsMessageBoxItem.hxx \
+    GUI/GraphicsItem/GraphicsObjectItem.hxx \
     GUI/GraphicsItem/GraphicsPixelLine.hxx \
     GUI/GraphicsItem/GraphicsPixelRectItem.hxx \
     GUI/GraphicsItem/GraphicsRoundedRectItem.hxx \
@@ -95,6 +110,7 @@ HEADERS += \
     GUI/GraphicsItem/PlayerItem.hxx \
     GUI/Models/CreateLevelModel.hxx \
     GUI/Models/LineModel.hxx \
+    GUI/Models/ObjectModel.hxx \
     GUI/Models/PolygonModel.hxx \
     GUI/Views/AbstractScribblingView.hxx \
     GUI/Views/AchievementsView.hxx \
@@ -111,22 +127,8 @@ HEADERS += \
     GUI/Views/PlayingView.hxx \
     GUI/Views/TestingView.hxx \
     GUI/Views/TestLevelView.hxx \
-    Objects/Deviations/Deviation.hxx \
-    Objects/Deviations/Mirror.hxx \
-    Objects/Deviations/Portal.hxx \
-    Objects/Mutables/Countdown.hxx \
-    Objects/Mutables/Mutable.hxx \
-    Objects/Mutables/Disposable.hxx \
-    Objects/Mutables/Switch.hxx \
-    Objects/Mutables/Transfer.hxx \
-    Objects/Obstacles/Tape.hxx \
-    Objects/Obstacles/Obstacle.hxx \
-    Objects/Obstacles/OneWay.hxx \
-    Objects/Object.hxx \
     Parser/Parser.hxx \
-    Parser/Serializer.hxx \
-    GUI/Models/ObjectModel.hxx \
-    GUI/GraphicsItem/GraphicsObjectItem.hxx
+    Parser/Serializer.hxx
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

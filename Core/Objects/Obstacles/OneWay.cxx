@@ -1,4 +1,4 @@
-#include "OneWay.hxx"
+#include "Core/Objects/Obstacles/OneWay.hxx"
 
 OneWay::OneWay(double p_xa, double p_ya, double p_xb, double p_yb):
   Obstacle(),

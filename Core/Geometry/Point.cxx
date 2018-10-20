@@ -1,5 +1,5 @@
-#include "Point.hxx"
-#include "Vector.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 #include <QDebug>
 

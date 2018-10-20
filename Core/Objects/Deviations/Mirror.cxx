@@ -1,6 +1,6 @@
-#include "Mirror.hxx"
+#include "Core/Objects/Deviations/Mirror.hxx"
 
-#include "Core/Vector.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 #include <cmath>
 

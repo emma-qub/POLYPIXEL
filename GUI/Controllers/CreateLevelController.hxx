@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "Core/Polygon.hxx"
-#include "Core/Point.hxx"
+#include "Core/Geometry/Polygon.hxx"
+#include "Core/Geometry/Point.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
 
 class CreateLevelModel;

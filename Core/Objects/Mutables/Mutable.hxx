@@ -1,9 +1,9 @@
 #ifndef MUTABLE_HXX
 #define MUTABLE_HXX
 
-#include "Objects/Object.hxx"
+#include "Core/Objects/Object.hxx"
 
-#include "Core/Point.hxx"
+#include "Core/Geometry/Point.hxx"
 
 class Mutable: public Object {
 

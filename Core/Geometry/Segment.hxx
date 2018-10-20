@@ -1,7 +1,7 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
-#include "Point.hxx"
+#include "Core/Geometry/Point.hxx"
 
 #include <string>
 

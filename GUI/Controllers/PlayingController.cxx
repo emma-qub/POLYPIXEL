@@ -1,6 +1,6 @@
 #include "PlayingController.hxx"
 
-#include "Core/Vector.hxx"
+#include "Core/Geometry/Vector.hxx"
 #include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/PlayingView.hxx"

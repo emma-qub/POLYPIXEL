@@ -1,4 +1,4 @@
-#include "Tape.hxx"
+#include "Core/Objects/Obstacles/Tape.hxx"
 
 Tape::Tape(double p_x, double p_y, double p_w, double p_h):
   Obstacle(),

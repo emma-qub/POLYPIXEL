@@ -4,8 +4,8 @@
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
 
-#include "Core/Segment.hxx"
-#include "Core/Vector.hxx"
+#include "Core/Geometry/Segment.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 class PolygonModel;
 class Object;

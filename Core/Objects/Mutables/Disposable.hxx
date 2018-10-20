@@ -1,7 +1,7 @@
 #ifndef DISPOSABLE_HXX
 #define DISPOSABLE_HXX
 
-#include "Objects/Mutables/Mutable.hxx"
+#include "Core/Objects/Mutables/Mutable.hxx"
 
 class Disposable: public Mutable {
 

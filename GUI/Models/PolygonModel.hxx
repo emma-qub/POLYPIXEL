@@ -3,7 +3,7 @@
 
 #include <QStandardItemModel>
 
-#include "Core/Polygon.hxx"
+#include "Core/Geometry/Polygon.hxx"
 
 class PolygonModel: public QStandardItemModel {
   Q_OBJECT

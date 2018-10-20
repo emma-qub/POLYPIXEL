@@ -1,5 +1,5 @@
 #include "GameOverItem.hxx"
-#include "Core/Polygon.hxx"
+#include "Core/Geometry/Polygon.hxx"
 #include "GUI/GraphicsItem/GraphicsStarsItem.hxx"
 
 #include <QBrush>

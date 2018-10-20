@@ -2,7 +2,7 @@
 #define PORTAL_HXX
 
 #include "Deviation.hxx"
-#include "Core/Vector.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 class Portal: public Deviation {
 

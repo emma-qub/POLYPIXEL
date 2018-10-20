@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-#include "Segment.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 namespace ppxl {
 

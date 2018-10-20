@@ -1,8 +1,8 @@
 #ifndef OBSTACLE_HXX
 #define OBSTACLE_HXX
 
-#include "Objects/Object.hxx"
-#include "Core/Segment.hxx"
+#include "Core/Objects/Object.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 class Obstacle: public Object {
 

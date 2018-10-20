@@ -1,7 +1,7 @@
-#include "Vector.hxx"
+#include "Core/Geometry/Vector.hxx"
 
-#include "Point.hxx"
-#include "Segment.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 #include <cmath>    // sqrt, abs, atan2
 #include <cfloat>   // DBL_EPSILON

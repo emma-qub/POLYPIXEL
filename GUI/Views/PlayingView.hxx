@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "Core/Point.hxx"
-#include "Core/Segment.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 class QLabel;
 class PolygonModel;

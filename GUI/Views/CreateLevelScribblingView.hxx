@@ -2,9 +2,9 @@
 #define CREATELEVELSCRIBBLINGVIEW_HXX
 
 #include "GUI/Views/AbstractScribblingView.hxx"
-#include "Core/Point.hxx"
-#include "Core/Vector.hxx"
-#include "Core/Polygon.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Vector.hxx"
+#include "Core/Geometry/Polygon.hxx"
 
 class CreateLevelModel;
 class ObjectModel;

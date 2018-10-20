@@ -3,13 +3,13 @@
 
 #include <QtXml/QDomElement>
 
-#include "Core/Point.hxx"
-#include "Core/Segment.hxx"
-#include "Core/Polygon.hxx"
-#include "Objects/Obstacles/Tape.hxx"
-#include "Objects/Obstacles/OneWay.hxx"
-#include "Objects/Deviations/Mirror.hxx"
-#include "Objects/Deviations/Portal.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Segment.hxx"
+#include "Core/Geometry/Polygon.hxx"
+#include "Core/Objects/Obstacles/Tape.hxx"
+#include "Core/Objects/Obstacles/OneWay.hxx"
+#include "Core/Objects/Deviations/Mirror.hxx"
+#include "Core/Objects/Deviations/Portal.hxx"
 
 class Serializer {
 public:

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPoint>
 
-#include "Core/Polygon.hxx"
+#include "Core/Geometry/Polygon.hxx"
 
 class PolygonModel;
 class ObjectModel;

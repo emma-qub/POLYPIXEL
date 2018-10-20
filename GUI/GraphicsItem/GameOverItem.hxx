@@ -1,7 +1,7 @@
 #ifndef GAMEOVERITEM_HXX
 #define GAMEOVERITEM_HXX
 
-#include "Core/Polygon.hxx"
+#include "Core/Geometry/Polygon.hxx"
 #include "GUI/GraphicsItem/GraphicsRoundedRectItem.hxx"
 
 class GameOverItem: public GraphicsRoundedRectItem {

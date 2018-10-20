@@ -3,7 +3,7 @@
 
 #include <QUndoCommand>
 
-#include "Core/Segment.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 class PolygonModel;
 

@@ -1,9 +1,9 @@
 #ifndef DEVIATION_HXX
 #define DEVIATION_HXX
 
-#include "Objects/Object.hxx"
+#include "Core/Objects/Object.hxx"
 
-#include "Core/Segment.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 class Deviation: public Object {
 

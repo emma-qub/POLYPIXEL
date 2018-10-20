@@ -3,14 +3,14 @@
 
 #include <QStandardItemModel>
 
-#include "Objects/Deviations/Mirror.hxx"
-#include "Objects/Deviations/Portal.hxx"
-#include "Objects/Mutables/Countdown.hxx"
-#include "Objects/Mutables/Disposable.hxx"
-#include "Objects/Mutables/Switch.hxx"
-#include "Objects/Mutables/Transfer.hxx"
-#include "Objects/Obstacles/OneWay.hxx"
-#include "Objects/Obstacles/Tape.hxx"
+#include "Core/Objects/Deviations/Mirror.hxx"
+#include "Core/Objects/Deviations/Portal.hxx"
+#include "Core/Objects/Mutables/Countdown.hxx"
+#include "Core/Objects/Mutables/Disposable.hxx"
+#include "Core/Objects/Mutables/Switch.hxx"
+#include "Core/Objects/Mutables/Transfer.hxx"
+#include "Core/Objects/Obstacles/OneWay.hxx"
+#include "Core/Objects/Obstacles/Tape.hxx"
 
 #include <QStandardItemModel>
 

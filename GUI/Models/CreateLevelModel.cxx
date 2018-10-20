@@ -1,6 +1,6 @@
 #include "CreateLevelModel.hxx"
 
-#include "Core/Vector.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 CreateLevelModel::CreateLevelModel(QObject* p_parent):
   PolygonModel(p_parent),

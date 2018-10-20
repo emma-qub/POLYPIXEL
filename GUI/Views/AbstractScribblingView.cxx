@@ -1,13 +1,13 @@
 #include "AbstractScribblingView.hxx"
 
-#include "Core/Point.hxx"
+#include "Core/Geometry/Point.hxx"
 #include "GUI/Models/PolygonModel.hxx"
 #include "GUI/GraphicsItem/GraphicsPixelLine.hxx"
-#include "Objects/Object.hxx"
-#include "Objects/Obstacles/Tape.hxx"
-#include "Objects/Obstacles/OneWay.hxx"
-#include "Objects/Deviations/Mirror.hxx"
-#include "Objects/Deviations/Portal.hxx"
+#include "Core/Objects/Object.hxx"
+#include "Core/Objects/Obstacles/Tape.hxx"
+#include "Core/Objects/Obstacles/OneWay.hxx"
+#include "Core/Objects/Deviations/Mirror.hxx"
+#include "Core/Objects/Deviations/Portal.hxx"
 
 
 #include <QGraphicsLineItem>

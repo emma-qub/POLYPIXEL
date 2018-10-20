@@ -1,8 +1,8 @@
-#include "Polygon.hxx"
+#include "Core/Geometry/Polygon.hxx"
 
-#include "Point.hxx"
-#include "Vector.hxx"
-#include "Segment.hxx"
+#include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Vector.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 #include <cmath>        // round, abs
 #include <cfloat>       // DBL_EPSILON

@@ -2,8 +2,8 @@
 #define ONEWAY_HXX
 
 #include "Obstacle.hxx"
-#include "Core/Vector.hxx"
-#include "Core/Point.hxx"
+#include "Core/Geometry/Vector.hxx"
+#include "Core/Geometry/Point.hxx"
 
 class OneWay: public Obstacle {
 
