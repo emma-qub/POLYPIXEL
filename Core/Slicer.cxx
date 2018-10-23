@@ -8,23 +8,23 @@
 #include <cmath>
 
 Slicer::Slicer():
-
-  m_orientedAreaTotal(0.)
-{
-
+  m_startPoint(),
+  m_orientedAreaTotal(0.) {
 }
 
-void Slicer::SliceIt(ppxl::Point const& p_endPoint) {
+bool Slicer::SliceIt(ppxl::Point const& p_endPoint) {
   auto lines = ComputeSlicingLines(p_endPoint);
 
   if (ComputeLinesType(lines) == eGoodCrossing) {
-    std::vector<ppxl::Polygon> newPolygonList;
-
     for (ppxl::Segment const& line: lines) {
       // Browse every polygon and slice it!
-      ComputeNewPolygonList(newPolygonList, line);
+      ComputeNewPolygonList(m_polygonsList, line);
     }
+
+    return true;
   }
+
+  return false;
 }
 
 std::vector<ppxl::Segment> Slicer::ComputeSlicingLines(ppxl::Point const& p_endPoint) {
@@ -44,9 +44,9 @@ Slicer::LineType Slicer::ComputeLinesType(std::vector<ppxl::Segment> const& p_li
   auto polygonList = m_polygonsList;
   for (ppxl::Segment const& line: p_lines) {
     for (auto const& polygon: polygonList) {
-      if (!polygon->IsCrossing(line) && !polygon->IsPointInside(line.GetA())) {
+      if (!polygon.IsCrossing(line) && !polygon.IsPointInside(line.GetA())) {
         noCrossing = true;
-      } else if (polygon->IsGoodSegment(line)) {
+      } else if (polygon.IsGoodSegment(line)) {
         goodCrossing = true;
       } else {
         badCrossing = true;
@@ -135,10 +135,10 @@ Deviation* Slicer::GetNearestDeviation(ppxl::Segment const& line) const {
 
 
 void Slicer::ComputeNewPolygonList(std::vector<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const {
-  for (auto const* polygon: m_polygonsList) {
+  for (auto const& polygon: m_polygonsList) {
     std::vector<ppxl::Point*> globalVertices;
     std::vector<ppxl::Point*> intersections;
-    GetVerticesAndIntersections(p_line, *polygon, globalVertices, intersections);
+    GetVerticesAndIntersections(p_line, polygon, globalVertices, intersections);
 
     std::vector<ppxl::Point> newVertices;
     std::vector<std::pair<ppxl::Point*, ppxl::Point*>> cuttingSegments = GetCuttingSegments(intersections);

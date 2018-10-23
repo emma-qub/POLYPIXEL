@@ -85,10 +85,10 @@ void TestingController::DisplayAreas(QPoint const& p_endPoint) {
   if (ComputeLinesType(lines) == eGoodCrossing) {
     QList<ppxl::Polygon> newPolygonList;
 
-    for (ppxl::Segment const& line: lines) {
-      // Browse every polygon and slice it!
-      ComputeNewPolygonList(newPolygonList, line);
-    }
+//    for (ppxl::Segment const& line: lines) {
+//      // Browse every polygon and slice it!
+//      ComputeNewPolygonList(newPolygonList, line);
+//    }
 
     double orientedAreaTotal = 0.;
     for (auto polygon: newPolygonList) {

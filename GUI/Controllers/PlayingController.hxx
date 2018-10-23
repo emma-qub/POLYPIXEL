@@ -5,6 +5,7 @@
 #include <QPoint>
 
 #include "Core/Geometry/Polygon.hxx"
+#include "Core/Slicer.hxx"
 
 class PolygonModel;
 class ObjectModel;
@@ -76,12 +77,6 @@ protected:
 
   QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
   void SliceIt(QPoint const& p_endPoint);
-  void ComputeNewPolygonList(QList<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const;
-  void GetVerticesAndIntersections(ppxl::Segment const& line, ppxl::Polygon const& polygon,
-    std::vector<ppxl::Point*>& globalVertices, std::vector<ppxl::Point*>& intersections) const;
-  void CleanIntersections(ppxl::Polygon const& polygon, std::vector<ppxl::Point*>& intersections) const;
-  std::vector<std::pair<ppxl::Point*, ppxl::Point*>> GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const;
-  bool StillHasBaseVertices(std::vector<ppxl::Point*> const& verticesGlobal, std::vector<ppxl::Point*> const& intersections) const;
 
   virtual void CheckWinning();
 
@@ -101,14 +96,12 @@ protected:
 
   void DisplayGameOver();
 
-  Deviation* GetNearestDeviation(ppxl::Segment const& line) const;
-  void ComputeDeviateLines(double firstLineLength, ppxl::Segment const& line, QList<ppxl::Segment>& lines) const;
-
   //  void replay();
   //  void undoSliceIt();
   //  void clearGame();
 
 protected:
+  Slicer m_slicer;
   PolygonModel* m_polygonModel;
   QList<ObjectModel*> m_objectModelsList;
   QList<Object*> m_objectsList;

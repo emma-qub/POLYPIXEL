@@ -11,6 +11,7 @@
 
 PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   QObject(p_parent),
+  m_slicer(),
   m_polygonModel(new PolygonModel(this)),
   m_gameInfo(),
   m_levelPath(""),
@@ -56,6 +57,8 @@ void PlayingController::SetObjectModelsList(const QList<ObjectModel*>& p_objectM
     << m_objectModelsList.at(ObjectModel::eOneWayModel)->GetObjectsList()
     << m_objectModelsList.at(ObjectModel::eTapeModel)->GetObjectsList();
 
+  m_slicer.SetDeviationsList(m_deviationsList.toVector().toStdVector());
+
   p_objectModelsList.at(ObjectModel::eMirrorModel);
 }
 
@@ -79,21 +82,22 @@ void PlayingController::Redraw() {
 void PlayingController::SetStartPoint(QPoint const& p_startPoint) {
   m_startPoint.SetX(static_cast<double>(p_startPoint.x()));
   m_startPoint.SetY(static_cast<double>(p_startPoint.y()));
+  m_slicer.SetStartPoint(m_startPoint);
 }
 
 void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
   QPoint endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
   QCursor::setPos(m_view->mapToGlobal(endPoint));
   SetStartPoint(p_cursorPosition);
-  ComputeSlicingLines(endPoint);
+  //ComputeSlicingLines(endPoint);
 }
 
 QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endPoint) {
-  QList<ppxl::Segment> lines;
+  auto lines = QList<ppxl::Segment>::fromVector(QVector<ppxl::Segment>::fromStdVector(m_slicer.ComputeSlicingLines(ppxl::Point(p_endPoint.x(), p_endPoint.y()))));
 
-  ppxl::Point endPoint(static_cast<double>(p_endPoint.x()), static_cast<double>(p_endPoint.y()));
-  ppxl::Segment scribbledLine(m_startPoint, endPoint);
-  ComputeDeviateLines(-1, scribbledLine, lines);
+//  ppxl::Point endPoint(static_cast<double>(p_endPoint.x()), static_cast<double>(p_endPoint.y()));
+//  ppxl::Segment scribbledLine(m_startPoint, endPoint);
+
 
   Redraw();
   auto linesColor = GetLinesColor(lines);
@@ -163,18 +167,9 @@ PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segm
 }
 
 void PlayingController::SliceIt(QPoint const& p_endPoint) {
-  auto lines = ComputeSlicingLines(p_endPoint);
 
-  if (ComputeLinesType(lines) == eGoodCrossing) {
-    QList<ppxl::Polygon> newPolygonList;
-
-    for (ppxl::Segment const& line: lines) {
-      // Browse every polygon and slice it!
-      ComputeNewPolygonList(newPolygonList, line);
-      m_polygonModel->SetPolygonsList(newPolygonList);
-      newPolygonList.clear();
-    }
-
+  if (m_slicer.SliceIt(ppxl::Point(p_endPoint.x(), p_endPoint.y()))) {
+    m_polygonModel->SetPolygonsList(QList<ppxl::Polygon>::fromVector(QVector<ppxl::Polygon>::fromStdVector(m_slicer.GetPolygonsList())));
     ++m_gameInfo.m_linesCount;
     m_gameInfo.m_partsCount = m_polygonModel->GetPolygonsCount();
     UpdateViewFromGameInfo();
@@ -190,175 +185,6 @@ void PlayingController::UpdateViewFromGameInfo() {
   m_view->UpdatePartsCount(m_gameInfo.m_partsCount, m_gameInfo.m_partsGoal);
 }
 
-
-void PlayingController::ComputeNewPolygonList(QList<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const {
-  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
-    std::vector<ppxl::Point*> globalVertices;
-    std::vector<ppxl::Point*> intersections;
-    GetVerticesAndIntersections(p_line, *polygon, globalVertices, intersections);
-
-    std::vector<ppxl::Point> newVertices;
-    std::vector<std::pair<ppxl::Point*, ppxl::Point*>> cuttingSegments = GetCuttingSegments(intersections);
-
-    while (StillHasBaseVertices(globalVertices, intersections)) {
-      // We really don't want the first point to be an intersection. Trust me.
-      ppxl::Point* p = globalVertices.at(0);
-      while (std::find(intersections.begin(), intersections.end(), p) != intersections.end()) {
-        globalVertices.erase(globalVertices.begin());
-        globalVertices.push_back(p);
-        p = globalVertices.at(0);
-      }
-      std::vector<ppxl::Point*> globalVerticesCopy(globalVertices);
-
-      bool lookingForOtherBound = false;
-      ppxl::Point* otherBound = nullptr;
-      for (ppxl::Point* currVerrtex: globalVerticesCopy) {
-        if (lookingForOtherBound) {
-          if (otherBound == currVerrtex) {
-            newVertices.push_back(*currVerrtex);
-            lookingForOtherBound = false;
-          }
-        } else {
-          if (std::find(intersections.begin(), intersections.end(), currVerrtex) != intersections.end()) {
-            // If the intersection is not equal to the last point, we add it
-            if (newVertices.size() > 0 && (std::find(newVertices.begin(), newVertices.end(), *currVerrtex) == newVertices.end())) {
-              newVertices.push_back(*currVerrtex);
-            }
-            otherBound = GetOtherBound(currVerrtex, cuttingSegments);
-            lookingForOtherBound = true;
-          } else {
-            newVertices.push_back(*currVerrtex);
-            auto it = std::find(globalVertices.begin(), globalVertices.end(), currVerrtex);
-            assert(it != globalVertices.end());
-            globalVertices.erase(it);
-          }
-        }
-      }
-      globalVerticesCopy.clear();
-      globalVerticesCopy = globalVertices;
-
-      ppxl::Polygon newPolygon(newVertices);
-      // Don't add the new polygon if its area is less than 0.1% of the total area.
-      // This allows users to draw several lines that pass near a point,
-      // but not exactly on this point, since it's quite difficult to achieve.
-      if (std::round(10.0*newPolygon.OrientedArea() * 100.0 / m_orientedAreaTotal)/10.0 >= 0.1) {
-        p_newPolygonList << newPolygon;
-      }
-
-      newVertices.clear();
-    }
-  }
-}
-
-void PlayingController::GetVerticesAndIntersections(ppxl::Segment const& line, ppxl::Polygon const& polygon,
-  std::vector<ppxl::Point*>& globalVertices, std::vector<ppxl::Point*>& intersections) const {
-
-  std::vector<ppxl::Point> baseVertices = polygon.GetVertices();
-
-  for (unsigned int k = 0; k < baseVertices.size(); ++k) {
-    auto A = new ppxl::Point(baseVertices.at(k));
-    auto B = new ppxl::Point(baseVertices.at((k+1)%baseVertices.size()));
-    ppxl::Segment AB(*A, *B);
-
-    globalVertices.push_back(A);
-
-    ppxl::Segment::Intersection intersectionType = AB.ComputeIntersection(line);
-    switch (intersectionType) {
-    case ppxl::Segment::Regular:
-    {
-      auto intersection = new ppxl::Point(ppxl::Segment::IntersectionPoint(AB, line));
-      globalVertices.push_back(intersection);
-      intersections.push_back(intersection);
-      break;
-    }
-    case ppxl::Segment::FirstVertexRegular:
-    {
-      auto intersection = new ppxl::Point(baseVertices.at(k));
-      globalVertices.push_back(intersection);
-      intersections.push_back(intersection);
-      break;
-    }
-    default:
-      break;
-    }
-  }
-
-  std::sort(intersections.begin(), intersections.end(), ComparePoints);
-
-  CleanIntersections(polygon, intersections);
-}
-
-void PlayingController::CleanIntersections(ppxl::Polygon const& polygon, std::vector<ppxl::Point*>& intersections) const {
-  if (intersections.size() < 2) {
-    intersections.clear();
-    return;
-  }
-
-  std::vector<ppxl::Point*> realIntersection;
-  bool inside = false;
-
-  for (unsigned int k = 0; k < intersections.size()-1; ++k) {
-    ppxl::Segment AB(*intersections.at(k), *intersections.at(k+1));
-    if (polygon.IsPointInside(AB.GetCenter())) {
-      if (!inside) {
-        realIntersection.push_back(intersections.at(k));
-        inside = true;
-      }
-    } else if (!polygon.IsPointInside(AB.GetCenter())) {
-      if (inside) {
-        realIntersection.push_back(intersections.at(k));
-        inside = false;
-      }
-    }
-  }
-
-  // Handle last vertex
-  if (inside)
-  {
-    realIntersection.push_back(intersections.at(intersections.size()-1));
-  }
-
-  intersections.clear();
-  intersections = realIntersection;
-}
-
-std::vector<std::pair<ppxl::Point*, ppxl::Point*>> PlayingController::GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const {
-  assert(intersections.size()%2 == 0);
-
-  std::vector<std::pair<ppxl::Point*, ppxl::Point*>> cuttingSegments;
-  if (intersections.size() == 0) {
-    return cuttingSegments;
-  }
-
-  for (unsigned int k = 0; k < intersections.size()-1; k += 2) {
-    ppxl::Segment AB(*intersections.at(k), *intersections.at(k+1));
-    cuttingSegments.push_back(std::pair<ppxl::Point*, ppxl::Point*>(intersections.at(k), intersections.at((k+1)%intersections.size())));
-  }
-  return cuttingSegments;
-}
-
-bool PlayingController::StillHasBaseVertices(std::vector<ppxl::Point*> const& globalVertices, std::vector<ppxl::Point*> const& intersections) const {
-  for (ppxl::Point* p: globalVertices) {
-    if (std::find(intersections.begin(), intersections.end(), p) == intersections.end()) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-ppxl::Point* PlayingController::GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const {
-  for (std::pair<ppxl::Point*, ppxl::Point*> const& cuttingSegment: cuttingSegments) {
-    if (cuttingSegment.first == intersection) {
-      return cuttingSegment.second;
-    } else if (cuttingSegment.second == intersection) {
-      return cuttingSegment.first;
-    }
-  }
-
-  return nullptr;
-}
-
 void PlayingController::OpenLevel(QString const& p_levelPath) {
   if (p_levelPath.isEmpty()) {
     return;
@@ -368,7 +194,9 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   Parser parser(p_levelPath);
 
   // Polygon model
-  m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
+  auto polygonsList = parser.GetPolygonsList();
+  m_polygonModel->SetPolygonsList(polygonsList);
+  m_slicer.SetPolygonsList(polygonsList.toVector().toStdVector());
 
   // Level Info
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
@@ -598,66 +426,6 @@ void PlayingController::clearGame() {
   emit update();
 }
 */
-
-Deviation* PlayingController::GetNearestDeviation(ppxl::Segment const& line) const {
-  double minDist = -1.;
-  Deviation* nearestDeviation = nullptr;
-
-  for (auto* deviation: m_deviationsList) {
-    auto deviationCast = static_cast<Deviation*>(deviation);
-    std::vector<ppxl::Segment> deviateLines = deviationCast->DeviateLine(line);
-    // If there is at least one reflected line
-    if (deviateLines.size() > 1) {
-      if (minDist < 0.) {
-        deviateLines.at(0).Length();
-      } else {
-        qMin(minDist, deviateLines.at(0).Length());
-      }
-      nearestDeviation = deviationCast;
-    }
-  }
-
-  return nearestDeviation;
-}
-
-void PlayingController::ComputeDeviateLines(double firstLineLength, ppxl::Segment const& line, QList<ppxl::Segment>& lines) const {
-  Deviation* nearestDeviation = GetNearestDeviation(line);
-
-  if (nearestDeviation) {
-    std::vector<ppxl::Segment> deviateLines = nearestDeviation->DeviateLine(line);
-    // Init firstLineLength
-    if (firstLineLength < 0.) {
-      firstLineLength = deviateLines.at(0).Length();
-    }
-
-    // At least two line has to be here: the line drawn and its reflexion
-    assert(deviateLines.size() > 1);
-
-    // Erase previous line, since it goes through current mirror
-    if (lines.size() > 1) {
-      lines.removeLast();
-    }
-
-    // Make the deviated line's length the same as the firstLine one
-    ppxl::Segment deviateLine = deviateLines.at(1);
-    ppxl::Point A = deviateLine.GetA();
-    ppxl::Point B = deviateLine.GetB();
-    ppxl::Vector lu = firstLineLength*ppxl::Vector(A, B).Normalize();
-    ppxl::Point BB(lu.GetX(), lu.GetY());
-    deviateLine.setB(A + BB);
-
-    // Push line and its reflexion
-    lines << deviateLines.at(0);
-    lines << deviateLine;
-
-    ComputeDeviateLines(firstLineLength, deviateLine, lines);
-  } else {
-    if (lines.size() > 1) {
-      lines.removeLast();
-    }
-    lines << line;
-  }
-}
 
 
 bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B) {
