@@ -36,7 +36,7 @@ LoadingView::LoadingView(QWidget* parent):
   timer->setSingleShot(false);
   timer->setInterval(10);
   connect(timer, &QTimer::timeout, this, [this](){
-    m_progressBar->setValue(m_progressBar->value()+1);
+    m_progressBar->setValue(m_progressBar->value()+10);
   });
   timer->start();
 }
