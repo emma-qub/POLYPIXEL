@@ -19,7 +19,9 @@ public:
   };
 
   Slicer();
+  virtual ~Slicer();
 
+  /// INLINE GETTERS AND SETTERS
   inline void SetPolygonsList(std::vector<ppxl::Polygon> const& p_polygonsList) { m_polygonsList = p_polygonsList; }
   inline std::vector<ppxl::Polygon> GetPolygonsList() { return m_polygonsList; }
   inline void SetDeviationsList(std::vector<Object*> p_deviationsList) { m_deviationsList = p_deviationsList; }
@@ -29,6 +31,7 @@ public:
   inline void SetOrientedAreaTotal(double p_orientedAreaTotal) { m_orientedAreaTotal = p_orientedAreaTotal; }
   static inline bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B) { return *A < *B; }
 
+  /// SLICING ALGORITHM
   bool SliceIt(ppxl::Point const& p_endPoint);
   std::vector<ppxl::Segment> ComputeSlicingLines(ppxl::Point const& p_endPoint);
   LineType ComputeLinesType(std::vector<ppxl::Segment> const& p_lines) const;
@@ -41,6 +44,12 @@ public:
   std::vector<std::pair<ppxl::Point*, ppxl::Point*>> GetCuttingSegments(std::vector<ppxl::Point*> const& intersections) const;
   bool StillHasBaseVertices(std::vector<ppxl::Point*> const& verticesGlobal, std::vector<ppxl::Point*> const& intersections) const;
   ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
+
+  /// AREAS AND BARYCENTERS
+  std::vector<double> ComputeAreas(double& p_minArea, double& p_maxArea);
+  ppxl::Point ComputeGlobalBarycenter() const;
+  std::vector<ppxl::Vector> ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter);
+  void InitTotalOrientedArea();
 
 private:
   std::vector<ppxl::Polygon> m_polygonsList;

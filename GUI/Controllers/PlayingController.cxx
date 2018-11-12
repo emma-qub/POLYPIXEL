@@ -15,7 +15,6 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
   m_polygonModel(new PolygonModel(this)),
   m_gameInfo(),
   m_levelPath(""),
-  m_orientedAreaTotal(0.0),
   m_view(p_view) {
 
   m_view->SetModel(m_polygonModel);
@@ -27,7 +26,7 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
     << new PortalModel(this);
 
   connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
-  connect(m_view, &PlayingView::Moving, this, &PlayingController::ComputeSlicingLines);
+  connect(m_view, &PlayingView::Moving, this, &PlayingController::MoveLine);
   connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
   connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
   connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
@@ -89,15 +88,11 @@ void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
   QPoint endPoint(static_cast<int>(m_startPoint.GetX()), static_cast<int>(m_startPoint.GetY()));
   QCursor::setPos(m_view->mapToGlobal(endPoint));
   SetStartPoint(p_cursorPosition);
-  //ComputeSlicingLines(endPoint);
 }
 
-QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endPoint) {
-  auto lines = QList<ppxl::Segment>::fromVector(QVector<ppxl::Segment>::fromStdVector(m_slicer.ComputeSlicingLines(ppxl::Point(p_endPoint.x(), p_endPoint.y()))));
-
-//  ppxl::Point endPoint(static_cast<double>(p_endPoint.x()), static_cast<double>(p_endPoint.y()));
-//  ppxl::Segment scribbledLine(m_startPoint, endPoint);
-
+QList<ppxl::Segment> PlayingController::MoveLine(QPoint const& p_endPoint) {
+  auto slicingLines = m_slicer.ComputeSlicingLines(ppxl::Point(p_endPoint.x(), p_endPoint.y()));
+  auto lines = QList<ppxl::Segment>::fromVector(QVector<ppxl::Segment>::fromStdVector(slicingLines));
 
   Redraw();
   auto linesColor = GetLinesColor(lines);
@@ -110,17 +105,17 @@ QList<ppxl::Segment> PlayingController::ComputeSlicingLines(QPoint const& p_endP
 }
 
 QColor PlayingController::GetLinesColor(QList<ppxl::Segment> const& p_lines) const {
-  auto lineType = ComputeLinesType(p_lines);
+  auto lineType = m_slicer.ComputeLinesType(p_lines.toVector().toStdVector());
   QColor color;
 
   switch (lineType) {
-  case eNoCrossing: {
+  case Slicer::eNoCrossing: {
     color = QColor(0x626262);
     break;
-  } case eGoodCrossing: {
+  } case Slicer::eGoodCrossing: {
     color = QColor(0x5DBE14);
     break;
-  } case eBadCrossing: {
+  } case Slicer::eBadCrossing: {
     color = QColor(0xC81214);
     break;
   } default: {
@@ -129,41 +124,6 @@ QColor PlayingController::GetLinesColor(QList<ppxl::Segment> const& p_lines) con
   }
 
   return color;
-}
-
-PlayingController::LineType PlayingController::ComputeLinesType(QList<ppxl::Segment> const& p_lines) const {
-  bool noCrossing = false;
-  bool goodCrossing = false;
-  bool badCrossing = false;
-
-  auto polygonList = m_polygonModel->GetPolygonsList();
-  for (ppxl::Segment const& line: p_lines) {
-    for (auto const& polygon: polygonList) {
-      if (!polygon->IsCrossing(line) && !polygon->IsPointInside(line.GetA())) {
-        noCrossing = true;
-      } else if (polygon->IsGoodSegment(line)) {
-        goodCrossing = true;
-      } else {
-        badCrossing = true;
-      }
-    }
-
-    for (auto const* obstacle: m_obstaclesList) {
-      if (static_cast<Obstacle const*>(obstacle)->Crossing(line)) {
-        badCrossing = true;
-      }
-    }
-  }
-
-  if (badCrossing) {
-    return eBadCrossing;
-  } else if (goodCrossing) {
-    return eGoodCrossing;
-  } else if (noCrossing) {
-    return eNoCrossing;
-  } else {
-    return eUnknownCrossing;
-  }
 }
 
 void PlayingController::SliceIt(QPoint const& p_endPoint) {
@@ -251,62 +211,24 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   m_objectsList << m_deviationsList << m_mutablesList << m_obstaclesList;
   m_view->SetObjectsList(m_objectsList);
 
+  m_slicer.SetDeviationsList(m_deviationsList.toVector().toStdVector());
+  m_slicer.SetMutablesList(m_mutablesList.toVector().toStdVector());
+  m_slicer.SetObstaclesList(m_obstaclesList.toVector().toStdVector());
+
+  m_slicer.InitTotalOrientedArea();
+
   StartLevel();
 }
 
 void PlayingController::StartLevel() {
   m_view->StartLevel();
   m_view->ClearImage();
-  m_orientedAreaTotal = 0.;
 
   UpdateViewFromGameInfo();
 
-  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
-    m_orientedAreaTotal += polygon->OrientedArea();
-  }
   Redraw();
 
   connect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &PlayingController::Redraw);
-}
-
-QList<double> PlayingController::ComputeAreas(double& p_minArea, double& p_maxArea) {
-  QList<double> orientedAreas;
-  p_minArea = 100.;
-  p_maxArea = 0.;
-
-  double areaCumul = 0.;
-  auto polygonsList = m_polygonModel->GetPolygonsList();
-  for (int row = 0; row < polygonsList.size(); ++row) {
-    auto polygon = polygonsList.at(row);
-    double currArea = 0.;
-
-    if (row == polygonsList.size()-1) {
-      currArea = 100. - areaCumul;
-    } else {
-      currArea = ComputePolygonPercentageArea(*polygon);
-      areaCumul += currArea;
-    }
-
-    orientedAreas << currArea;
-    p_minArea = std::min(currArea, p_minArea);
-    p_maxArea = std::max(currArea, p_maxArea);
-  }
-
-  return orientedAreas;
-}
-
-QList<ppxl::Vector> PlayingController::ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter) {
-  QList<ppxl::Vector> shiftVectors;
-
-  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
-    ppxl::Vector currShift(p_globalBarycenter, polygon->Barycenter());
-    double currShiftLength = currShift.Norm();
-    currShift.Normalize();
-    currShift *= 0.2*currShiftLength;
-    shiftVectors << currShift;
-  }
-
-  return shiftVectors;
 }
 
 int PlayingController::ComputeStarsCount(double p_gap) {
@@ -327,9 +249,9 @@ void PlayingController::CheckWinning() {
   if (m_gameInfo.m_linesCount >= m_gameInfo.m_linesGoal || m_gameInfo.m_partsCount >= m_gameInfo.m_partsGoal) {
     double minArea;
     double maxArea;
-    auto globalBarycenter = ComputeGlobalBarycenter();
-    auto shiftVectorsList = ComputeShiftVectorsList(globalBarycenter);
-    auto areasList = ComputeAreas(minArea, maxArea);
+    auto globalBarycenter = m_slicer.ComputeGlobalBarycenter();
+    auto shiftVectorsList = QList<ppxl::Vector>::fromVector(QVector<ppxl::Vector>::fromStdVector(m_slicer.ComputeShiftVectorsList(globalBarycenter)));
+    auto areasList = QList<double>::fromVector(QVector<double>::fromStdVector(m_slicer.ComputeAreas(minArea, maxArea)));
     double gap = std::abs(maxArea - minArea);
 
     auto starsCount = ComputeStarsCount(gap);
@@ -354,25 +276,6 @@ void PlayingController::CheckWinning() {
   }
 }
 
-ppxl::Point PlayingController::ComputeGlobalBarycenter() const {
-  ppxl::Point globalBarycenter;
-  unsigned int polygonCount = 0;
-
-  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
-    globalBarycenter += polygon->Barycenter();
-    ++polygonCount;
-  }
-
-  assert(polygonCount > 0);
-  globalBarycenter /= polygonCount;
-
-  return globalBarycenter;
-}
-
-double PlayingController::ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const {
-  return qRound(10.*polygon.OrientedArea() * 100. / m_orientedAreaTotal) / 10.;
-}
-
 void PlayingController::UpdateStarsMax(int starsMaxCount) {
   Parser parser(m_levelPath);
   Serializer serializer(m_levelPath);
@@ -391,43 +294,4 @@ void PlayingController::UpdateStarsMax(int starsMaxCount) {
 
 void PlayingController::DisplayGameOver() {
   m_view->DisplayGameOver();
-}
-
-/*
-void PlayingController::undoSliceIt() {
-  if (m_polygonListPerTurn.size() > 1) {
-    m_polygonListPerTurn.pop_back();
-    m_model->setPolygonList(m_polygonListPerTurn.last());
-    m_gameInfo->setLinesCount(m_gameInfo.m_linesCount-1);
-    m_gameInfo->setPartsCount(m_model->getPolygonsCount());
-    m_levelRunning = true;
-
-    emit update();
-  }
-}
-
-void PlayingController::clearGame() {
-  m_model->clearPolygons();
-  m_model->clearTapes();
-  m_model->clearMirrors();
-  m_model->clearPortals();
-  m_model->clearRefractors();
-  m_model->clearDeviations();
-  m_gameInfo->setLinesCount(0);
-  m_gameInfo->setPartsCount(0);
-  m_gameInfo->setPartsGoal(0);
-  m_gameInfo->setStars(-1);
-  m_gameInfo->setStarsMax(-1);
-  m_orientedAreaTotal = 0.0;
-  m_maxGapToWin = 0.0;
-  m_levelRunning = false;
-  m_polygonListPerTurn.clear();
-
-  emit update();
-}
-*/
-
-
-bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B) {
-  return *A < *B;
 }

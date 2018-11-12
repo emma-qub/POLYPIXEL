@@ -57,15 +57,12 @@ void TestingController::Restart() {
 
 void TestingController::PlayLevel() {
   m_levelPath = "";
-  m_orientedAreaTotal = 0.;
   m_gameInfo.m_linesCount = 0;
   m_gameInfo.m_partsCount = m_polygonModel->GetPolygonsCount();
   m_gameInfo.m_stars = 0;
+  m_slicer.InitTotalOrientedArea();
   m_view->SetSaveButtonEnable(false);
 
-  for (auto const* polygon: m_polygonModel->GetPolygonsList()) {
-    m_orientedAreaTotal += polygon->OrientedArea();
-  }
   UpdateViewFromGameInfo();
   m_view->StartLevel();
   Redraw();
@@ -80,15 +77,10 @@ void TestingController::Redraw() {
 }
 
 void TestingController::DisplayAreas(QPoint const& p_endPoint) {
-  auto lines = ComputeSlicingLines(p_endPoint);
+  auto lines = MoveLine(p_endPoint);
 
-  if (ComputeLinesType(lines) == eGoodCrossing) {
+  if (m_slicer.ComputeLinesType(lines.toVector().toStdVector()) == Slicer::eGoodCrossing) {
     QList<ppxl::Polygon> newPolygonList;
-
-//    for (ppxl::Segment const& line: lines) {
-//      // Browse every polygon and slice it!
-//      ComputeNewPolygonList(newPolygonList, line);
-//    }
 
     double orientedAreaTotal = 0.;
     for (auto polygon: newPolygonList) {
@@ -106,7 +98,7 @@ void TestingController::CheckWinning() {
   if (m_gameInfo.m_linesCount >= m_gameInfo.m_linesGoal || m_gameInfo.m_partsCount >= m_gameInfo.m_partsGoal) {
     double minArea;
     double maxArea;
-    auto areasList = ComputeAreas(minArea, maxArea);
+    auto areasList = QList<double>::fromVector(QVector<double>::fromStdVector(m_slicer.ComputeAreas(minArea, maxArea)));
     double gap = std::abs(maxArea - minArea);
 
     auto starsCount = ComputeStarsCount(gap);

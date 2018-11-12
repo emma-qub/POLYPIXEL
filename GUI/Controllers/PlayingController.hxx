@@ -49,13 +49,6 @@ class PlayingController: public QObject {
   Q_OBJECT
 
 public:
-  enum LineType {
-    eGoodCrossing,
-    eBadCrossing,
-    eNoCrossing,
-    eUnknownCrossing
-  };
-
   PlayingController(PlayingView* p_view, QObject* p_parent = nullptr);
 
   void InitView();
@@ -75,30 +68,21 @@ protected:
   void SetStartPoint(QPoint const& p_startPoint);
   ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
 
-  QList<ppxl::Segment> ComputeSlicingLines(QPoint const& p_endPoint);
+  QList<ppxl::Segment> MoveLine(QPoint const& p_endPoint);
   void SliceIt(QPoint const& p_endPoint);
 
   virtual void CheckWinning();
 
   void InvertScribbleLine(const QPoint& p_cursorPosition);
   QColor GetLinesColor(QList<ppxl::Segment> const& p_lines) const;
-  LineType ComputeLinesType(QList<ppxl::Segment> const& p_lines) const;
 
   void OpenLevel(QString const& p_levelPath);
   void StartLevel();
 
-  QList<double> ComputeAreas(double& p_minArea, double& p_maxArea);
-  double ComputePolygonPercentageArea(ppxl::Polygon const& polygon) const;
-  QList<ppxl::Vector> ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter);
-  ppxl::Point ComputeGlobalBarycenter() const;
   int ComputeStarsCount(double p_gap);
   void UpdateStarsMax(int starsMaxCount);
 
   void DisplayGameOver();
-
-  //  void replay();
-  //  void undoSliceIt();
-  //  void clearGame();
 
 protected:
   Slicer m_slicer;
@@ -110,14 +94,11 @@ protected:
   QList<Object*> m_obstaclesList;
   GameInfo m_gameInfo;
   QString m_levelPath;
-  double m_orientedAreaTotal;
 
 private:
   PlayingView* m_view;
   ppxl::Point m_startPoint;
   QPoint m_startQPoint;
 };
-
-bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B);
 
 #endif

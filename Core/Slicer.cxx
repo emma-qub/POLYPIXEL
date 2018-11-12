@@ -12,15 +12,24 @@ Slicer::Slicer():
   m_orientedAreaTotal(0.) {
 }
 
+Slicer::~Slicer() = default;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// SLICING ALGORITHM
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool Slicer::SliceIt(ppxl::Point const& p_endPoint) {
   auto lines = ComputeSlicingLines(p_endPoint);
 
   if (ComputeLinesType(lines) == eGoodCrossing) {
+    std::vector<ppxl::Polygon> newPolygonList;
     for (ppxl::Segment const& line: lines) {
       // Browse every polygon and slice it!
-      ComputeNewPolygonList(m_polygonsList, line);
+      ComputeNewPolygonList(newPolygonList, line);
+      m_polygonsList = newPolygonList;
+      newPolygonList.clear();
     }
-
     return true;
   }
 
@@ -130,9 +139,6 @@ Deviation* Slicer::GetNearestDeviation(ppxl::Segment const& line) const {
 
   return nearestDeviation;
 }
-
-
-
 
 void Slicer::ComputeNewPolygonList(std::vector<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const {
   for (auto const& polygon: m_polygonsList) {
@@ -300,4 +306,70 @@ ppxl::Point* Slicer::GetOtherBound(ppxl::Point const* intersection, std::vector<
   }
 
   return nullptr;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// AREAS AND BARYCENTERS
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<double> Slicer::ComputeAreas(double& p_minArea, double& p_maxArea) {
+  std::vector<double> orientedAreas;
+  p_minArea = 100.;
+  p_maxArea = 0.;
+
+  double areaCumul = 0.;
+  for (unsigned int row = 0; row < m_polygonsList.size(); ++row) {
+    auto polygon = m_polygonsList.at(row);
+    double currArea = 0.;
+
+    if (row == m_polygonsList.size()-1) {
+      currArea = 100. - areaCumul;
+    } else {
+      currArea = qRound(10.*polygon.OrientedArea() * 100. / m_orientedAreaTotal) / 10.;
+      areaCumul += currArea;
+    }
+
+    orientedAreas.push_back(currArea);
+    p_minArea = std::min(currArea, p_minArea);
+    p_maxArea = std::max(currArea, p_maxArea);
+  }
+
+  return orientedAreas;
+}
+
+ppxl::Point Slicer::ComputeGlobalBarycenter() const {
+  ppxl::Point globalBarycenter;
+  unsigned int polygonCount = 0;
+
+  for (auto const& polygon: m_polygonsList) {
+    globalBarycenter += polygon.Barycenter();
+    ++polygonCount;
+  }
+
+  assert(polygonCount > 0);
+  globalBarycenter /= polygonCount;
+
+  return globalBarycenter;
+}
+
+std::vector<ppxl::Vector> Slicer::ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter) {
+  std::vector<ppxl::Vector> shiftVectors;
+
+  for (auto const& polygon: m_polygonsList) {
+    ppxl::Vector currShift(p_globalBarycenter, polygon.Barycenter());
+    double currShiftLength = currShift.Norm();
+    currShift.Normalize();
+    currShift *= 0.2*currShiftLength;
+    shiftVectors.push_back(currShift);
+  }
+
+  return shiftVectors;
+}
+
+void Slicer::InitTotalOrientedArea() {
+  m_orientedAreaTotal = 0.;
+  for (auto const& polygon: m_polygonsList) {
+    m_orientedAreaTotal += polygon.OrientedArea();
+  }
 }
