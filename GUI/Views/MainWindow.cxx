@@ -169,6 +169,6 @@ void MainWindow::SetModelsToTestController() {
 
 void MainWindow::GoToMap(bool p_moveToNextLevel) {
   if (p_moveToNextLevel) {
-    m_mapView->MoveToNextLevel();
+    //m_mapView->MoveToNextLevel();
   }
 }
