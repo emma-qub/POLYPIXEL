@@ -61,7 +61,7 @@ CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   addAction(m_removeAction);
 
   auto snapToGridAction = new QAction("Snap to grid", this);
-  snapToGridAction->setShortcut(QKeySequence("CTRL+I"));
+  snapToGridAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
   connect(snapToGridAction, &QAction::triggered, this, &CreateLevelScribblingView::SnappedToGrid);
   addAction(snapToGridAction);
 
@@ -345,6 +345,8 @@ void CreateLevelScribblingView::DrawPolygonFromCore(QStandardItem* p_polygonItem
 }
 
 void CreateLevelScribblingView::DrawObjectsFromModel() {
+  QColor controlPointColor("#333333");
+
   for (auto* objectModel: m_objectModelsList) {
     auto objectsList = objectModel->GetObjectsList();
     for (auto* object: objectsList) {
@@ -353,6 +355,10 @@ void CreateLevelScribblingView::DrawObjectsFromModel() {
       case Object::eTape: {
         auto tape = static_cast<Tape*>(object);
         scene()->addRect(tape->GetX(), tape->GetY(), tape->GetW(), tape->GetH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
+        for (auto const& controlPoint: tape->GetcontrolPointsList()) {
+          QPoint controlQPoint(static_cast<int>(controlPoint.GetX()), static_cast<int>(controlPoint.GetY()));
+          DrawPoint(controlQPoint, controlPointColor);
+        }
         break;
       } case Object::eOneWay: {
         auto oneWay = static_cast<OneWay*>(object);
@@ -713,6 +719,20 @@ void CreateLevelScribblingView::MouseMoveForTape(QMouseEvent* p_event) {
     auto y2 = qMax(m_objectStartPoint.y(), p_event->pos().y());
     Tape tape(x1, y1, x2-x1, y2-y1);
     model->SetObject(model->GetTapesList().size()-1, &tape);
+  } else  {
+    auto model = static_cast<TapeModel*>(m_objectModelsList.at(ObjectModel::eTapeModel));
+    auto nearestControlPointType = Tape::eNone;
+    for (auto tape: model->GetTapesList()) {
+      nearestControlPointType = tape->GetNearestControlPointType(ppxl::Point(p_event->pos().x(), p_event->pos().y()));
+      if (nearestControlPointType != Tape::eNone) {
+        qDebug() << nearestControlPointType << tape->GetControlPoint(nearestControlPointType);
+        setCursor(Qt::OpenHandCursor);
+        break;
+      }
+    }
+    if (nearestControlPointType == Tape::eNone) {
+      setCursor(Qt::ArrowCursor);
+    }
   }
 }
 

@@ -34,6 +34,35 @@ bool Tape::Crossing(ppxl::Segment const& p_line) const {
   return false;
 }
 
+std::vector<ppxl::Point> Tape::GetcontrolPointsList() const {
+  return {
+    ppxl::Point(m_x, m_y),
+    ppxl::Point(m_x + m_w/2.0, m_y),
+    ppxl::Point(m_x + m_w, m_y),
+    ppxl::Point(m_x + m_w, m_y + m_h/2.0),
+    ppxl::Point(m_x + m_w, m_y + m_h),
+    ppxl::Point(m_x + m_w/2.0, m_y + m_h),
+    ppxl::Point(m_x, m_y + m_h),
+    ppxl::Point(m_x, m_y + m_h/2.0),
+    ppxl::Point(m_x + m_w/2, m_y + m_h/2)
+  };
+}
+
+ppxl::Point Tape::GetControlPoint(Tape::ControlPointType p_type) const {
+  return GetcontrolPointsList().at(p_type);
+}
+
+Tape::ControlPointType Tape::GetNearestControlPointType(const ppxl::Point& p_point) const {
+  auto controlPointsList = GetcontrolPointsList();
+  for (unsigned int type = 0; type < eNone; ++type) {
+    auto const& controlPoint = controlPointsList.at(type);
+    if (ppxl::Point::Distance(p_point, controlPoint) < 5) {
+      return static_cast<ControlPointType>(type);
+    }
+  }
+  return eNone;
+}
+
 std::vector<ppxl::Point> Tape::GetTapeVertices() const {
   std::vector<ppxl::Point> tapeVertices({
     ppxl::Point(m_x, m_y),
