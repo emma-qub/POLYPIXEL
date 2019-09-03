@@ -119,11 +119,33 @@ void PortalModel::SetObject(int p_index, Object* p_object) {
   assert(p_object->GetObjectType() == Object::ePortal);
   auto newPortal = static_cast<Portal*>(p_object);
 
+  // Update Portal
   auto portal = m_portalsList.at(p_index);
   portal->SetIn(newPortal->GetIn());
   portal->SetOut(newPortal->GetOut());
 
-  /// UPDATE STANDARD ITEMS
+  // Update Portal Item
+  auto portalItem = m_objectsItem->child(p_index, 0);
+  auto inLine = portal->GetIn();
+  auto inItem = portalItem->child(0, 0);
+  inItem->child(0, 0)->setText(QString::number(inLine.GetA().GetX(), 'f', 0));
+  inItem->child(0, 1)->setText(QString::number(inLine.GetA().GetY(), 'f', 0));
+  inItem->child(0, 2)->setText(QString::number(inLine.GetB().GetX(), 'f', 0));
+  inItem->child(0, 3)->setText(QString::number(inLine.GetB().GetY(), 'f', 0));
+  auto normalIn = portal->GetNormalIn();
+  auto normalInItem = portalItem->child(1, 0);
+  normalInItem->child(0, 0)->setText(QString::number(normalIn.GetX(), 'f', 0));
+  normalInItem->child(0, 1)->setText(QString::number(normalIn.GetY(), 'f', 0));
+  auto outLine = portal->GetOut();
+  auto outItem = portalItem->child(2, 0);
+  outItem->child(0, 0)->setText(QString::number(outLine.GetA().GetX(), 'f', 0));
+  outItem->child(0, 1)->setText(QString::number(outLine.GetA().GetY(), 'f', 0));
+  outItem->child(0, 2)->setText(QString::number(outLine.GetB().GetX(), 'f', 0));
+  outItem->child(0, 3)->setText(QString::number(outLine.GetB().GetY(), 'f', 0));
+  auto normalOut = portal->GetNormalOut();
+  auto normalOutItem = portalItem->child(3, 0);
+  normalOutItem->child(0, 0)->setText(QString::number(normalOut.GetX(), 'f', 0));
+  normalOutItem->child(0, 1)->setText(QString::number(normalOut.GetY(), 'f', 0));
 }
 
 

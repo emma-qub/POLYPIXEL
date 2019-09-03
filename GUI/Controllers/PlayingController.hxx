@@ -10,14 +10,6 @@
 class PolygonModel;
 class ObjectModel;
 class PlayingView;
-class MirrorModel;
-class PortalModel;
-class CountdownModel;
-class DisposableModel;
-class SwitchModel;
-class TransferModel;
-class OneWayModel;
-class TapeModel;
 class Deviation;
 class Mutable;
 class Obstacle;

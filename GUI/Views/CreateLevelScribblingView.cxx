@@ -760,6 +760,10 @@ void CreateLevelScribblingView::MousePressForObject(QMouseEvent* p_event) {
       auto model = static_cast<OneWayModel*>(m_objectModelsList.at(ObjectModel::eOneWayModel));
       model->AddOneWay(OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
       break;
+    } case ePortalMode: {
+      auto model = static_cast<PortalModel*>(m_objectModelsList.at(ObjectModel::ePortalModel));
+      model->AddPortal(Portal(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0., m_objectStartPoint.x()+10, m_objectStartPoint.y(), 0.+10, 0.));
+      break;
     } default: {
       break;
     }
@@ -786,6 +790,12 @@ void CreateLevelScribblingView::MouseMoveForObject(QMouseEvent* p_event) {
       auto model = static_cast<OneWayModel*>(m_objectModelsList.at(ObjectModel::eOneWayModel));
       OneWay oneWay(ox, oy, nx, ny);
       model->SetObject(model->GetOneWaysList().size()-1, &oneWay);
+      break;
+    } case ePortalMode: {
+      auto model = static_cast<PortalModel*>(m_objectModelsList.at(ObjectModel::ePortalModel));
+      auto angle = ppxl::Vector::Angle(ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(ox+100, oy)), ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(nx, ny)))+(M_PI_4+M_PI_2)/3.;
+      Portal portal(ox, oy, nx, ny, ox+std::sin(angle)*20., oy+std::cos(angle)*20., nx+std::sin(angle)*20., ny+std::cos(angle)*20.);
+      model->SetObject(model->GetPortalsList().size()-1, &portal);
       break;
     } default: {
       break;
