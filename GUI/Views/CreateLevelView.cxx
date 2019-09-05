@@ -169,6 +169,11 @@ void CreateLevelView::ResetGameInfo() {
   m_toleranceSpinBox->setValue(10);
 }
 
+void CreateLevelView::ActivateSelectionTool() {
+  m_treeViewStackWidget->setCurrentWidget(m_polygonTreeView);
+  m_scribblingView->SetToolMode(CreateLevelScribblingView::eSelectionMode);
+}
+
 void CreateLevelView::ActivatePolygonTool() {
   m_treeViewStackWidget->setCurrentWidget(m_polygonTreeView);
   m_scribblingView->SetToolMode(CreateLevelScribblingView::ePolygonMode);

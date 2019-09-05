@@ -20,6 +20,10 @@ std::string OneWay::GetName() const {
   return "OneWay";
 }
 
+bool OneWay::Intersect(const ppxl::Point& p_point) const {
+  return m_line.PointIsOnSegment(p_point);
+}
+
 bool OneWay::Crossing(ppxl::Segment const& p_line) const {
   if (p_line.ComputeIntersection(m_line) == ppxl::Segment::Regular) {
     auto lineVector = ppxl::Vector::FromSegment(p_line);

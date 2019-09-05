@@ -64,6 +64,7 @@ private:
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;
 
+  QAction* m_selectAction;
   QAction* m_polygonAction;
   QAction* m_tapeAction;
   QAction* m_mirrorAction;

@@ -4,6 +4,7 @@
 #include "Obstacle.hxx"
 #include "Core/Geometry/Vector.hxx"
 #include "Core/Geometry/Point.hxx"
+#include "Core/Geometry/Segment.hxx"
 
 class OneWay: public Obstacle {
 
@@ -18,6 +19,7 @@ public:
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
   std::string GetName() const override;
+  bool Intersect(ppxl::Point const& p_point) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
 private:

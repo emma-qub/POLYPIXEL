@@ -4,6 +4,7 @@
 #include "Core/Geometry/Point.hxx"
 
 #include <string>
+#include <cfloat>
 
 namespace ppxl {
 
@@ -50,6 +51,8 @@ public:
   Intersection ComputeIntersection(Point const& P, Point const& Q) const;
   Intersection ComputeIntersection(Segment const& p_segment) const;
   static Point IntersectionPoint(Segment const& AB, Segment const& PQ);
+
+  bool PointIsOnSegment(Point const& C, double p_tolerence = DBL_EPSILON) const;
 
   void Translate(Vector const& p_direction);
   void Translate(double x, double y);

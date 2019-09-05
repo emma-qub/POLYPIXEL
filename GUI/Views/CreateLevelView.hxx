@@ -24,6 +24,7 @@ class CreateLevelView: public QWidget {
 
 public:
   enum Tool {
+    eSelectionTool,
     ePolygonTool,
     eTapeTool,
     eMirrorTool,
@@ -57,6 +58,7 @@ public:
 
   void SetTestAvailable(bool p_enable);
 
+  void ActivateSelectionTool();
   void ActivatePolygonTool();
   void ActivateTapeTool();
   void ActivateMirrorTool();

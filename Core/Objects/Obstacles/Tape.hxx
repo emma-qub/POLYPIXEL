@@ -37,6 +37,7 @@ public:
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
   std::string GetName() const override;
+  bool Intersect(ppxl::Point const& p_point) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
   std::vector<ppxl::Point> GetcontrolPointsList() const;

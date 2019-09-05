@@ -23,6 +23,10 @@ std::string Mirror::GetName() const {
   return "Mirror";
 }
 
+bool Mirror::Intersect(const ppxl::Point& p_point) const {
+  return m_line.PointIsOnSegment(p_point, 0.1);
+}
+
 std::vector<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) const {
   std::vector<ppxl::Segment> deviatedLines;
 

@@ -22,6 +22,12 @@ std::string Tape::GetName() const {
   return "Tape";
 }
 
+bool Tape::Intersect(const ppxl::Point& p_point) const
+{
+  return m_x <= p_point.GetX() && p_point.GetX() <= m_x+m_w
+      && m_y <= p_point.GetY() && p_point.GetY() <= m_y+m_h;
+}
+
 bool Tape::Crossing(ppxl::Segment const& p_line) const {
   auto edges = GetTapeEdges();
 

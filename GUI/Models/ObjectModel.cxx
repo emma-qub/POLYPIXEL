@@ -39,7 +39,9 @@ void MirrorModel::AddMirror(Mirror const& p_mirror) {
     << new QStandardItem(QString::number(line.GetA().GetY(), 'f', 0))
     << new QStandardItem(QString::number(line.GetB().GetX(), 'f', 0))
     << new QStandardItem(QString::number(line.GetB().GetY(), 'f', 0)));
+
   m_objectsItem->appendRow(QList<QStandardItem*>() << mirrorItem << new QStandardItem << new QStandardItem << new QStandardItem);
+  RegisterObject(mirror, mirrorItem);
 }
 
 void MirrorModel::SetObject(int p_index, Object* p_object) {
@@ -113,6 +115,7 @@ void PortalModel::AddPortal(Portal const& p_portal) {
   portalItem->appendRow(QList<QStandardItem*>() << exitNormalItem << new QStandardItem << new QStandardItem << new QStandardItem);
 
   m_objectsItem->appendRow(QList<QStandardItem*>() << portalItem << new QStandardItem << new QStandardItem << new QStandardItem);
+  RegisterObject(portal, portalItem);
 }
 
 void PortalModel::SetObject(int p_index, Object* p_object) {
@@ -159,20 +162,20 @@ CountdownModel::CountdownModel(QObject* p_parent):
 CountdownModel::~CountdownModel() = default;
 
 void CountdownModel::AddCountdown(Countdown const& p_countdown) {
-  auto countdown = new Countdown(p_countdown);
-  m_countdownsList << countdown;
-  AddObject(countdown);
+  //auto countdown = new Countdown(p_countdown);
+  //m_countdownsList << countdown;
+  //AddObject(countdown);
 
-  auto counter = p_countdown.GetCounter();
-  auto position = p_countdown.GetPosition();
+  //auto counter = p_countdown.GetCounter();
+  //auto position = p_countdown.GetPosition();
 
-  auto countdownItem = new QStandardItem(tr("%1 #%2").arg(p_countdown.GetName().c_str()).arg(m_countdownsList.size()));
-  countdownItem->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(counter))
-    << new QStandardItem(QString::number(position.GetX(), 'f', 0))
-    << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
+  //auto countdownItem = new QStandardItem(tr("%1 #%2").arg(p_countdown.GetName().c_str()).arg(m_countdownsList.size()));
+  //countdownItem->appendRow(QList<QStandardItem*>()
+  //  << new QStandardItem(QString::number(counter))
+  //  << new QStandardItem(QString::number(position.GetX(), 'f', 0))
+  //  << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
 
-  m_objectsItem->appendRow(QList<QStandardItem*>() << countdownItem << new QStandardItem << new QStandardItem);
+  //m_objectsItem->appendRow(QList<QStandardItem*>() << countdownItem << new QStandardItem << new QStandardItem);
 }
 
 void CountdownModel::SetObject(int p_index, Object* p_object) {
@@ -196,18 +199,18 @@ DisposableModel::DisposableModel(QObject* p_parent):
 DisposableModel::~DisposableModel() = default;
 
 void DisposableModel::AddDisposable(Disposable const& p_disposable) {
-  auto disposable = new Disposable(p_disposable);
-  m_disposablesList << disposable;
-  AddObject(disposable);
+  //auto disposable = new Disposable(p_disposable);
+  //m_disposablesList << disposable;
+  //AddObject(disposable);
 
-  auto position = p_disposable.GetPosition();
+  //auto position = p_disposable.GetPosition();
 
-  auto disposableItem = new QStandardItem(tr("%1 #%2").arg(p_disposable.GetName().c_str()).arg(m_disposablesList.size()));
-  disposableItem->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(position.GetX(), 'f', 0))
-    << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
+  //auto disposableItem = new QStandardItem(tr("%1 #%2").arg(p_disposable.GetName().c_str()).arg(m_disposablesList.size()));
+  //disposableItem->appendRow(QList<QStandardItem*>()
+  //  << new QStandardItem(QString::number(position.GetX(), 'f', 0))
+  //  << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
 
-  m_objectsItem->appendRow(QList<QStandardItem*>() << disposableItem << new QStandardItem);
+  //m_objectsItem->appendRow(QList<QStandardItem*>() << disposableItem << new QStandardItem);
 }
 
 void DisposableModel::SetObject(int p_index, Object* p_object) {
@@ -231,17 +234,17 @@ SwitchModel::SwitchModel(QObject* p_parent):
 SwitchModel::~SwitchModel() = default;
 
 void SwitchModel::AddSwitch(Switch const& p_switch) {
-  auto switche = new Switch(p_switch);
-  m_switchesList << switche;
-  AddObject(switche);
+  //auto switche = new Switch(p_switch);
+  //m_switchesList << switche;
+  //AddObject(switche);
 
-  auto position = p_switch.GetPosition();
-  auto switchItem = new QStandardItem(tr("%1 #%2").arg(p_switch.GetName().c_str()).arg(m_switchesList.size()));
-  switchItem->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(position.GetX(), 'f', 0))
-    << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
+  //auto position = p_switch.GetPosition();
+  //auto switchItem = new QStandardItem(tr("%1 #%2").arg(p_switch.GetName().c_str()).arg(m_switchesList.size()));
+  //switchItem->appendRow(QList<QStandardItem*>()
+  //  << new QStandardItem(QString::number(position.GetX(), 'f', 0))
+  //  << new QStandardItem(QString::number(position.GetY(), 'f', 0)));
 
-  m_objectsItem->appendRow(QList<QStandardItem*>() << switchItem << new QStandardItem);
+  //m_objectsItem->appendRow(QList<QStandardItem*>() << switchItem << new QStandardItem);
 }
 
 void SwitchModel::SetObject(int p_index, Object* p_object) {
@@ -265,27 +268,27 @@ TransferModel::TransferModel(QObject* p_parent):
 TransferModel::~TransferModel() = default;
 
 void TransferModel::AddTransfer(Transfer const& p_transfer) {
-  auto transfer = new Transfer(p_transfer);
-  m_transfersList << transfer;
-  AddObject(transfer);
+  //auto transfer = new Transfer(p_transfer);
+  //m_transfersList << transfer;
+  //AddObject(transfer);
 
-  auto position1 = p_transfer.GetPosition();
-  auto position1Item = new QStandardItem(tr("Position #1"));
-  position1Item->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(position1.GetX(), 'f', 0))
-    << new QStandardItem(QString::number(position1.GetY(), 'f', 0)));
+  //auto position1 = p_transfer.GetPosition();
+  //auto position1Item = new QStandardItem(tr("Position #1"));
+  //position1Item->appendRow(QList<QStandardItem*>()
+  //  << new QStandardItem(QString::number(position1.GetX(), 'f', 0))
+  //  << new QStandardItem(QString::number(position1.GetY(), 'f', 0)));
 
-  auto position2 = p_transfer.GetPosition2();
-  auto position2Item = new QStandardItem(tr("Position #2"));
-  position2Item->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(position2.GetX(), 'f', 0))
-    << new QStandardItem(QString::number(position2.GetY(), 'f', 0)));
+  //auto position2 = p_transfer.GetPosition2();
+  //auto position2Item = new QStandardItem(tr("Position #2"));
+  //position2Item->appendRow(QList<QStandardItem*>()
+  //  << new QStandardItem(QString::number(position2.GetX(), 'f', 0))
+  //  << new QStandardItem(QString::number(position2.GetY(), 'f', 0)));
 
-  auto transferItem = new QStandardItem(tr("%1 #%2").arg(p_transfer.GetName().c_str()).arg(m_transfersList.size()));
-  transferItem->appendRow(QList<QStandardItem*>() << position1Item << new QStandardItem);
-  transferItem->appendRow(QList<QStandardItem*>() << position2Item << new QStandardItem);
+  //auto transferItem = new QStandardItem(tr("%1 #%2").arg(p_transfer.GetName().c_str()).arg(m_transfersList.size()));
+  //transferItem->appendRow(QList<QStandardItem*>() << position1Item << new QStandardItem);
+  //transferItem->appendRow(QList<QStandardItem*>() << position2Item << new QStandardItem);
 
-  m_objectsItem->appendRow(QList<QStandardItem*>() << transferItem << new QStandardItem);
+  //m_objectsItem->appendRow(QList<QStandardItem*>() << transferItem << new QStandardItem);
 }
 
 void TransferModel::SetObject(int p_index, Object* p_object) {
@@ -335,6 +338,7 @@ void OneWayModel::AddOneWay(OneWay const& p_oneWay) {
   oneWayItem->appendRow(QList<QStandardItem*>() << directionItem << new QStandardItem << new QStandardItem << new QStandardItem);
 
   m_objectsItem->appendRow(QList<QStandardItem*>() << oneWayItem << new QStandardItem << new QStandardItem << new QStandardItem);
+  RegisterObject(oneWay, oneWayItem);
 }
 
 void OneWayModel::SetObject(int p_index, Object* p_object) {
@@ -386,6 +390,7 @@ void TapeModel::AddTape(Tape const& p_tape) {
     << new QStandardItem(QString::number(bottom, 'f', 0)));
 
   m_objectsItem->appendRow(QList<QStandardItem*>() << tapeItem << new QStandardItem << new QStandardItem << new QStandardItem);
+  RegisterObject(tape, tapeItem);
 }
 
 void TapeModel::SetObject(int p_index, Object* p_object) {

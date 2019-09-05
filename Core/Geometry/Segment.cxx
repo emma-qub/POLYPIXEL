@@ -236,6 +236,27 @@ Point Segment::IntersectionPoint(Segment const& AB, Segment const& PQ) {
   return Point(A + tAB);
 }
 
+bool Segment::PointIsOnSegment(const Point& C, double p_tolerence) const {
+  auto A = m_a;
+  auto B = m_b;
+
+  auto crossproduct = (C.GetY() - A.GetY()) * (B.GetX() - A.GetX()) - (C.GetX() - A.GetX()) * (B.GetY() - A.GetY());
+
+  // Compare with p_tolerence
+  if (std::abs(crossproduct) > p_tolerence)
+    return false;
+
+  auto dotproduct = (C.GetX() - A.GetX()) * (B.GetX() - A.GetX()) + (C.GetY() - A.GetY())*(B.GetY() - A.GetY());
+  if (dotproduct < 0)
+    return false;
+
+  auto squaredlengthba = (B.GetX() - A.GetX())*(B.GetX() - A.GetX()) + (B.GetY() - A.GetY())*(B.GetY() - A.GetY());
+  if (dotproduct > squaredlengthba)
+    return false;
+
+  return true;
+}
+
 bool operator==(Segment const& p_segment1, Segment const& p_segment2) {
   return (p_segment1.GetA() == p_segment2.GetA() && p_segment1.GetB() == p_segment2.GetB());
 }

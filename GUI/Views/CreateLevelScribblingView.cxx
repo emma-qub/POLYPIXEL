@@ -232,6 +232,7 @@ void CreateLevelScribblingView::DrawPolygonsFromCore() {
 
   for (int polygonRow = 0; polygonRow < m_polygonModel->rowCount(); ++polygonRow) {
     auto polygonItem = polygonsItem->child(polygonRow, 0);
+    qDebug() << polygonsItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
     auto polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
 
     if (currentPolygon == polygon) {
@@ -462,6 +463,9 @@ void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
     break;
   } case eTapeMode: {
     MouseMoveForTape(p_event);
+    break;
+  } case eSelectionMode: {
+    MouseMoveForSelection(p_event);
     break;
   } default: {
     MouseMoveForObject(p_event);
@@ -767,6 +771,40 @@ void CreateLevelScribblingView::MousePressForObject(QMouseEvent* p_event) {
     } default: {
       break;
     }
+    }
+  }
+}
+
+Object* CreateLevelScribblingView::FindObjectUnderCursor(QMouseEvent* p_event) const {
+  for (auto objectModel: m_objectModelsList) {
+    for (auto object: objectModel->GetObjectsList())
+    {
+      if (object->Intersect(ppxl::Point(p_event->pos().x(), p_event->pos().y()))) {
+        return object;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+void CreateLevelScribblingView::MouseMoveForSelection(QMouseEvent* p_event) {
+  auto objectUnderCursor = FindObjectUnderCursor(p_event);
+
+  for (auto objectModel: m_objectModelsList) {
+    for (auto object: objectModel->GetObjectsList()) {
+      ObjectModel::States itemState;
+      if (objectUnderCursor == nullptr) {
+        itemState = ObjectModel::eEnabled;
+      } else {
+        if (object == objectUnderCursor) {
+          itemState = ObjectModel::eHighlightUp;
+        } else {
+          itemState = ObjectModel::eHighlightDown;
+        }
+      }
+
+      objectModel->GetItemFromObject(object)->setData(itemState, ObjectModel::eStateRole);
     }
   }
 }

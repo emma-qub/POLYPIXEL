@@ -72,6 +72,11 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
 
   auto groupAction = new QActionGroup(m_toolbar);
 
+  m_selectAction = new QAction("S", groupAction);
+  m_toolbar->addAction(m_selectAction);
+  m_selectAction->setCheckable(true);
+  connect(m_selectAction, &QAction::triggered, m_view, &CreateLevelView::ActivateSelectionTool);
+
   m_polygonAction = new QAction("P", groupAction);
   m_toolbar->addAction(m_polygonAction);
   m_polygonAction->setCheckable(true);
@@ -104,7 +109,10 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
 
 void CreateLevelController::SelectTool(CreateLevelView::Tool p_tool) {
   switch(p_tool) {
-  case CreateLevelView::ePolygonTool: {
+  case CreateLevelView::eSelectionTool: {
+    m_selectAction->trigger();
+    break;
+  } case CreateLevelView::ePolygonTool: {
     m_polygonAction->trigger();
     break;
   } case CreateLevelView::eTapeTool: {

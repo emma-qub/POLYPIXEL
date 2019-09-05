@@ -16,6 +16,7 @@ class CreateLevelScribblingView: public AbstractScribblingView {
 
 public:
   enum ToolMode {
+    eSelectionMode,
     ePolygonMode,
     eTapeMode,
     eMirrorMode,
@@ -75,6 +76,9 @@ protected:
   void MousePressForObject(QMouseEvent* p_event);
   void MouseMoveForObject(QMouseEvent* p_event);
   void MouseReleaseForObject(QMouseEvent* p_event);
+
+  Object* FindObjectUnderCursor(QMouseEvent* p_event) const;
+  void MouseMoveForSelection(QMouseEvent* p_event);
 
   void GetDiscreteEnd(QMouseEvent* p_event, double& p_nx, double& p_ny);
 

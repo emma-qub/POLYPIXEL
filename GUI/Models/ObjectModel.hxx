@@ -17,6 +17,18 @@
 class ObjectModel: public QStandardItemModel {
 
 public:
+  enum States {
+    eSelected,
+    eEnabled,
+    eDisabled,
+    eHighlightUp,
+    eHighlightDown
+  };
+
+  enum ItemRoles {
+    eStateRole = Qt::UserRole+1
+  };
+
   enum ModelType {
     eTapeModel,
     eMirrorModel,
@@ -27,16 +39,20 @@ public:
   ObjectModel(const QString& ObjectName, QObject* p_parent = nullptr);
   ~ObjectModel() override;
 
-  QList<Object*> GetObjectsList() const { return m_objectsList; }
   virtual void SetObject(int p_index, Object* p_object) = 0;
+
+  inline QList<Object*> GetObjectsList() const { return m_objectsList; }
+  inline QStandardItem* GetItemFromObject(Object* p_object) const { return m_objectItemMap[p_object]; }
 
 protected:
   inline void AddObject(Object* p_object) { m_objectsList << p_object; }
+  inline void RegisterObject(Object* p_object, QStandardItem* p_item) { m_objectItemMap[p_object] = p_item; }
 
   QStandardItem* m_objectsItem;
 
 private:
   QList<Object*> m_objectsList;
+  QMap<Object*, QStandardItem*> m_objectItemMap;
 };
 
 class MirrorModel: public ObjectModel {

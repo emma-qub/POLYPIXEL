@@ -108,7 +108,7 @@ void AbstractScribblingView::DrawFromModel() {
   auto polygonItems = m_polygonModel->GetPolygonsItem();
   for (int polygonRow = 0; polygonRow < polygonItems->rowCount(); ++polygonRow) {
     auto polygonItem = polygonItems->child(polygonRow, 0);
-    m_penColor =  polygonItem->data(Qt::DecorationRole).value<QColor>();
+    m_penColor = polygonItem->data(Qt::DecorationRole).value<QColor>();
     m_pen.setColor(m_penColor);
     auto* polygon = polygonItem->data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
     QVector<QPointF> verticesList;
