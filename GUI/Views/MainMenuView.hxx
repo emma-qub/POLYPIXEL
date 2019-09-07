@@ -4,7 +4,7 @@
 #include <QWidget>
 
 class QLabel;
-class QPushButton;
+class QtMaterialContainedButton;
 
 class MainMenuView : public QWidget {
   Q_OBJECT
@@ -21,10 +21,9 @@ protected:
   void paintEvent(QPaintEvent* p_event) override;
 
 private:
-  QLabel* m_menuLabel;
-  QPushButton* m_worldsButton;
-  QPushButton* m_createLevelButton;
-  QPushButton* m_optionsButton;
+  QtMaterialContainedButton* m_worldsButton;
+  QtMaterialContainedButton* m_createLevelButton;
+  QtMaterialContainedButton* m_optionsButton;
 };
 
 #endif

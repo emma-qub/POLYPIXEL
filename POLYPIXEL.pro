@@ -34,6 +34,17 @@ SOURCES += \
     Core/Slicer.cxx \
     GUI/Commands/CreateLevelCommands.cxx \
     GUI/Commands/TestLevelCommands.cxx \
+    GUI/Components/lib/qtmaterialoverlaywidget.cpp \
+    GUI/Components/lib/qtmaterialrippleoverlay.cpp \
+    GUI/Components/lib/qtmaterialripple.cpp \
+    GUI/Components/lib/qtmaterialstatetransition.cpp \
+    GUI/Components/lib/qtmaterialstyle.cpp \
+    GUI/Components/lib/qtmaterialtheme.cpp \
+    GUI/Components/qtmaterialbutton.cpp \
+    GUI/Components/qtmaterialbutton_internal.cpp \
+    GUI/Components/qtmaterialcontainedbutton.cpp \
+    GUI/Components/qtmaterialoutlinedbutton.cpp \
+    GUI/Components/qtmaterialtextbutton.cpp \
     GUI/Controllers/CreateLevelController.cxx \
     GUI/Controllers/GameController.cxx \
     GUI/Controllers/PlayingController.cxx \
@@ -92,6 +103,24 @@ HEADERS += \
     Core/Slicer.hxx \
     GUI/Commands/CreateLevelCommands.hxx \
     GUI/Commands/TestLevelCommands.hxx \
+    GUI/Components/lib/qtmaterialoverlaywidget.h \
+    GUI/Components/lib/qtmaterialripple.h \
+    GUI/Components/lib/qtmaterialrippleoverlay.h \
+    GUI/Components/lib/qtmaterialstatetransition.h \
+    GUI/Components/lib/qtmaterialstatetransitionevent.h \
+    GUI/Components/lib/qtmaterialstyle.h \
+    GUI/Components/lib/qtmaterialstyle_p.h \
+    GUI/Components/lib/qtmaterialtheme.h \
+    GUI/Components/lib/qtmaterialtheme_p.h \
+    GUI/Components/qtmaterialbutton.h \
+    GUI/Components/qtmaterialbutton_internal.h \
+    GUI/Components/qtmaterialbutton_p.h \
+    GUI/Components/qtmaterialcontainedbutton.h \
+    GUI/Components/qtmaterialcontainedbutton_p.h \
+    GUI/Components/qtmaterialoutlinedbutton.h \
+    GUI/Components/qtmaterialoutlinedbutton_p.h \
+    GUI/Components/qtmaterialtextbutton.h \
+    GUI/Components/qtmaterialtextbutton_p.h \
     GUI/Controllers/CreateLevelController.hxx \
     GUI/Controllers/GameController.hxx \
     GUI/Controllers/PlayingController.hxx \

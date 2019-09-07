@@ -1,31 +1,46 @@
 #include "MainMenuView.hxx"
 
+#include "GUI/Components/qtmaterialcontainedbutton.h"
+
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QPushButton>
-
-
 
 #include <QPainter>
 #include <QStyleOption>
 
 
-
 MainMenuView::MainMenuView(QWidget* parent):
   QWidget(parent),
-  m_menuLabel(new QLabel("Menu")),
-  m_worldsButton(new QPushButton("Play")),
-  m_createLevelButton(new QPushButton("Create Level")),
-  m_optionsButton(new QPushButton("Options")) {
+  m_worldsButton(new QtMaterialContainedButton("Play")),
+  m_createLevelButton(new QtMaterialContainedButton("Create Level")),
+  m_optionsButton(new QtMaterialContainedButton("Options")) {
 
   auto mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(m_menuLabel);
-  m_menuLabel->setAlignment(Qt::AlignCenter);
-  mainLayout->addWidget(m_worldsButton);
-  mainLayout->addWidget(m_createLevelButton);
-  mainLayout->addWidget(m_optionsButton);
-  mainLayout->setAlignment(Qt::AlignCenter | Qt::AlignHCenter);
+  auto emptyLayout = new QVBoxLayout;
+  emptyLayout->addWidget(new QLabel);
+  auto buttonLayout = new QVBoxLayout;
+  buttonLayout->addWidget(m_worldsButton);
+  buttonLayout->addWidget(m_createLevelButton);
+  buttonLayout->addWidget(m_optionsButton);
+  buttonLayout->setAlignment(Qt::AlignCenter);
+  mainLayout->addLayout(emptyLayout);
+  mainLayout->addLayout(buttonLayout);
   setLayout(mainLayout);
+
+  auto buttonFont = m_worldsButton->font();
+  buttonFont.setWeight(100);
+  buttonFont.setPointSize(16);
+  auto buttonCornerRadius = 20;
+  auto buttonWidth = 450;
+  m_worldsButton->setCornerRadius(buttonCornerRadius);
+  m_worldsButton->setFixedWidth(buttonWidth);
+  m_worldsButton->setFont(buttonFont);
+  m_createLevelButton->setCornerRadius(buttonCornerRadius);
+  m_createLevelButton->setFixedWidth(buttonWidth);
+  m_createLevelButton->setFont(buttonFont);
+  m_optionsButton->setCornerRadius(buttonCornerRadius);
+  m_optionsButton->setFixedWidth(buttonWidth);
+  m_optionsButton->setFont(buttonFont);
 
   connect(m_worldsButton, &QPushButton::clicked, this, &MainMenuView::PlayRequested);
   connect(m_createLevelButton, &QPushButton::clicked, this, &MainMenuView::CreateLevelRequested);
