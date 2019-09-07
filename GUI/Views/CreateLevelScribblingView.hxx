@@ -49,6 +49,9 @@ signals:
   void SnappedToGrid();
   void NewLevelRequested();
   void OpenLevelRequested(QString const& p_fileName);
+  void MousePressed(QMouseEvent* p_event);
+  void MouseMoved(QMouseEvent* p_event);
+  void MouseReleased(QMouseEvent* p_event);
 
 protected:
   ppxl::Polygon* GetCurrentPolygon() const;
@@ -87,7 +90,7 @@ protected:
   void ConfirmOpenLevel();
 
 private:
-  QPixmap m_gripPixmap;
+  QPixmap m_gridPixmap;
   CreateLevelModel* m_polygonModel;
   QList<ObjectModel*> m_objectModelsList;
   QItemSelectionModel* m_selectionModel;

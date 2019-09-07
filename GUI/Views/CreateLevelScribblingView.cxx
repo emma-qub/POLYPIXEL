@@ -24,7 +24,7 @@ const QColor CreateLevelScribblingView::NOT_SELECTED_COLOR = QColor("#CCCCCC");
 
 CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   AbstractScribblingView(p_parent),
-  m_gripPixmap(),
+  m_gridPixmap(),
   m_polygonModel(nullptr),
   m_objectModelsList(),
   m_selectionModel(nullptr),
@@ -119,7 +119,7 @@ void CreateLevelScribblingView::InitView() {
     scene()->addLine(QLineF(xMin, j, xMax, j), thickPen);
   }
 
-  m_gripPixmap = grab(sceneRect().toRect());
+  m_gridPixmap = grab(sceneRect().toRect());
 
   scene()->clear();
   DrawGrid();
@@ -143,7 +143,7 @@ void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selecti
 }
 
 void CreateLevelScribblingView::DrawGrid() {
-  scene()->addPixmap(m_gripPixmap);
+  scene()->addPixmap(m_gridPixmap);
 }
 
 ppxl::Polygon* CreateLevelScribblingView::GetCurrentPolygon() const {
@@ -442,6 +442,9 @@ void CreateLevelScribblingView::DrawPoint(QPoint const& p_point, QColor const& p
 }
 
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
+  Q_EMIT MousePressed(p_event);
+  return;
+
   switch (m_toolMode) {
   case ePolygonMode: {
     MousePressForPolygon(p_event);
@@ -457,6 +460,9 @@ void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
 }
 
 void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
+  Q_EMIT MouseMoved(p_event);
+  return;
+
   switch (m_toolMode) {
   case ePolygonMode: {
     MouseMoveForPolygon(p_event);
@@ -475,6 +481,9 @@ void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
 }
 
 void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
+  Q_EMIT MouseReleased(p_event);
+  return;
+
   switch (m_toolMode) {
   case ePolygonMode: {
     MouseReleaseForPolygon(p_event);

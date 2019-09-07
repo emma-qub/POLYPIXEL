@@ -24,6 +24,8 @@ AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
   m_pen = (QPen(QBrush(QColor("#000000")), m_penWidth));
 }
 
+AbstractScribblingView::~AbstractScribblingView() = default;
+
 void AbstractScribblingView::InitView() {
   if (m_viewInitialized) {
     return;
@@ -171,5 +173,3 @@ void AbstractScribblingView::DrawLine(QPoint const& p_startPoint, QPoint const& 
   m_pen.setColor(p_color);
   m_scene->addLine(QLineF(p_startPoint, p_endPoint), m_pen);
 }
-
-AbstractScribblingView::~AbstractScribblingView() = default;
