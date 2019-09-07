@@ -14,6 +14,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 CONFIG += c++14
 
 SOURCES += \
+    GUI/Models/PolygonItem.cxx \
     main.cxx \
     Core/Geometry/Point.cxx \
     Core/Geometry/Polygon.cxx \
@@ -140,6 +141,7 @@ HEADERS += \
     GUI/Models/CreateLevelModel.hxx \
     GUI/Models/LineModel.hxx \
     GUI/Models/ObjectModel.hxx \
+    GUI/Models/PolygonItem.hxx \
     GUI/Models/PolygonModel.hxx \
     GUI/Views/AbstractScribblingView.hxx \
     GUI/Views/AchievementsView.hxx \

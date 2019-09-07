@@ -10,25 +10,22 @@
 #include <QAction>
 #include <QItemSelectionModel>
 #include <QToolBar>
+#include <QMouseEvent>
+
+#include <cmath>
 
 CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p_parent):
   QObject(p_parent),
-  m_polygonModel(new CreateLevelModel(this)),
+  m_model(new CreateLevelModel(this)),
   m_view(p_view),
   m_undoStack(new QUndoStack(this)),
-  m_toolbar(nullptr) {
+  m_toolbar(nullptr),
+  m_objectStartPoint(),
+  m_creatingObject(false),
+  m_editingObject(false) {
 
-  m_view->SetPolygonModel(m_polygonModel);
-  m_objectModelsList
-    << new TapeModel(this)
-    << new MirrorModel(this)
-    << new OneWayModel(this)
-    << new PortalModel(this);
-  m_view->SetObjectModelsList(m_objectModelsList);
-  connect(m_polygonModel, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
-  for (auto* objectModel: m_objectModelsList) {
-    connect(objectModel, &ObjectModel::dataChanged, m_view, &CreateLevelView::Redraw);
-  }
+  m_view->SetModel(m_model);
+  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
 
   m_view->SetUndoStack(m_undoStack);
 
@@ -39,12 +36,14 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
   connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
   connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
 
+  connect(m_view, &CreateLevelView::MousePressed, this, &CreateLevelController::MousePressEvent);
+  connect(m_view, &CreateLevelView::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
+  connect(m_view, &CreateLevelView::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
+
   connect(m_view, &CreateLevelView::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
   connect(m_view, &CreateLevelView::ValueYChanged, this, &CreateLevelController::UpdateYVertex);
   connect(m_view, &CreateLevelView::EditionXDone, this, &CreateLevelController::TranslateXVertex);
   connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
-
-  connect(m_view, &CreateLevelView::PolygonSelected, this, &CreateLevelController::Redraw);
 
   connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
   connect(m_view, &CreateLevelView::NewLevelRequested, this, &CreateLevelController::NewLevel);
@@ -75,60 +74,34 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   m_selectAction = new QAction("S", groupAction);
   m_toolbar->addAction(m_selectAction);
   m_selectAction->setCheckable(true);
-  connect(m_selectAction, &QAction::triggered, m_view, &CreateLevelView::ActivateSelectionTool);
+  connect(m_selectAction, &QAction::triggered, [this](){ m_toolMode = eSelectionMode; });
 
   m_polygonAction = new QAction("P", groupAction);
   m_toolbar->addAction(m_polygonAction);
   m_polygonAction->setCheckable(true);
-  connect(m_polygonAction, &QAction::triggered, m_view, &CreateLevelView::ActivatePolygonTool);
+  connect(m_polygonAction, &QAction::triggered, [this](){ m_toolMode = ePolygonMode; });
 
   m_tapeAction = new QAction("T", groupAction);
   m_toolbar->addAction(m_tapeAction);
   m_tapeAction->setCheckable(true);
-  connect(m_tapeAction, &QAction::triggered, m_view, &CreateLevelView::ActivateTapeTool);
+  connect(m_tapeAction, &QAction::triggered, [this](){ m_toolMode = eTapeMode; });
 
   m_mirrorAction = new QAction("M", groupAction);
   m_toolbar->addAction(m_mirrorAction);
   m_mirrorAction->setCheckable(true);
-  connect(m_mirrorAction, &QAction::triggered, m_view, &CreateLevelView::ActivateMirrorTool);
+  connect(m_mirrorAction, &QAction::triggered, [this](){ m_toolMode = eMirrorMode; });
 
   m_oneWayAction = new QAction("O", groupAction);
   m_toolbar->addAction(m_oneWayAction);
   m_oneWayAction->setCheckable(true);
-  connect(m_oneWayAction, &QAction::triggered, m_view, &CreateLevelView::ActivateOneWayTool);
+  connect(m_oneWayAction, &QAction::triggered, [this](){ m_toolMode = eOneWayMode; });
 
   m_portalAction = new QAction("R", groupAction);
   m_toolbar->addAction(m_portalAction);
   m_portalAction->setCheckable(true);
-  connect(m_portalAction, &QAction::triggered, m_view, &CreateLevelView::ActivatePortalTool);
+  connect(m_portalAction, &QAction::triggered, [this](){ m_toolMode = ePortalMode; });
 
-  connect(m_view, &CreateLevelView::ToolActivated, this, &CreateLevelController::SelectTool);
-
-  SelectTool(CreateLevelView::ePolygonTool);
-}
-
-void CreateLevelController::SelectTool(CreateLevelView::Tool p_tool) {
-  switch(p_tool) {
-  case CreateLevelView::eSelectionTool: {
-    m_selectAction->trigger();
-    break;
-  } case CreateLevelView::ePolygonTool: {
-    m_polygonAction->trigger();
-    break;
-  } case CreateLevelView::eTapeTool: {
-    m_tapeAction->trigger();
-    break;
-  } case CreateLevelView::eMirrorTool: {
-    m_mirrorAction->trigger();
-    break;
-  } case CreateLevelView::eOneWayTool: {
-    m_oneWayAction->trigger();
-    break;
-  } case CreateLevelView::ePortalTool: {
-    m_portalAction->trigger();
-    break;
-  }
-  }
+  m_polygonAction->trigger();
 }
 
 int CreateLevelController::GetLinesGoal() const {
@@ -148,7 +121,7 @@ int CreateLevelController::GetTolerance() const {
 }
 
 void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto* polygon = p_index.parent().data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
   auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
   vertex.SetX(p_value);
 
@@ -156,7 +129,7 @@ void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_inde
 }
 
 void CreateLevelController::UpdateYVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(PolygonModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto* polygon = p_index.parent().data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
   auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
   vertex.SetY(p_value);
 
@@ -178,7 +151,7 @@ void CreateLevelController::TranslateYVertex(int p_value, QModelIndex const& p_i
 void CreateLevelController::SnapToGrid() {
   auto currentIndex = m_view->GetSelectionModel()->currentIndex();
 
-  auto itemType = currentIndex.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>();
+  auto itemType = currentIndex.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
   switch(itemType) {
   case (CreateLevelModel::ePolygons): {
     currentIndex = QModelIndex();
@@ -201,7 +174,7 @@ void CreateLevelController::SnapToGrid() {
 }
 
 void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex) {
-  auto* polygonItem = m_polygonModel->itemFromIndex(p_currentIndex);
+  auto* polygonItem = m_model->itemFromIndex(p_currentIndex);
 
   for (int row = 0; row < polygonItem->rowCount(); ++row) {
     auto oldX = polygonItem->child(row, 1)->data(Qt::DisplayRole).toInt();
@@ -232,7 +205,7 @@ void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_curren
 
 void CreateLevelController::CheckTestAvailable() {
   // Check if a polygon has less than 3 vertices
-  for (auto* polygon: m_polygonModel->GetPolygonsList()) {
+  for (auto* polygon: m_model->GetPolygonsList()) {
     if (!polygon->HasEnoughVertices()) {
       m_view->SetTestAvailable(false);
       return;
@@ -240,7 +213,7 @@ void CreateLevelController::CheckTestAvailable() {
   }
 
   // Check polygon one by one
-  for (auto* polygon: m_polygonModel->GetPolygonsList()) {
+  for (auto* polygon: m_model->GetPolygonsList()) {
     if (!polygon->IsGoodPolygon()) {
       m_view->SetTestAvailable(false);
       return;
@@ -248,8 +221,8 @@ void CreateLevelController::CheckTestAvailable() {
   }
 
   // Check intersections between polygons
-  for (auto* polygon1: m_polygonModel->GetPolygonsList()) {
-    for (auto* polygon2: m_polygonModel->GetPolygonsList()) {
+  for (auto* polygon1: m_model->GetPolygonsList()) {
+    for (auto* polygon2: m_model->GetPolygonsList()) {
       if (polygon1 == polygon2) {
         continue;
       }
@@ -265,9 +238,187 @@ void CreateLevelController::CheckTestAvailable() {
   m_view->SetTestAvailable(true);
 }
 
+void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
+  m_objectStartPoint = p_event->pos();
+
+  switch(m_toolMode) {
+  case eSelectionMode: {
+    SelectObjectUnderCursor(p_event->pos());
+    break;
+  }
+  case ePolygonMode: {
+    break;
+  }
+  case eTapeMode:
+  case eMirrorMode:
+  case eOneWayMode:
+  case ePortalMode: {
+    m_creatingObject = true;
+    CreateObect();
+    break;
+  }
+  }
+}
+
+void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
+  switch(m_toolMode) {
+  case eSelectionMode: {
+    HighlightObjectUnderCursor(p_event->pos());
+    break;
+  }
+  case ePolygonMode: {
+    break;
+  }
+  case eTapeMode:
+  case eMirrorMode:
+  case eOneWayMode:
+  case ePortalMode: {
+    MoveObject(p_event->pos());
+    break;
+  }
+  }
+}
+
+void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
+  switch(m_toolMode) {
+  case ePolygonMode: {
+    break;
+  }
+  case eTapeMode:
+  case eMirrorMode:
+  case eOneWayMode:
+  case ePortalMode: {
+    m_creatingObject = false;
+    m_objectStartPoint = QPoint();
+    break;
+  }
+  default:
+    break;
+  }
+}
+
+void CreateLevelController::SelectObjectUnderCursor(const QPoint& p_pos) {
+
+}
+
+void CreateLevelController::CreateObect() {
+  switch(m_toolMode) {
+  case eTapeMode: {
+    m_model->AddTape(Tape(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    break;
+  }
+  case eMirrorMode: {
+    m_model->AddMirror(Mirror(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    break;
+  }
+  case eOneWayMode: {
+    m_model->AddOneWay(OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    break;
+  }
+  case ePortalMode: {
+    m_model->AddPortal(Portal(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0., m_objectStartPoint.x()+10, m_objectStartPoint.y(), 0.+10, 0.));
+    break;
+  }
+  default:
+    break;
+  }
+}
+
+void CreateLevelController::MoveObject(const QPoint& p_pos) {
+  if (m_creatingObject) {
+    double nx;
+    double ny;
+    double ox = m_objectStartPoint.x();
+    double oy = m_objectStartPoint.y();
+
+    GetDiscreteEnd(p_pos, nx, ny);
+
+    switch(m_toolMode) {
+    case eTapeMode: {
+      auto x1 = qMin(m_objectStartPoint.x(), p_pos.x());
+      auto y1 = qMin(m_objectStartPoint.y(), p_pos.y());
+      auto x2 = qMax(m_objectStartPoint.x(), p_pos.x());
+      auto y2 = qMax(m_objectStartPoint.y(), p_pos.y());
+      Tape tape(x1, y1, x2-x1, y2-y1);
+      m_model->SetTape(m_model->GetTapesList().size()-1, &tape);
+      break;
+    }
+    case eMirrorMode: {
+      Mirror mirror(ox, oy, nx, ny);
+      m_model->SetMirror(m_model->GetMirrorsList().size()-1, &mirror);
+      break;
+    }
+    case eOneWayMode: {
+      OneWay oneWay(ox, oy, nx, ny);
+      m_model->SetOneWay(m_model->GetOneWaysList().size()-1, &oneWay);
+      break;
+    }
+    case ePortalMode: {
+      auto angle = ppxl::Vector::Angle(ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(ox+100, oy)), ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(nx, ny)))+(M_PI_4+M_PI_2)/3.;
+      Portal portal(ox, oy, nx, ny, ox+std::sin(angle)*20., oy+std::cos(angle)*20., nx+std::sin(angle)*20., ny+std::cos(angle)*20.);
+      m_model->SetPortal(m_model->GetPortalsList().size()-1, &portal);
+      break;
+    }
+    default:
+      break;
+    }
+  }
+}
+
+void CreateLevelController::GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny) {
+  auto ox = static_cast<double>(m_objectStartPoint.x());
+  auto oy = static_cast<double>(m_objectStartPoint.y());
+  auto px = static_cast<double>(p_pos.x());
+  auto py = static_cast<double>(p_pos.y());
+  auto radius = ppxl::Point::Distance(ppxl::Point(ox, oy), ppxl::Point(px, py));
+
+  p_nx = 2.*m_view->GetSceneRectWidth();
+  p_ny = 2.*m_view->GetSceneRectHeight();
+  double minDist = -1;
+  for (int k = 0; k < 24; ++k) {
+    auto dk = static_cast<double>(k);
+    auto dx = radius*std::cos(dk*M_PI/12.)+ox;
+    auto dy = radius*std::sin(dk*M_PI/12.)+oy;
+
+    auto dist = ppxl::Point::Distance(ppxl::Point(px, py), ppxl::Point(dx, dy));
+    if (minDist < 0 || dist < minDist) {
+      p_nx = dx;
+      p_ny = dy;
+      minDist = dist;
+    }
+  }
+}
+
+void CreateLevelController::HighlightObjectUnderCursor(const QPoint& p_pos) {
+  Object* objectUnderCursor = nullptr;
+  for (auto object: m_model->GetObjectsList()) {
+    if (object->Intersect(ppxl::Point(p_pos.x(), p_pos.y()))) {
+      objectUnderCursor = object;
+      break;
+    }
+  }
+
+  if (objectUnderCursor) {
+    for (auto object: m_model->GetObjectsList()) {
+      ObjectModel::States itemState;
+      if (objectUnderCursor == nullptr) {
+        itemState = ObjectModel::eEnabled;
+      } else {
+        if (object == objectUnderCursor) {
+          itemState = ObjectModel::eHighlightUp;
+        } else {
+          itemState = ObjectModel::eHighlightDown;
+        }
+      }
+
+      m_model->GetItemFromObject(object)->setData(itemState, ObjectModel::eStateRole);
+    }
+  }
+}
+
 void CreateLevelController::NewLevel() {
   m_undoStack->clear();
-  m_polygonModel->ClearPolygons();
+  m_model->ClearPolygons();
   m_view->ResetGameInfo();
   Redraw();
 }
@@ -280,7 +431,7 @@ void CreateLevelController::OpenLevel(const QString& p_fileName) {
   m_view->SetPartsGoal(parser.GetPartsGoal());
   m_view->SetMaxGapToWin(parser.GetMaxGapToWin());
   m_view->SetTolerance(parser.GetTolerance());
-  m_polygonModel->SetPolygonsList(parser.GetPolygonsList());
+  m_model->SetPolygonsList(parser.GetPolygonsList());
 
   Redraw();
 }
@@ -297,19 +448,19 @@ void CreateLevelController::Redraw() {
 
 void CreateLevelController::UndoRedo() {
   auto selectionModel = m_view->GetSelectionModel();
-  auto selection = m_polygonModel->GetSelection();
+  auto selection = m_model->GetSelection();
   auto polygonRow = selection.last().first;
   auto vertexRow = selection.last().second;
 
-  auto polygonsIndex = m_polygonModel->index(0, 0);
+  auto polygonsIndex = m_model->index(0, 0);
   if (polygonRow == -1 && vertexRow == -1) {
     selectionModel->setCurrentIndex(polygonsIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
   } else {
-    auto polygonIndex = m_polygonModel->index(polygonRow, 0, polygonsIndex);
+    auto polygonIndex = m_model->index(polygonRow, 0, polygonsIndex);
     if (vertexRow == -1) {
       selectionModel->setCurrentIndex(polygonIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     } else {
-      auto vertexIndex = m_polygonModel->index(vertexRow, 0, polygonIndex);
+      auto vertexIndex = m_model->index(vertexRow, 0, polygonIndex);
       selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
   }
@@ -317,60 +468,60 @@ void CreateLevelController::UndoRedo() {
 }
 
 void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
-  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
+  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
   m_undoStack->push(addPolygonCommand);
 }
 
 void CreateLevelController::AppendPolygon(ppxl::Polygon const& p_polygon) {
-  InsertPolygon(m_polygonModel->rowCount(), p_polygon);
+  InsertPolygon(m_model->rowCount(), p_polygon);
 }
 
 void CreateLevelController::RemovePolygon(int p_polygonRow) {
   int newPolygonRow = p_polygonRow;
-  if (m_polygonModel->rowCount() == 0) {
+  if (m_model->rowCount() == 0) {
     newPolygonRow = -1;
   } else {
-    if (p_polygonRow == m_polygonModel->rowCount()-1) {
+    if (p_polygonRow == m_model->rowCount()-1) {
       newPolygonRow = p_polygonRow-1;
     }
   }
 
-  auto* polygon = m_polygonModel->GetPolygonsList().at(p_polygonRow);
+  auto* polygon = m_model->GetPolygonsList().at(p_polygonRow);
 
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
+  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
   m_undoStack->push(removePolygonCommand);
 }
 
 void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
+    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
     m_undoStack->push(movePolygonCommand);
   } else {
-    m_polygonModel->TranslatePolygon(p_polygonRow, p_direction);
+    m_model->TranslatePolygon(p_polygonRow, p_direction);
   }
 }
 
 void CreateLevelController::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* addVertexCommand = new AddVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
+  QUndoCommand* addVertexCommand = new AddVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
   m_undoStack->push(addVertexCommand);
 }
 
 void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_vertex) {
-  InsertVertex(p_polygonRow, m_polygonModel->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
+  InsertVertex(p_polygonRow, m_model->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
 }
 
 void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow) {
-  auto const& vertex = m_polygonModel->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
+  auto const& vertex = m_model->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
 
-  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
+  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
   m_undoStack->push(removeVertexCommand);
 }
 
 void CreateLevelController::MoveVertex(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack) {
   if (p_pushToStack) {
-    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_polygonModel, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
+    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
     m_undoStack->push(moverVertexCommand);
   } else {
-    m_polygonModel->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
+    m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
   }
 }

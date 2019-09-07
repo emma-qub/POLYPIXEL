@@ -12,18 +12,27 @@ class ObjectModel;
 class QUndoStack;
 class QStandardItem;
 class QToolBar;
+class QMouseEvent;
 
 class CreateLevelController: public QObject {
   Q_OBJECT
 
 public:
+  enum ToolMode {
+    eSelectionMode,
+    ePolygonMode,
+    eTapeMode,
+    eMirrorMode,
+    eOneWayMode,
+    ePortalMode
+  };
+
   explicit CreateLevelController(CreateLevelView* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
 
   void SetToolBar(QToolBar* p_toolbar);
 
-  inline CreateLevelModel* GetPolygonModel() const { return m_polygonModel; }
-  inline QList<ObjectModel*> GetObjectModelsList() const { return m_objectModelsList; }
+  inline CreateLevelModel* GetPolygonModel() const { return m_model; }
   int GetLinesGoal() const;
   int GetPartsGoal() const;
   int GetMaxGapToWin() const;
@@ -52,17 +61,26 @@ protected:
   void SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex);
   void CheckTestAvailable();
 
+  void MousePressEvent(QMouseEvent* p_event);
+  void MouseMoveEvent(QMouseEvent* p_event);
+  void MouseReleaseEvent(QMouseEvent* p_event);
+
+  void SelectObjectUnderCursor(QPoint const& p_pos);
+  void CreateObect();
+  void MoveObject(QPoint const& p_pos);
+  void GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny);
+  void HighlightObjectUnderCursor(QPoint const& p_pos);
+
   void NewLevel();
   void OpenLevel(QString const& p_fileName);
 
-  void SelectTool(CreateLevelView::Tool p_tool);
-
 private:
-  CreateLevelModel* m_polygonModel;
-  QList<ObjectModel*> m_objectModelsList;
+  CreateLevelModel* m_model;
   CreateLevelView* m_view;
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;
+
+  ToolMode m_toolMode;
 
   QAction* m_selectAction;
   QAction* m_polygonAction;
@@ -70,6 +88,10 @@ private:
   QAction* m_mirrorAction;
   QAction* m_oneWayAction;
   QAction* m_portalAction;
+
+  QPoint m_objectStartPoint;
+  bool m_creatingObject;
+  bool m_editingObject;
 };
 
 #endif

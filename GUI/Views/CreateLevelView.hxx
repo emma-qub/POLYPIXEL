@@ -23,7 +23,7 @@ class CreateLevelView: public QWidget {
   Q_OBJECT
 
 public:
-  enum Tool {
+  enum ToolMode {
     eSelectionTool,
     ePolygonTool,
     eTapeTool,
@@ -46,8 +46,7 @@ public:
   void SetTolerance(int p_value);
   void ResetGameInfo();
 
-  void SetPolygonModel(CreateLevelModel* p_polygonModel);
-  void SetObjectModelsList(const QList<ObjectModel*>& p_objectModelsList);
+  void SetModel(CreateLevelModel* p_model);
   void SetUndoStack(QUndoStack* p_undoStack);
   QItemSelectionModel* GetSelectionModel() const;
 
@@ -58,12 +57,8 @@ public:
 
   void SetTestAvailable(bool p_enable);
 
-  void ActivateSelectionTool();
-  void ActivatePolygonTool();
-  void ActivateTapeTool();
-  void ActivateMirrorTool();
-  void ActivateOneWayTool();
-  void ActivatePortalTool();
+  qreal GetSceneRectWidth() const;
+  qreal GetSceneRectHeight() const;
 
 signals:
   void TestLevelRequested();
@@ -82,7 +77,10 @@ signals:
   void SnappedToGrid();
   void NewLevelRequested();
   void OpenLevelRequested(QString const& p_fileName);
-  void ToolActivated(Tool p_tool);
+  void ToolActivated(ToolMode p_tool);
+  void MousePressed(QMouseEvent* p_event);
+  void MouseMoved(QMouseEvent* p_event);
+  void MouseReleased(QMouseEvent* p_event);
 
 protected:
   void UpdateMaxGapToWinPrefix(int p_value);
@@ -92,12 +90,9 @@ private:
   QLabel* m_createLevelLabel;
   QPushButton* m_testLevelButton;
   QPushButton* m_menuButton;
-  CreateLevelModel* m_polygonModel;
-  QList<ObjectModel*> m_objectModelsList;
+  CreateLevelModel* m_model;
   CreateLevelScribblingView* m_scribblingView;
-  QTreeView* m_polygonTreeView;
-  QTreeView* m_objectsTreeView;
-  QStackedWidget* m_treeViewStackWidget;
+  QTreeView* m_treeView;
   QUndoView* m_undoView;
   QSpinBox* m_linesGoalSpinBox;
   QSpinBox* m_partsGoalSpinBox;

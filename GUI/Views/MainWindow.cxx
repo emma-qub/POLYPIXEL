@@ -13,7 +13,7 @@
 #include "MapView.hxx"
 
 #include "GUI/Models/CreateLevelModel.hxx"
-#include "GUI/Models/PolygonModel.hxx"
+//#include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/LevelsModel.hxx"
 #include "GUI/Models/WorldsModel.hxx"
 
@@ -162,8 +162,8 @@ void MainWindow::SetModelsToTestController() {
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
   m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
   m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
-  m_testLevelController->SetPolygonModel(m_createLevelController->GetPolygonModel());
-  m_testLevelController->SetObjectModelsList(m_createLevelController->GetObjectModelsList());
+  //m_testLevelController->SetPolygonModel(m_createLevelController->GetPolygonModel());
+  //m_testLevelController->SetObjectModelsList(m_createLevelController->GetObjectModelsList());
   m_testLevelController->PlayLevel();
 }
 

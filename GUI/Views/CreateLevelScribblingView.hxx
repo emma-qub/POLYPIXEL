@@ -15,29 +15,21 @@ class CreateLevelScribblingView: public AbstractScribblingView {
   Q_OBJECT
 
 public:
-  enum ToolMode {
-    eSelectionMode,
-    ePolygonMode,
-    eTapeMode,
-    eMirrorMode,
-    eOneWayMode,
-    ePortalMode
-  };
-
   CreateLevelScribblingView(QWidget* parent = nullptr);
   ~CreateLevelScribblingView() override;
 
   void InitView() override;
 
-  void SetPolygonModel(PolygonModel* p_model) override;
+  void SetModel(CreateLevelModel* p_model);
   void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
   void SetSelectionModel(QItemSelectionModel* p_selectionModel);
-
-  inline void SetToolMode(ToolMode p_toolMode) { m_toolMode = p_toolMode; }
 
   void DrawGrid();
   void DrawFromModel() override;
   void DrawFromCore();
+
+  qreal GetSceneRectWidth() const;
+  qreal GetSceneRectHeight() const;
 
 signals:
   void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);
@@ -91,10 +83,8 @@ protected:
 
 private:
   QPixmap m_gridPixmap;
-  CreateLevelModel* m_polygonModel;
-  QList<ObjectModel*> m_objectModelsList;
+  CreateLevelModel* m_model;
   QItemSelectionModel* m_selectionModel;
-  ToolMode m_toolMode;
   bool m_viewInitialized;
   bool m_isStuck;
   bool m_nextToVertex;
