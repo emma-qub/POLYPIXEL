@@ -22,7 +22,10 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
   m_objectStartPoint(),
   m_creatingObject(false),
   m_editingObject(false),
-  hoveredItem(nullptr) {
+  m_mousePressed(false),
+  m_nearControlPoint(false),
+  m_hoveredItem(nullptr),
+  m_selectedItem(nullptr) {
 
   m_view->SetModel(m_model);
   connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
@@ -74,7 +77,13 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   m_selectAction = new QAction("S", groupAction);
   m_toolbar->addAction(m_selectAction);
   m_selectAction->setCheckable(true);
-  connect(m_selectAction, &QAction::triggered, [this](){ m_toolMode = eSelectionMode; });
+  connect(m_selectAction, &QAction::toggled, [this](bool p_checked){
+    m_toolMode = eSelectionMode;
+    if (p_checked) {
+      m_hoveredItem = nullptr;
+      m_selectedItem = nullptr;
+    }
+  });
 
   m_polygonAction = new QAction("P", groupAction);
   m_toolbar->addAction(m_polygonAction);
@@ -244,10 +253,13 @@ void CreateLevelController::CheckTestAvailable() {
 
 void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
   m_objectStartPoint = p_event->pos();
+  m_mousePressed = true;
 
   switch(m_toolMode) {
   case eSelectionMode: {
     SelectObjectUnderCursor();
+    m_selectedItem = m_hoveredItem;
+    m_hoveredItem = nullptr;
     break;
   }
   case ePolygonMode: {
@@ -257,8 +269,15 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
   case eMirrorMode:
   case eOneWayMode:
   case ePortalMode: {
-    m_creatingObject = true;
-    CreateObect();
+    if (m_nearControlPoint) {
+      m_editingObject = true;
+      m_creatingObject = false;
+    } else {
+      m_editingObject = false;
+      m_creatingObject = true;
+      CreateObect();
+    }
+
     break;
   }
   }
@@ -267,7 +286,9 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
 void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
   switch(m_toolMode) {
   case eSelectionMode: {
-    HighlightObjectUnderCursor(p_event->pos());
+    if (m_mousePressed == false) {
+      HighlightObjectUnderCursor(p_event->pos());
+    }
     break;
   }
   case ePolygonMode: {
@@ -277,13 +298,29 @@ void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
   case eMirrorMode:
   case eOneWayMode:
   case ePortalMode: {
-    MoveObject(p_event->pos());
+    if (m_mousePressed) {
+      if (m_creatingObject) {
+        MoveNewObject(p_event->pos());
+      } else {
+        MoveExistingObject(p_event->pos());
+      }
+    } else if (m_selectedItem) {
+      bool nearControlPoint = false;
+      QPoint nearestControlPoint;
+      FindNearestControlPoint(nearControlPoint, nearestControlPoint, p_event->pos());
+      if (nearControlPoint) {
+        m_nearControlPoint = true;
+      }
+    }
     break;
   }
   }
 }
 
 void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
+  m_objectStartPoint = QPoint();
+  m_mousePressed = false;
+
   switch(m_toolMode) {
   case ePolygonMode: {
     break;
@@ -293,7 +330,7 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
   case eOneWayMode:
   case ePortalMode: {
     m_creatingObject = false;
-    m_objectStartPoint = QPoint();
+    m_editingObject = false;
     break;
   }
   default:
@@ -301,20 +338,25 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
   }
 }
 
+void CreateLevelController::FindNearestControlPoint(bool& nearControlPoint, QPoint& nearestControlPoint, QPoint const& p_pos) const {
+  auto object = m_selectedItem->data(CreateLevelModel::eGraphicsItemRole).value<GraphicsObjectItem*>();
+  qDebug() << object->GetControlPoints();
+}
+
 void CreateLevelController::SelectObjectUnderCursor() {
-  if (hoveredItem) {
+  if (m_hoveredItem) {
     for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
       auto objectListIndex = m_model->index(objectsListRow, 0);
       for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
         auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
         auto item = m_model->itemFromIndex(objectIndex);
-        if (item == hoveredItem) {
+        if (item == m_hoveredItem) {
           item->setData(CreateLevelModel::eSelected, CreateLevelModel::eStateRole);
           auto selectionModel = m_view->GetSelectionModel();
           selectionModel->setCurrentIndex(item->index(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
           m_objectTypeAction[item->data(CreateLevelModel::eObjectTypeRole).value<CreateLevelModel::ObjectType>()]->trigger();
         } else {
-          item->setData(CreateLevelModel::eEnabled, CreateLevelModel::eStateRole);
+          item->setData(CreateLevelModel::eDisabled, CreateLevelModel::eStateRole);
         }
       }
     }
@@ -324,19 +366,25 @@ void CreateLevelController::SelectObjectUnderCursor() {
 void CreateLevelController::CreateObect() {
   switch(m_toolMode) {
   case eTapeMode: {
-    m_model->AddTape(Tape(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    auto item = m_model->AddTape(Tape(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    m_view->CreateObjectFromItem(item);
     break;
   }
   case eMirrorMode: {
-    m_model->AddMirror(Mirror(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    auto item = m_model->AddMirror(Mirror(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y()));
+    m_view->CreateObjectFromItem(item);
     break;
   }
   case eOneWayMode: {
-    m_model->AddOneWay(OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
+    auto item = m_model->AddOneWay(OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y()));
+    m_view->CreateObjectFromItem(item);
     break;
   }
   case ePortalMode: {
-    m_model->AddPortal(Portal(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0., m_objectStartPoint.x()+10, m_objectStartPoint.y(), 0.+10, 0.));
+    auto item = m_model->AddPortal(Portal(
+      m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y(),
+      m_objectStartPoint.x()+10, m_objectStartPoint.y(), m_objectStartPoint.x()+10, m_objectStartPoint.y()));
+    m_view->CreateObjectFromItem(item);
     break;
   }
   default:
@@ -344,7 +392,7 @@ void CreateLevelController::CreateObect() {
   }
 }
 
-void CreateLevelController::MoveObject(const QPoint& p_pos) {
+void CreateLevelController::MoveNewObject(const QPoint& p_pos) {
   if (m_creatingObject) {
     double nx;
     double ny;
@@ -382,6 +430,12 @@ void CreateLevelController::MoveObject(const QPoint& p_pos) {
     default:
       break;
     }
+  }
+}
+
+void CreateLevelController::MoveExistingObject(const QPoint& p_pos) {
+  if (m_editingObject) {
+
   }
 }
 
@@ -430,11 +484,11 @@ void CreateLevelController::HighlightObjectUnderCursor(const QPoint& p_pos) {
       if (object != nullptr) {
         if (objectUnderCursor == nullptr) {
           item->setData(ObjectModel::eEnabled, CreateLevelModel::eStateRole);
-          hoveredItem = nullptr;
+          m_hoveredItem = nullptr;
         } else {
           if (object == objectUnderCursor) {
             item->setData(ObjectModel::eHighlightUp, CreateLevelModel::eStateRole);
-            hoveredItem = item;
+            m_hoveredItem = item;
           } else {
             item->setData(ObjectModel::eHighlightDown, CreateLevelModel::eStateRole);
           }

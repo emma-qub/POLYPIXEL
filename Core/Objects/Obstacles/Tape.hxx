@@ -6,19 +6,6 @@
 class Tape: public Obstacle {
 
 public:
-  enum ControlPointType {
-    eTopLeft,
-    eTop,
-    eTopRight,
-    eRight,
-    eBottomRight,
-    eBottom,
-    eBottomLeft,
-    eLeft,
-    eMiddle,
-    eNone
-  };
-
   Tape(double p_x, double p_y, double p_w, double p_h);
   ~Tape() override;
 
@@ -44,10 +31,6 @@ public:
   std::string GetName() const override;
   bool Intersect(ppxl::Point const& p_point, double p_tolerence = DBL_EPSILON) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
-
-  std::vector<ppxl::Point> GetcontrolPointsList() const;
-  ppxl::Point GetControlPoint(ControlPointType p_type) const;
-  ControlPointType GetNearestControlPointType(ppxl::Point const& p_point) const;
 
 protected:
   std::vector<ppxl::Point> GetTapeVertices() const;

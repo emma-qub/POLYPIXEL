@@ -234,7 +234,6 @@ void CreateLevelScribblingView::DrawPolygonsFromCore() {
 
   for (int polygonRow = 0; polygonRow < m_model->rowCount(); ++polygonRow) {
     auto polygonItem = polygonsItem->child(polygonRow, 0);
-    qDebug() << polygonsItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
     auto polygon = polygonItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
 
     if (currentPolygon == polygon) {
@@ -347,6 +346,38 @@ void CreateLevelScribblingView::DrawPolygonFromCore(QStandardItem* p_polygonItem
   }
 }
 
+void CreateLevelScribblingView::CreateObjectFromItem(QStandardItem* p_item) {
+  auto object = p_item->data(CreateLevelModel::eObjectRole).value<Object*>();
+  if (object != nullptr) {
+    auto objectType = object->GetObjectType();
+    switch (objectType) {
+    case Object::eTape: {
+      auto newGraphicsItem = new GraphicsTapeItem(p_item);
+      scene()->addItem(newGraphicsItem);
+      p_item->setData(QVariant::fromValue<GraphicsObjectItem*>(newGraphicsItem), CreateLevelModel::eGraphicsItemRole);
+      break;
+    } case Object::eMirror: {
+      auto newGraphicsItem = new GraphicsMirrorItem(p_item);
+      scene()->addItem(newGraphicsItem);
+      p_item->setData(QVariant::fromValue<GraphicsObjectItem*>(newGraphicsItem), CreateLevelModel::eGraphicsItemRole);
+      break;
+    } case Object::eOneWay: {
+      auto newGraphicsItem = new GraphicsOneWayItem(p_item);
+      scene()->addItem(newGraphicsItem);
+      p_item->setData(QVariant::fromValue<GraphicsObjectItem*>(newGraphicsItem), CreateLevelModel::eGraphicsItemRole);
+      break;
+    } case Object::ePortal: {
+      auto newGraphicsItem = new GraphicsPortalItem(p_item);
+      scene()->addItem(newGraphicsItem);
+      p_item->setData(QVariant::fromValue<GraphicsObjectItem*>(newGraphicsItem), CreateLevelModel::eGraphicsItemRole);
+      break;
+    } default: {
+      break;
+    }
+    }
+  }
+}
+
 void CreateLevelScribblingView::DrawObjectsFromModel() {
   QColor controlPointColor("#333333");
 
@@ -361,32 +392,9 @@ void CreateLevelScribblingView::DrawObjectsFromModel() {
         tr("This item %1 has no object").arg(item->text()).toStdString().c_str());
 
       auto object = item->data(CreateLevelModel::eObjectRole).value<Object*>();
+      auto objectItem = item->data(CreateLevelModel::eGraphicsItemRole).value<GraphicsObjectItem*>();
       if (object != nullptr) {
-        auto objectType = object->GetObjectType();
-        switch (objectType) {
-        case Object::eTape: {
-          scene()->addItem(new GraphicsTapeItem(item));
-
-//          if (item->data(CreateLevelModel::eStateRole) == CreateLevelModel::eSelected) {
-//            for (auto const& controlPoint: tape->GetcontrolPointsList()) {
-//              QPoint controlQPoint(static_cast<int>(controlPoint.GetX()), static_cast<int>(controlPoint.GetY()));
-//              DrawPoint(controlQPoint, controlPointColor);
-//            }
-//          }
-          break;
-        } case Object::eMirror: {
-          scene()->addItem(new GraphicsMirrorItem(item));
-          break;
-        } case Object::eOneWay: {
-          scene()->addItem(new GraphicsOneWayItem(item));
-          break;
-        } case Object::ePortal: {
-          scene()->addItem(new GraphicsPortalItem(item));
-          break;
-        } default: {
-          break;
-        }
-        }
+        scene()->addItem(objectItem);
       }
     }
   }

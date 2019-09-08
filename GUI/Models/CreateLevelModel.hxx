@@ -8,6 +8,7 @@
 #include "Core/Objects/Obstacles/OneWay.hxx"
 #include "Core/Objects/Deviations/Mirror.hxx"
 #include "Core/Objects/Deviations/Portal.hxx"
+#include "GUI/GraphicsItem/GraphicsObjectItem.hxx"
 
 #include <QStandardItemModel>
 #include <QStack>
@@ -23,7 +24,8 @@ public:
     eObjectRole = Qt::UserRole,
     eObjectTypeRole,
     eItemTypeRole,
-    eStateRole
+    eStateRole,
+    eGraphicsItemRole
   };
   enum ObjectType {
     ePolygon,
@@ -86,19 +88,19 @@ public:
   void RemovePolygonAt(int p_polygonRow);
   void ClearPolygons();
 
-  void AddTape(Tape const& p_tape);
+  QStandardItem* AddTape(Tape const& p_tape);
   inline QList<Tape*> GetTapesList() const { return m_tapesList; }
   void SetTape(int p_index, Object* p_object);
 
-  void AddMirror(Mirror const& p_mirror);
+  QStandardItem* AddMirror(Mirror const& p_mirror);
   inline QList<Mirror*> GetMirrorsList() const { return m_mirrorsList; }
   void SetMirror(int p_index, Object* p_object);
 
-  void AddOneWay(OneWay const& p_oneWay);
+  QStandardItem* AddOneWay(OneWay const& p_oneWay);
   inline QList<OneWay*> GetOneWaysList() const { return m_oneWaysList; }
   void SetOneWay(int p_index, Object* p_object);
 
-  void AddPortal(Portal const& p_portal);
+  QStandardItem* AddPortal(Portal const& p_portal);
   inline QList<Portal*> GetPortalsList() const { return m_portalsList; }
   void SetPortal(int p_index, Object* p_object);
 
@@ -132,6 +134,7 @@ private:
 
 Q_DECLARE_METATYPE(ppxl::Polygon*)
 Q_DECLARE_METATYPE(Object*)
+Q_DECLARE_METATYPE(GraphicsObjectItem*);
 Q_DECLARE_METATYPE(CreateLevelModel::ItemType);
 Q_DECLARE_METATYPE(CreateLevelModel::ObjectType);
 Q_DECLARE_METATYPE(CreateLevelModel::State);

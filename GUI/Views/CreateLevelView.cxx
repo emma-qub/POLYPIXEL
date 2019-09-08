@@ -151,6 +151,10 @@ qreal CreateLevelView::GetSceneRectHeight() const {
   return m_scribblingView->GetSceneRectHeight();
 }
 
+void CreateLevelView::CreateObjectFromItem(QStandardItem* p_item) {
+  m_scribblingView->CreateObjectFromItem(p_item);
+}
+
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
   if (3 <= p_value && p_value < 5) {
     m_maxGapToWinSpinBox->setSuffix(" (hard)");

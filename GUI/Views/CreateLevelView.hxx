@@ -18,6 +18,7 @@ class QUndoView;
 class QUndoStack;
 class QSpinBox;
 class QStackedWidget;
+class QStandardItem;
 
 class CreateLevelView: public QWidget {
   Q_OBJECT
@@ -59,6 +60,8 @@ public:
 
   qreal GetSceneRectWidth() const;
   qreal GetSceneRectHeight() const;
+
+  void CreateObjectFromItem(QStandardItem* p_item);
 
 signals:
   void TestLevelRequested();

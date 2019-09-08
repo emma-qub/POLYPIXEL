@@ -164,7 +164,7 @@ QModelIndex CreateLevelModel::GetVertexIndex(int p_polygonRow, int p_vertexRow) 
 /// TAPE
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CreateLevelModel::AddTape(Tape const& p_tape) {
+QStandardItem* CreateLevelModel::AddTape(Tape const& p_tape) {
   auto tape = new Tape(p_tape);
   m_tapesList << tape;
 
@@ -191,6 +191,8 @@ void CreateLevelModel::AddTape(Tape const& p_tape) {
 
   m_tapesItem->appendRow({tapeItem, new QStandardItem, new QStandardItem, new QStandardItem});
   RegisterObject(tape, tapeItem);
+
+  return tapeItem;
 }
 
 void CreateLevelModel::SetTape(int p_index, Object* p_object) {
@@ -219,7 +221,7 @@ void CreateLevelModel::SetTape(int p_index, Object* p_object) {
 /// MIRROR
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CreateLevelModel::AddMirror(Mirror const& p_mirror) {
+QStandardItem* CreateLevelModel::AddMirror(Mirror const& p_mirror) {
   auto mirror = new Mirror(p_mirror);
   m_mirrorsList << mirror;
 
@@ -239,6 +241,8 @@ void CreateLevelModel::AddMirror(Mirror const& p_mirror) {
 
   m_mirrorsItem->appendRow({mirrorItem, new QStandardItem, new QStandardItem, new QStandardItem});
   RegisterObject(mirror, mirrorItem);
+
+  return mirrorItem;
 }
 
 void CreateLevelModel::SetMirror(int p_index, Object* p_object) {
@@ -263,7 +267,7 @@ void CreateLevelModel::SetMirror(int p_index, Object* p_object) {
 /// ONE WAY
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CreateLevelModel::AddOneWay(OneWay const& p_oneWay) {
+QStandardItem* CreateLevelModel::AddOneWay(OneWay const& p_oneWay) {
   auto oneWay = new OneWay(p_oneWay);
   m_oneWaysList << oneWay;
 
@@ -293,6 +297,8 @@ void CreateLevelModel::AddOneWay(OneWay const& p_oneWay) {
 
   m_oneWaysItem->appendRow({oneWayItem, new QStandardItem, new QStandardItem, new QStandardItem});
   RegisterObject(oneWay, oneWayItem);
+
+  return oneWayItem;
 }
 
 void CreateLevelModel::SetOneWay(int p_index, Object* p_object) {
@@ -322,7 +328,7 @@ void CreateLevelModel::SetOneWay(int p_index, Object* p_object) {
 /// PORTAL
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CreateLevelModel::AddPortal(Portal const& p_portal) {
+QStandardItem* CreateLevelModel::AddPortal(Portal const& p_portal) {
   auto portal = new Portal(p_portal);
   m_portalsList << portal;
 
@@ -375,6 +381,8 @@ void CreateLevelModel::AddPortal(Portal const& p_portal) {
 
   m_portalsItem->appendRow({portalItem, new QStandardItem, new QStandardItem, new QStandardItem});
   RegisterObject(portal, portalItem);
+
+  return portalItem;
 }
 
 void CreateLevelModel::SetPortal(int p_index, Object* p_object) {

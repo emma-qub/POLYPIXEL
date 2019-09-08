@@ -37,7 +37,32 @@ QList<QColor> GraphicsObjectItem::GetColorAccordingToItemState() const {
   }
 }
 
+void GraphicsObjectItem::DrawControlPoints(QPainter* p_painter)
+{
+  p_painter->save();
+  p_painter->setBrush(Qt::NoBrush);
+  p_painter->setPen(QPen(QBrush(QColor("#000000")), 10));
+  m_controlPoints.clear();
+  m_controlPoints = ComputeControlPoints();
+  for (auto const& controlPoint: m_controlPoints) {
+    p_painter->drawPoint(controlPoint);
+  }
+  p_painter->restore();
+}
 
+void GraphicsObjectItem::paint(QPainter* p_painter, const QStyleOptionGraphicsItem* p_option, QWidget* p_widget)
+{
+  DrawObject(p_painter);
+  if (m_item->data(CreateLevelModel::eStateRole).value<CreateLevelModel::State>() == CreateLevelModel::eSelected) {
+    setZValue(1000);
+    DrawControlPoints(p_painter);
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// TAPE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GraphicsTapeItem::GraphicsTapeItem(QStandardItem* p_item, QGraphicsItem* p_parent):
   GraphicsObjectItem(p_item, p_parent),
   m_tape(static_cast<Tape*>(p_item->data(CreateLevelModel::eObjectRole).value<Object*>())) {
@@ -49,7 +74,7 @@ QRectF GraphicsTapeItem::boundingRect() const {
   return QRectF(m_tape->GetX(), m_tape->GetY(), m_tape->GetW(), m_tape->GetH());
 }
 
-void GraphicsTapeItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem const* p_option, QWidget* p_widget) {
+void GraphicsTapeItem::DrawObject(QPainter* p_painter) {
   auto color = GetColorAccordingToItemState().first();
 
   p_painter->save();
@@ -59,12 +84,33 @@ void GraphicsTapeItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem const
   p_painter->restore();
 }
 
+QList<QPoint> GraphicsTapeItem::ComputeControlPoints() const {
+  auto l = m_tape->GetLeft();
+  auto t = m_tape->GetTop();
+  auto r = m_tape->GetRight();
+  auto b = m_tape->GetBottom();
+
+  QPoint lt(l, t);
+  QPoint tt((l+r)/2, t);
+  QPoint rt(r, t);
+  QPoint rr(r, (t+b)/2);
+  QPoint rb(r, b);
+  QPoint bb((l+r)/2, b);
+  QPoint lb(l, b);
+  QPoint ll(l, (t+b)/2);
+  QPoint c((l+r)/2, (t+b)/2);
+
+  return {lt, tt, rt, rr, rb, bb, lb, ll, c};
+}
+
 QList<QColor> GraphicsTapeItem::GetEnabledColors() const {
   return {QColor("#f44336")};
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// MIRROR
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GraphicsMirrorItem::GraphicsMirrorItem(QStandardItem* p_item, QGraphicsItem* p_parent):
   GraphicsObjectItem(p_item, p_parent),
   m_mirror(static_cast<Mirror*>(p_item->data(CreateLevelModel::eObjectRole).value<Object*>())) {
@@ -80,10 +126,11 @@ QRectF GraphicsMirrorItem::boundingRect() const {
   auto B = line.GetB();
   auto Bx = B.GetX();
   auto By = B.GetY();
+
   return QRectF(qMin(Ax, Bx), qMin(Ay, By), qAbs(Bx-Ax), qAbs(By-Ay));
 }
 
-void GraphicsMirrorItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem const* p_option, QWidget* p_widget) {
+void GraphicsMirrorItem::DrawObject(QPainter* p_painter) {
   auto mirrorLine = m_mirror->GetLine();
   auto mirrorLineA = mirrorLine.GetA();
   auto mirrorLineB = mirrorLine.GetB();
@@ -97,12 +144,29 @@ void GraphicsMirrorItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem con
   p_painter->restore();
 }
 
+QList<QPoint> GraphicsMirrorItem::ComputeControlPoints() const {
+  auto line = m_mirror->GetLine();
+  auto A = line.GetA();
+  auto Ax = A.GetX();
+  auto Ay = A.GetY();
+  auto B = line.GetB();
+  auto Bx = B.GetX();
+  auto By = B.GetY();
+  QPoint a(Ax, Ay);
+  QPoint b(Bx, By);
+  QPoint c((Ax+Bx)/2, (Ay+By)/2);
+
+  return {a, b, c};
+}
+
 QList<QColor> GraphicsMirrorItem::GetEnabledColors() const {
   return {QColor("#607d8b")};
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ONE WAY
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GraphicsOneWayItem::GraphicsOneWayItem(QStandardItem* p_item, QGraphicsItem* p_parent):
   GraphicsObjectItem(p_item, p_parent),
   m_oneWay(static_cast<OneWay*>(p_item->data(CreateLevelModel::eObjectRole).value<Object*>())){
@@ -121,7 +185,7 @@ QRectF GraphicsOneWayItem::boundingRect() const {
   return QRectF(qMin(Ax, Bx), qMin(Ay, By), qAbs(Bx-Ax), qAbs(By-Ay));
 }
 
-void GraphicsOneWayItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem const* p_option, QWidget* p_widget) {
+void GraphicsOneWayItem::DrawObject(QPainter* p_painter) {
   auto oneWayLine = m_oneWay->GetLine();
   auto oneWayLineA = oneWayLine.GetA();
   auto oneWayLineB = oneWayLine.GetB();
@@ -135,12 +199,29 @@ void GraphicsOneWayItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem con
   p_painter->restore();
 }
 
+QList<QPoint> GraphicsOneWayItem::ComputeControlPoints() const {
+  auto line = m_oneWay->GetLine();
+  auto A = line.GetA();
+  auto Ax = A.GetX();
+  auto Ay = A.GetY();
+  auto B = line.GetB();
+  auto Bx = B.GetX();
+  auto By = B.GetY();
+  QPoint a(Ax, Ay);
+  QPoint b(Bx, By);
+  QPoint c((Ax+Bx)/2, (Ay+By)/2);
+
+  return {a, b, c};
+}
+
 QList<QColor> GraphicsOneWayItem::GetEnabledColors() const {
   return {QColor("#795548")};
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// PORTAL
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GraphicsPortalItem::GraphicsPortalItem(QStandardItem* p_item, QGraphicsItem* p_parent):
   GraphicsObjectItem(p_item, p_parent),
   m_portal(static_cast<Portal*>(p_item->data(CreateLevelModel::eObjectRole).value<Object*>())) {
@@ -170,7 +251,7 @@ QRectF GraphicsPortalItem::boundingRect() const {
   return QRectF(minX, minY, qAbs(maxX-minX), qAbs(maxY-minY));
 }
 
-void GraphicsPortalItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem const* p_option, QWidget* p_widget) {
+void GraphicsPortalItem::DrawObject(QPainter* p_painter) {
   auto colors = GetColorAccordingToItemState();
 
   auto portalIn = m_portal->GetIn();
@@ -190,6 +271,32 @@ void GraphicsPortalItem::paint(QPainter* p_painter, QStyleOptionGraphicsItem con
   p_painter->setPen(QPen(QBrush(colorOut), 7));
   p_painter->drawLine(portalOutA.GetX(), portalOutA.GetY(), portalOutB.GetX(), portalOutB.GetY());
   p_painter->restore();
+}
+
+QList<QPoint> GraphicsPortalItem::ComputeControlPoints() const {
+  auto lineIn = m_portal->GetIn();
+  auto A = lineIn.GetA();
+  auto Ax = A.GetX();
+  auto Ay = A.GetY();
+  auto B = lineIn.GetB();
+  auto Bx = B.GetX();
+  auto By = B.GetY();
+  QPoint a(Ax, Ay);
+  QPoint b(Bx, By);
+  QPoint c((Ax+Bx)/2, (Ay+By)/2);
+
+  auto lineOut = m_portal->GetOut();
+  auto D = lineIn.GetA();
+  auto Dx = D.GetX();
+  auto Dy = D.GetY();
+  auto E = lineIn.GetB();
+  auto Ex = E.GetX();
+  auto Ey = E.GetY();
+  QPoint d(Dx, Dy);
+  QPoint e(Ex, Ey);
+  QPoint f((Dx+Ex)/2, (Dy+Ey)/2);
+
+  return {a, b, c, d, e, f};
 }
 
 QList<QColor> GraphicsPortalItem::GetEnabledColors() const {

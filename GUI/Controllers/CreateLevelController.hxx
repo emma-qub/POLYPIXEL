@@ -67,7 +67,9 @@ protected:
 
   void SelectObjectUnderCursor();
   void CreateObect();
-  void MoveObject(QPoint const& p_pos);
+  void FindNearestControlPoint(bool& nearControlPoint, QPoint& nearestControlPoint, const QPoint& p_pos) const;
+  void MoveNewObject(QPoint const& p_pos);
+  void MoveExistingObject(QPoint const& p_pos);
   void GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny);
   void HighlightObjectUnderCursor(QPoint const& p_pos);
 
@@ -89,8 +91,11 @@ private:
   QPoint m_objectStartPoint;
   bool m_creatingObject;
   bool m_editingObject;
+  bool m_mousePressed;
+  bool m_nearControlPoint;
 
-  QStandardItem* hoveredItem;
+  QStandardItem* m_hoveredItem;
+  QStandardItem* m_selectedItem;
 };
 
 #endif
