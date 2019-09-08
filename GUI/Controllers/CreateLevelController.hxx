@@ -6,8 +6,8 @@
 #include "Core/Geometry/Polygon.hxx"
 #include "Core/Geometry/Point.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
+#include "GUI/Models/CreateLevelModel.hxx"
 
-class CreateLevelModel;
 class ObjectModel;
 class QUndoStack;
 class QStandardItem;
@@ -65,7 +65,7 @@ protected:
   void MouseMoveEvent(QMouseEvent* p_event);
   void MouseReleaseEvent(QMouseEvent* p_event);
 
-  void SelectObjectUnderCursor(QPoint const& p_pos);
+  void SelectObjectUnderCursor();
   void CreateObect();
   void MoveObject(QPoint const& p_pos);
   void GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny);
@@ -84,14 +84,13 @@ private:
 
   QAction* m_selectAction;
   QAction* m_polygonAction;
-  QAction* m_tapeAction;
-  QAction* m_mirrorAction;
-  QAction* m_oneWayAction;
-  QAction* m_portalAction;
+  QMap<CreateLevelModel::ObjectType, QAction*> m_objectTypeAction;
 
   QPoint m_objectStartPoint;
   bool m_creatingObject;
   bool m_editingObject;
+
+  QStandardItem* hoveredItem;
 };
 
 #endif

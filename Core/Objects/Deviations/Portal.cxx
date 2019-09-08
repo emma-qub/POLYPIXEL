@@ -42,8 +42,8 @@ std::string Portal::GetName() const {
   return "Portal";
 }
 
-bool Portal::Intersect(const ppxl::Point& p_point) const {
-  return m_in.PointIsOnSegment(p_point, 0.1) || m_out.PointIsOnSegment(p_point, 0.1);
+bool Portal::Intersect(const ppxl::Point& p_point, double p_tolerence) const {
+  return m_in.PointIsOnSegment(p_point, p_tolerence) || m_out.PointIsOnSegment(p_point, p_tolerence);
 }
 
 std::vector<ppxl::Segment> Portal::DeviateLine(ppxl::Segment const& p_line) const {

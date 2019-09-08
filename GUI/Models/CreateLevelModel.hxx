@@ -20,14 +20,29 @@ class CreateLevelModel: public QStandardItemModel {
 
 public:
   enum ItemRole {
-    ePolygonRole = Qt::UserRole,
+    eObjectRole = Qt::UserRole,
+    eObjectTypeRole,
     eItemTypeRole,
     eStateRole
   };
-  enum ItemType {
-    ePolygons,
+  enum ObjectType {
     ePolygon,
-    eVertex,
+    eTape,
+    eMirror,
+    eOneWay,
+    ePortal,
+    ePolygons = 10+ePolygon,
+    eTapes,
+    eMirrors,
+    eOneWays,
+    ePortals,
+  };
+  enum ItemType {
+    eObject,
+    eObjectList,
+    ePoint,
+    eSegment,
+    eVector,
     eX,
     eY
   };
@@ -116,6 +131,9 @@ private:
 };
 
 Q_DECLARE_METATYPE(ppxl::Polygon*)
+Q_DECLARE_METATYPE(Object*)
 Q_DECLARE_METATYPE(CreateLevelModel::ItemType);
+Q_DECLARE_METATYPE(CreateLevelModel::ObjectType);
+Q_DECLARE_METATYPE(CreateLevelModel::State);
 
 #endif

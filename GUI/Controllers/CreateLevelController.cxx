@@ -1,6 +1,5 @@
 #include "CreateLevelController.hxx"
 
-#include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/CreateLevelView.hxx"
 #include "GUI/Commands/CreateLevelCommands.hxx"
@@ -22,7 +21,8 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
   m_toolbar(nullptr),
   m_objectStartPoint(),
   m_creatingObject(false),
-  m_editingObject(false) {
+  m_editingObject(false),
+  hoveredItem(nullptr) {
 
   m_view->SetModel(m_model);
   connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
@@ -81,25 +81,29 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   m_polygonAction->setCheckable(true);
   connect(m_polygonAction, &QAction::triggered, [this](){ m_toolMode = ePolygonMode; });
 
-  m_tapeAction = new QAction("T", groupAction);
-  m_toolbar->addAction(m_tapeAction);
-  m_tapeAction->setCheckable(true);
-  connect(m_tapeAction, &QAction::triggered, [this](){ m_toolMode = eTapeMode; });
+  auto tapeAction = new QAction("T", groupAction);
+  m_toolbar->addAction(tapeAction);
+  tapeAction->setCheckable(true);
+  connect(tapeAction, &QAction::triggered, [this](){ m_toolMode = eTapeMode; });
+  m_objectTypeAction[CreateLevelModel::eTape] = tapeAction;
 
-  m_mirrorAction = new QAction("M", groupAction);
-  m_toolbar->addAction(m_mirrorAction);
-  m_mirrorAction->setCheckable(true);
-  connect(m_mirrorAction, &QAction::triggered, [this](){ m_toolMode = eMirrorMode; });
+  auto mirrorAction = new QAction("M", groupAction);
+  m_toolbar->addAction(mirrorAction);
+  mirrorAction->setCheckable(true);
+  connect(mirrorAction, &QAction::triggered, [this](){ m_toolMode = eMirrorMode; });
+  m_objectTypeAction[CreateLevelModel::eMirror] = mirrorAction;
 
-  m_oneWayAction = new QAction("O", groupAction);
-  m_toolbar->addAction(m_oneWayAction);
-  m_oneWayAction->setCheckable(true);
-  connect(m_oneWayAction, &QAction::triggered, [this](){ m_toolMode = eOneWayMode; });
+  auto oneWayAction = new QAction("O", groupAction);
+  m_toolbar->addAction(oneWayAction);
+  oneWayAction->setCheckable(true);
+  connect(oneWayAction, &QAction::triggered, [this](){ m_toolMode = eOneWayMode; });
+  m_objectTypeAction[CreateLevelModel::eOneWay] = oneWayAction;
 
-  m_portalAction = new QAction("R", groupAction);
-  m_toolbar->addAction(m_portalAction);
-  m_portalAction->setCheckable(true);
-  connect(m_portalAction, &QAction::triggered, [this](){ m_toolMode = ePortalMode; });
+  auto portalAction = new QAction("R", groupAction);
+  m_toolbar->addAction(portalAction);
+  portalAction->setCheckable(true);
+  connect(portalAction, &QAction::triggered, [this](){ m_toolMode = ePortalMode; });
+  m_objectTypeAction[CreateLevelModel::ePortal] = portalAction;
 
   m_polygonAction->trigger();
 }
@@ -121,7 +125,7 @@ int CreateLevelController::GetTolerance() const {
 }
 
 void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto* polygon = p_index.parent().data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
   vertex.SetX(p_value);
 
@@ -129,7 +133,7 @@ void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_inde
 }
 
 void CreateLevelController::UpdateYVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto* polygon = p_index.parent().data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
   vertex.SetY(p_value);
 
@@ -153,12 +157,12 @@ void CreateLevelController::SnapToGrid() {
 
   auto itemType = currentIndex.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
   switch(itemType) {
-  case (CreateLevelModel::ePolygons): {
+  case (CreateLevelModel::eObjectList): {
     currentIndex = QModelIndex();
     break;
-  } case (CreateLevelModel::ePolygon): {
+  } case (CreateLevelModel::eObject): {
     break;
-  } case (CreateLevelModel::eVertex): {
+  } case (CreateLevelModel::ePoint): {
     currentIndex = currentIndex.parent();
     break;
   }
@@ -243,7 +247,7 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
 
   switch(m_toolMode) {
   case eSelectionMode: {
-    SelectObjectUnderCursor(p_event->pos());
+    SelectObjectUnderCursor();
     break;
   }
   case ePolygonMode: {
@@ -297,8 +301,24 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
   }
 }
 
-void CreateLevelController::SelectObjectUnderCursor(const QPoint& p_pos) {
-
+void CreateLevelController::SelectObjectUnderCursor() {
+  if (hoveredItem) {
+    for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
+      auto objectListIndex = m_model->index(objectsListRow, 0);
+      for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
+        auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
+        auto item = m_model->itemFromIndex(objectIndex);
+        if (item == hoveredItem) {
+          item->setData(CreateLevelModel::eSelected, CreateLevelModel::eStateRole);
+          auto selectionModel = m_view->GetSelectionModel();
+          selectionModel->setCurrentIndex(item->index(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+          m_objectTypeAction[item->data(CreateLevelModel::eObjectTypeRole).value<CreateLevelModel::ObjectType>()]->trigger();
+        } else {
+          item->setData(CreateLevelModel::eEnabled, CreateLevelModel::eStateRole);
+        }
+      }
+    }
+  }
 }
 
 void CreateLevelController::CreateObect() {
@@ -392,26 +412,34 @@ void CreateLevelController::GetDiscreteEnd(QPoint const& p_pos, double& p_nx, do
 void CreateLevelController::HighlightObjectUnderCursor(const QPoint& p_pos) {
   Object* objectUnderCursor = nullptr;
   for (auto object: m_model->GetObjectsList()) {
-    if (object->Intersect(ppxl::Point(p_pos.x(), p_pos.y()))) {
+    if (object->Intersect(ppxl::Point(p_pos.x(), p_pos.y()), 10.)) {
       objectUnderCursor = object;
       break;
     }
   }
 
-  if (objectUnderCursor) {
-    for (auto object: m_model->GetObjectsList()) {
-      ObjectModel::States itemState;
-      if (objectUnderCursor == nullptr) {
-        itemState = ObjectModel::eEnabled;
-      } else {
-        if (object == objectUnderCursor) {
-          itemState = ObjectModel::eHighlightUp;
+  for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
+    auto objectListIndex = m_model->index(objectsListRow, 0);
+    for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
+      auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
+      auto item = m_model->itemFromIndex(objectIndex);
+      bool isRightObject = item->data(CreateLevelModel::eItemTypeRole) == CreateLevelModel::eObject;
+      Q_ASSERT_X(isRightObject, "CreateLevelController::HighlightObjectUnderCursor",
+        tr("This item %1 has no object").arg(item->text()).toStdString().c_str());
+      auto object = item->data(CreateLevelModel::eObjectRole).value<Object*>();
+      if (object != nullptr) {
+        if (objectUnderCursor == nullptr) {
+          item->setData(ObjectModel::eEnabled, CreateLevelModel::eStateRole);
+          hoveredItem = nullptr;
         } else {
-          itemState = ObjectModel::eHighlightDown;
+          if (object == objectUnderCursor) {
+            item->setData(ObjectModel::eHighlightUp, CreateLevelModel::eStateRole);
+            hoveredItem = item;
+          } else {
+            item->setData(ObjectModel::eHighlightDown, CreateLevelModel::eStateRole);
+          }
         }
       }
-
-      m_model->GetItemFromObject(object)->setData(itemState, ObjectModel::eStateRole);
     }
   }
 }

@@ -20,8 +20,8 @@ std::string OneWay::GetName() const {
   return "OneWay";
 }
 
-bool OneWay::Intersect(const ppxl::Point& p_point) const {
-  return m_line.PointIsOnSegment(p_point);
+bool OneWay::Intersect(const ppxl::Point& p_point, double p_tolerence) const {
+  return m_line.PointIsOnSegment(p_point, p_tolerence);
 }
 
 bool OneWay::Crossing(ppxl::Segment const& p_line) const {

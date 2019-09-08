@@ -236,14 +236,14 @@ Point Segment::IntersectionPoint(Segment const& AB, Segment const& PQ) {
   return Point(A + tAB);
 }
 
-bool Segment::PointIsOnSegment(const Point& C, double p_tolerence) const {
+bool Segment::PointIsOnSegment(Point const& C, double p_tolerence) const {
   auto A = m_a;
   auto B = m_b;
 
   auto crossproduct = (C.GetY() - A.GetY()) * (B.GetX() - A.GetX()) - (C.GetX() - A.GetX()) * (B.GetY() - A.GetY());
 
   // Compare with p_tolerence
-  if (std::abs(crossproduct) > p_tolerence)
+  if (std::abs(crossproduct) > p_tolerence*Length())
     return false;
 
   auto dotproduct = (C.GetX() - A.GetX()) * (B.GetX() - A.GetX()) + (C.GetY() - A.GetY())*(B.GetY() - A.GetY());

@@ -1,8 +1,9 @@
 ﻿#include "CreateLevelScribblingView.hxx"
 
+#include "Core/Objects/Object.hxx"
 #include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
-#include "Core/Objects/Object.hxx"
+#include "GUI/GraphicsItem/GraphicsObjectItem.hxx"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -147,12 +148,12 @@ ppxl::Polygon* CreateLevelScribblingView::GetCurrentPolygon() const {
 
   auto itemType = currentIndex.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
   switch(itemType) {
-  case (CreateLevelModel::ePolygons): {
+  case (CreateLevelModel::eObjectList): {
     currentIndex = QModelIndex();
     break;
-  } case (CreateLevelModel::ePolygon): {
+  } case (CreateLevelModel::eObject): {
     break;
-  } case (CreateLevelModel::eVertex): {
+  } case (CreateLevelModel::ePoint): {
     currentIndex = currentIndex.parent();
     break;
   }
@@ -163,7 +164,7 @@ ppxl::Polygon* CreateLevelScribblingView::GetCurrentPolygon() const {
   }
 
   if (currentIndex.isValid()) {
-    currentPolygon = currentIndex.data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+    currentPolygon = currentIndex.data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   }
 
   return currentPolygon;
@@ -203,14 +204,14 @@ void CreateLevelScribblingView::DrawPolygonsFromModel() {
   if (currentPolygon == nullptr) {
     auto currentIndex = m_model->index(0, 0, m_model->index(0, 0));
     m_selectionModel->setCurrentIndex(currentIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-    currentPolygon = currentIndex.data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+    currentPolygon = currentIndex.data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   }
 
   QStandardItem* currentPolygonItem = nullptr;
 
   for (int rowPolygon = 0; rowPolygon < polygonsItem->rowCount(); ++rowPolygon) {
     auto polygonItem = polygonsItem->child(rowPolygon, 0);
-    auto const* polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+    auto const* polygon = polygonItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
 
     if (currentPolygon == polygon) {
       currentPolygonItem = polygonItem;
@@ -233,8 +234,8 @@ void CreateLevelScribblingView::DrawPolygonsFromCore() {
 
   for (int polygonRow = 0; polygonRow < m_model->rowCount(); ++polygonRow) {
     auto polygonItem = polygonsItem->child(polygonRow, 0);
-    qDebug() << polygonsItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
-    auto polygon = polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+    qDebug() << polygonsItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
+    auto polygon = polygonItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
 
     if (currentPolygon == polygon) {
       currentPolygonItem = polygonItem;
@@ -252,7 +253,7 @@ void CreateLevelScribblingView::DrawPolygonFromModel(QStandardItem* p_polygonIte
 
   QColor vertexColor("#333333");
 
-  auto polygon = p_polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto polygon = p_polygonItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   if (p_polygonItem->rowCount() > 1) {
     for (int row = 0; row < p_polygonItem->rowCount(); ++row) {
       auto indexA = row;
@@ -304,7 +305,7 @@ void CreateLevelScribblingView::DrawPolygonFromCore(QStandardItem* p_polygonItem
 
   QColor vertexColor("#333333");
 
-  auto polygon = p_polygonItem->data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+  auto polygon = p_polygonItem->data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
   auto vertices = polygon->GetVertices();
   if (vertices.size() > 1) {
     for (unsigned int vertexRow = 0; vertexRow < vertices.size(); ++vertexRow) {
@@ -349,45 +350,44 @@ void CreateLevelScribblingView::DrawPolygonFromCore(QStandardItem* p_polygonItem
 void CreateLevelScribblingView::DrawObjectsFromModel() {
   QColor controlPointColor("#333333");
 
-  for (auto object: m_model->GetObjectsList()) {
-    auto objectType = object->GetObjectType();
-    switch (objectType) {
-    case Object::eTape: {
-      auto tape = static_cast<Tape*>(object);
-      scene()->addRect(tape->GetX(), tape->GetY(), tape->GetW(), tape->GetH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
-      for (auto const& controlPoint: tape->GetcontrolPointsList()) {
-        QPoint controlQPoint(static_cast<int>(controlPoint.GetX()), static_cast<int>(controlPoint.GetY()));
-        DrawPoint(controlQPoint, controlPointColor);
+  for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
+    auto objectListIndex = m_model->index(objectsListRow, 0);
+
+    for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
+      auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
+      auto item = m_model->itemFromIndex(objectIndex);
+      bool isRightObject = item->data(CreateLevelModel::eItemTypeRole) == CreateLevelModel::eObject;
+      Q_ASSERT_X(isRightObject, "CreateLevelController::HighlightObjectUnderCursor",
+        tr("This item %1 has no object").arg(item->text()).toStdString().c_str());
+
+      auto object = item->data(CreateLevelModel::eObjectRole).value<Object*>();
+      if (object != nullptr) {
+        auto objectType = object->GetObjectType();
+        switch (objectType) {
+        case Object::eTape: {
+          scene()->addItem(new GraphicsTapeItem(item));
+
+//          if (item->data(CreateLevelModel::eStateRole) == CreateLevelModel::eSelected) {
+//            for (auto const& controlPoint: tape->GetcontrolPointsList()) {
+//              QPoint controlQPoint(static_cast<int>(controlPoint.GetX()), static_cast<int>(controlPoint.GetY()));
+//              DrawPoint(controlQPoint, controlPointColor);
+//            }
+//          }
+          break;
+        } case Object::eMirror: {
+          scene()->addItem(new GraphicsMirrorItem(item));
+          break;
+        } case Object::eOneWay: {
+          scene()->addItem(new GraphicsOneWayItem(item));
+          break;
+        } case Object::ePortal: {
+          scene()->addItem(new GraphicsPortalItem(item));
+          break;
+        } default: {
+          break;
+        }
+        }
       }
-      break;
-    } case Object::eOneWay: {
-      auto oneWay = static_cast<OneWay*>(object);
-      auto oneWayLine = oneWay->GetLine();
-      auto oneWayLineA = oneWayLine.GetA();
-      auto oneWayLineB = oneWayLine.GetB();
-      scene()->addLine(oneWayLineA.GetX(), oneWayLineA.GetY(), oneWayLineB.GetX(), oneWayLineB.GetY(), QPen(QBrush(QColor("#cccccc")), 7));
-      break;
-    } case Object::eMirror: {
-      auto mirror = static_cast<Mirror*>(object);
-      auto mirrorLine = mirror->GetLine();
-      auto mirrorLineA = mirrorLine.GetA();
-      auto mirrorLineB = mirrorLine.GetB();
-      scene()->addLine(mirrorLineA.GetX(), mirrorLineA.GetY(), mirrorLineB.GetX(), mirrorLineB.GetY(), QPen(QBrush(QColor("#0033ff")), 7));
-      break;
-    } case Object::ePortal: {
-      auto portal = static_cast<Portal*>(object);
-      auto portalIn = portal->GetIn();
-      auto portalInA = portalIn.GetA();
-      auto portalInB = portalIn.GetB();
-      scene()->addLine(portalInA.GetX(), portalInA.GetY(), portalInB.GetX(), portalInB.GetY(), QPen(QBrush(QColor("#ff9a00")), 7));
-      auto portalOut = portal->GetOut();
-      auto portalOutA = portalOut.GetA();
-      auto portalOutB = portalOut.GetB();
-      scene()->addLine(portalOutA.GetX(), portalOutA.GetY(), portalOutB.GetX(), portalOutB.GetY(), QPen(QBrush(QColor("#27a7d8")), 7));
-      break;
-    } default: {
-      break;
-    }
     }
   }
 }
@@ -397,12 +397,12 @@ void CreateLevelScribblingView::InsertPolygon() {
   index = index.sibling(index.row(), 0);
   auto itemType = index.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
   switch(itemType) {
-  case (CreateLevelModel::ePolygons): {
+  case (CreateLevelModel::eObjectList): {
     index = m_model->index(m_model->rowCount(m_model->index(0, 0)), 0);
     break;
-  } case (CreateLevelModel::ePolygon): {
+  } case (CreateLevelModel::eObject): {
     break;
-  } case (CreateLevelModel::eVertex): {
+  } case (CreateLevelModel::ePoint): {
     index = index.parent();
     break;
   }
@@ -419,14 +419,14 @@ void CreateLevelScribblingView::Remove() {
   index = index.sibling(index.row(), 0);
   auto itemType = index.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
   switch(itemType) {
-  case (CreateLevelModel::ePolygon): {
+  case (CreateLevelModel::eObject): {
     Q_EMIT(PolygonRemoved(index.row()));
     break;
-  } case (CreateLevelModel::eVertex): {
+  } case (CreateLevelModel::ePoint): {
     Q_EMIT(VertexRemoved(index.parent().row(), index.row()));
     break;
   }
-  case (CreateLevelModel::ePolygons):
+  case (CreateLevelModel::eObjectList):
   default: {
     break;
   }
@@ -494,12 +494,12 @@ void CreateLevelScribblingView::MouseMoveForPolygon(QMouseEvent* p_event) {
     // This is a vertex
     auto itemType = currIndex.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
     switch(itemType) {
-    case (CreateLevelModel::ePolygons): {
+    case (CreateLevelModel::eObjectList): {
       currIndex = m_model->index(0, 0);
       break;
-    } case (CreateLevelModel::ePolygon): {
+    } case (CreateLevelModel::eObject): {
       break;
-    } case (CreateLevelModel::eVertex): {
+    } case (CreateLevelModel::ePoint): {
       currIndex = currIndex.parent();
       break;
     }
@@ -508,7 +508,7 @@ void CreateLevelScribblingView::MouseMoveForPolygon(QMouseEvent* p_event) {
     }
     }
 
-    auto const* polygon = currIndex.data(CreateLevelModel::ePolygonRole).value<ppxl::Polygon*>();
+    auto const* polygon = currIndex.data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
     auto vertices = polygon->GetVertices();
     m_nextToVertex = false;
     m_nextToBarycenter = false;
@@ -601,18 +601,18 @@ void CreateLevelScribblingView::MouseReleaseForPolygon(QMouseEvent* p_event) {
       int vertexRow;
       auto itemType = index.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
       switch (itemType) {
-      case (CreateLevelModel::ePolygons): {
+      case (CreateLevelModel::eObjectList): {
         auto polygonsItem = m_model->GetPolygonsItem();
         auto polygonItem = polygonsItem->child(polygonsItem->rowCount(), 0);
         polygonRow = polygonItem->row();
         vertexRow = polygonItem->rowCount();
         break;
-      } case (CreateLevelModel::ePolygon): {
+      } case (CreateLevelModel::eObject): {
         auto polygonItem = m_model->itemFromIndex(index);
         polygonRow = polygonItem->row();
         vertexRow = polygonItem->rowCount();
         break;
-      } case (CreateLevelModel::eVertex): {
+      } case (CreateLevelModel::ePoint): {
         polygonRow = index.parent().row();
         vertexRow = index.row()+1;
         break;
@@ -622,6 +622,8 @@ void CreateLevelScribblingView::MouseReleaseForPolygon(QMouseEvent* p_event) {
         vertexRow = index.parent().row()+1;
         break;
       }
+      default:
+        break;
       }
       Q_EMIT(VertexInserted(polygonRow, vertexRow, point));
     }

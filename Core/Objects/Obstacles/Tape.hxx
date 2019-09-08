@@ -34,10 +34,15 @@ public:
   inline double GetH() const { return m_h; }
   inline void SetH(double p_h) { m_h = p_h; }
 
+  inline double GetLeft() const { return m_x; }
+  inline double GetTop() const { return m_y; }
+  inline double GetRight() const { return m_x + m_w; }
+  inline double GetBottom() const { return m_y + m_h; }
+
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
   std::string GetName() const override;
-  bool Intersect(ppxl::Point const& p_point) const override;
+  bool Intersect(ppxl::Point const& p_point, double p_tolerence = DBL_EPSILON) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
   std::vector<ppxl::Point> GetcontrolPointsList() const;

@@ -22,10 +22,10 @@ std::string Tape::GetName() const {
   return "Tape";
 }
 
-bool Tape::Intersect(const ppxl::Point& p_point) const
+bool Tape::Intersect(const ppxl::Point& p_point, double p_tolerence) const
 {
-  return m_x <= p_point.GetX() && p_point.GetX() <= m_x+m_w
-      && m_y <= p_point.GetY() && p_point.GetY() <= m_y+m_h;
+  return m_x-p_tolerence <= p_point.GetX() && p_point.GetX() <= m_x+m_w+p_tolerence
+      && m_y-p_tolerence <= p_point.GetY() && p_point.GetY() <= m_y+m_h+p_tolerence;
 }
 
 bool Tape::Crossing(ppxl::Segment const& p_line) const {
