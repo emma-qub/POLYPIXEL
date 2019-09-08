@@ -150,7 +150,8 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_stateMachine.setInitialState(loadingState);
   m_stateMachine.start();
 
-  showFullScreen();
+  showMaximized();
+  //showFullScreen();
 }
 
 MainWindow::~MainWindow() = default;

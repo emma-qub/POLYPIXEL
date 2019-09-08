@@ -65,6 +65,7 @@ protected:
   void MouseMoveEvent(QMouseEvent* p_event);
   void MouseReleaseEvent(QMouseEvent* p_event);
 
+  void DisableObjectItems();
   void SelectObjectUnderCursor();
   void CreateObect();
   void FindNearestControlPoint(bool& nearControlPoint, QPoint& nearestControlPoint, const QPoint& p_pos) const;

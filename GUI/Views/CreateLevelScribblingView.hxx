@@ -31,7 +31,7 @@ public:
   qreal GetSceneRectWidth() const;
   qreal GetSceneRectHeight() const;
 
-  void CreateObjectFromItem(QStandardItem* p_item);
+  void CreateGraphicsObjectFromItem(QStandardItem* p_item);
 
 signals:
   void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);

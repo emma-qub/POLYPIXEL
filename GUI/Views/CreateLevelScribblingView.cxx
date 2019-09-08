@@ -346,7 +346,7 @@ void CreateLevelScribblingView::DrawPolygonFromCore(QStandardItem* p_polygonItem
   }
 }
 
-void CreateLevelScribblingView::CreateObjectFromItem(QStandardItem* p_item) {
+void CreateLevelScribblingView::CreateGraphicsObjectFromItem(QStandardItem* p_item) {
   auto object = p_item->data(CreateLevelModel::eObjectRole).value<Object*>();
   if (object != nullptr) {
     auto objectType = object->GetObjectType();

@@ -151,8 +151,8 @@ qreal CreateLevelView::GetSceneRectHeight() const {
   return m_scribblingView->GetSceneRectHeight();
 }
 
-void CreateLevelView::CreateObjectFromItem(QStandardItem* p_item) {
-  m_scribblingView->CreateObjectFromItem(p_item);
+void CreateLevelView::CreateGraphicsObjectFromItem(QStandardItem* p_item) {
+  m_scribblingView->CreateGraphicsObjectFromItem(p_item);
 }
 
 void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
