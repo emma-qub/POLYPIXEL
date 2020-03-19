@@ -87,35 +87,40 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   });
 
   m_polygonAction = new QAction("P", groupAction);
+  m_polygonAction->setShortcut(QKeySequence(Qt::Key_P));
   m_toolbar->addAction(m_polygonAction);
   m_polygonAction->setCheckable(true);
   connect(m_polygonAction, &QAction::triggered, [this](){ m_toolMode = ePolygonMode; DisableObjectItems(); });
 
   auto tapeAction = new QAction("T", groupAction);
+  tapeAction->setShortcut(QKeySequence(Qt::Key_T));
   m_toolbar->addAction(tapeAction);
   tapeAction->setCheckable(true);
   connect(tapeAction, &QAction::triggered, [this](){ m_toolMode = eTapeMode; DisableObjectItems(); });
   m_objectTypeAction[CreateLevelModel::eTape] = tapeAction;
 
   auto mirrorAction = new QAction("M", groupAction);
+  mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
   m_toolbar->addAction(mirrorAction);
   mirrorAction->setCheckable(true);
   connect(mirrorAction, &QAction::triggered, [this](){ m_toolMode = eMirrorMode; DisableObjectItems(); });
   m_objectTypeAction[CreateLevelModel::eMirror] = mirrorAction;
 
   auto oneWayAction = new QAction("O", groupAction);
+  oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
   m_toolbar->addAction(oneWayAction);
   oneWayAction->setCheckable(true);
   connect(oneWayAction, &QAction::triggered, [this](){ m_toolMode = eOneWayMode; DisableObjectItems(); });
   m_objectTypeAction[CreateLevelModel::eOneWay] = oneWayAction;
 
   auto portalAction = new QAction("R", groupAction);
+  portalAction->setShortcut(QKeySequence(Qt::Key_R));
   m_toolbar->addAction(portalAction);
   portalAction->setCheckable(true);
   connect(portalAction, &QAction::triggered, [this](){ m_toolMode = ePortalMode; DisableObjectItems(); });
   m_objectTypeAction[CreateLevelModel::ePortal] = portalAction;
 
-  m_polygonAction->trigger();
+  m_objectTypeAction[CreateLevelModel::eTape]->trigger();
 }
 
 int CreateLevelController::GetLinesGoal() const {

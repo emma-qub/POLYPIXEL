@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_toolbar->setOrientation(Qt::Vertical);
   m_toolbar->setAllowedAreas(Qt::NoToolBarArea);
   m_toolbar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-  m_toolbar->move(20, 50);
+  m_toolbar->move(50, 50);
 
   m_createLevelController->SetToolBar(m_toolbar);
 
