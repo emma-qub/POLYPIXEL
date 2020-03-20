@@ -24,3 +24,7 @@ int Mutable::GetRoundNumber() const {
 ppxl::Point Mutable::GetPosition() const {
   return m_position;
 }
+
+void Mutable::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointType p_controlPointType) {
+
+}

@@ -66,7 +66,7 @@ void MapView::mousePressEvent(QMouseEvent* p_mouseEvent) {
 
 void MapView::PlayLevel() {
   CleanGameStart();
-  Q_EMIT(PlayLevelRequested(m_currentLevelPath));
+  Q_EMIT PlayLevelRequested(m_currentLevelPath);
 }
 
 void MapView::CleanGameStart() {

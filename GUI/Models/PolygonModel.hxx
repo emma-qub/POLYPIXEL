@@ -36,7 +36,7 @@ public:
   void RemovePolygonAt(int p_polygonRow);
   void ClearPolygons();
 
-signals:
+Q_SIGNALS:
   void PolygonListChanged();
 
 private:

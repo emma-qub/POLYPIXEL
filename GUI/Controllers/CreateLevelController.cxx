@@ -1,8 +1,6 @@
 #include "CreateLevelController.hxx"
 
-#include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/CreateLevelWidget.hxx"
-#include "GUI/Commands/CreateLevelCommands.hxx"
 #include "Parser/Parser.hxx"
 
 #include <QUndoStack>
@@ -15,246 +13,263 @@
 
 CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject* p_parent):
   QObject(p_parent),
-  m_model(new CreateLevelModel(this)),
-  m_view(p_view),
-  m_undoStack(new QUndoStack(this)),
+  m_objectsListModel(new CreateLevelObjectsListModel(this)),
+  m_objectsDetailModel(new CreateLevelObjectsDetailModel(this)),
+  m_vertexListModel(new CreateLevelVertexListModel(this)),
+  m_createLevelWidget(p_view),
   m_toolbar(nullptr),
   m_objectStartPoint(),
+  m_creatingNewPolygon(false),
   m_creatingObject(false),
-  m_editingObject(false),
   m_mousePressed(false),
-  m_nearControlPoint(false),
-  m_hoveredItem(nullptr),
-  m_selectedItem(nullptr) {
+  m_isNearVertex(false),
+  m_nearestVertex(),
+  m_nearestVertexRow(-1),
+  m_isNearControlPoint(false),
+  m_nearestControlPoint(),
+  m_hoveredItem(nullptr) {
 
-  m_view->SetModel(m_model);
-  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelWidget::Redraw);
+  m_createLevelWidget->SetObjectsListModel(m_objectsListModel);
+  m_createLevelWidget->SetObjectsDetailModel(m_objectsDetailModel);
+  m_createLevelWidget->SetVertexListModel(m_vertexListModel);
 
-  m_view->SetUndoStack(m_undoStack);
+  connect(m_createLevelWidget, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
+  connect(m_createLevelWidget, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
+  connect(m_createLevelWidget, &CreateLevelWidget::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
 
-  connect(m_view, &CreateLevelWidget::PolygonInserted, this, &CreateLevelController::InsertPolygon);
-  connect(m_view, &CreateLevelWidget::PolygonRemoved, this, &CreateLevelController::RemovePolygon);
-  connect(m_view, &CreateLevelWidget::PolygonMoved, this, &CreateLevelController::MovePolygon);
-  connect(m_view, &CreateLevelWidget::VertexInserted, this, &CreateLevelController::InsertVertex);
-  connect(m_view, &CreateLevelWidget::VertexRemoved, this, &CreateLevelController::RemoveVertex);
-  connect(m_view, &CreateLevelWidget::VertexMoved, this, &CreateLevelController::MoveVertex);
+  connect(m_createLevelWidget, &CreateLevelWidget::SnapToGridRequested, this, &CreateLevelController::SnapToGrid);
+  connect(m_createLevelWidget, &CreateLevelWidget::SnapAllToGridRequested, this, &CreateLevelController::SnapAllToGrid);
+  connect(m_createLevelWidget, &CreateLevelWidget::NewLevelRequested, this, &CreateLevelController::NewLevel);
+  connect(m_createLevelWidget, &CreateLevelWidget::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
 
-  connect(m_view, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
-  connect(m_view, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
-  connect(m_view, &CreateLevelWidget::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
-
-  connect(m_view, &CreateLevelWidget::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
-  connect(m_view, &CreateLevelWidget::ValueYChanged, this, &CreateLevelController::UpdateYVertex);
-  connect(m_view, &CreateLevelWidget::EditionXDone, this, &CreateLevelController::TranslateXVertex);
-  connect(m_view, &CreateLevelWidget::EditionYDone, this, &CreateLevelController::TranslateYVertex);
-
-  connect(m_view, &CreateLevelWidget::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
-  connect(m_view, &CreateLevelWidget::NewLevelRequested, this, &CreateLevelController::NewLevel);
-  connect(m_view, &CreateLevelWidget::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
-
-  connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
-  connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::CheckTestAvailable);
-
-  auto undoAction = m_undoStack->createUndoAction(m_view, tr("Undo"));
-  undoAction->setShortcut(QKeySequence::Undo);
-  m_view->addAction(undoAction);
-  auto redoAction = m_undoStack->createRedoAction(m_view, tr("Redo"));
-  redoAction->setShortcut(QKeySequence::Redo);
-  m_view->addAction(redoAction);
+  auto polygonDoneAction = new QAction("PolygonDone", m_createLevelWidget);
+  polygonDoneAction->setShortcut(QKeySequence(Qt::Key_Return));
+  m_createLevelWidget->addAction(polygonDoneAction);
+  connect(polygonDoneAction, &QAction::triggered, this, [this](){
+    auto currentPolygonIndex = m_createLevelWidget->FindCurrentPolygonIndex();
+    auto currentGraphicsPolygon = m_objectsListModel->GetGraphicsFromIndex(currentPolygonIndex);
+    if (currentGraphicsPolygon) {
+      currentGraphicsPolygon->SetState(GraphicsObjectItem::eDisabledState);
+      m_createLevelWidget->SetCurrentObjectOrPolygonIndex(currentPolygonIndex.parent());
+    }
+    m_creatingNewPolygon = true;
+  });
 }
 
-CreateLevelController::~CreateLevelController() {
-  // When QUndoStack is deleted, it emits a last indexChanged, calling Redraw
-  // from the scribbling view, whose model is already deleted, so disconnect.
-  disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelWidget::Redraw);
-}
+CreateLevelController::~CreateLevelController() = default;
 
 void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   m_toolbar = p_toolbar;
 
   auto groupAction = new QActionGroup(m_toolbar);
 
-  m_selectAction = new QAction("S", groupAction);
+  m_selectAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/selectionToolIcon.png"), "Selection (S)", groupAction);
+  m_selectAction->setShortcut(QKeySequence(Qt::Key_S));
   m_toolbar->addAction(m_selectAction);
   m_selectAction->setCheckable(true);
-  connect(m_selectAction, &QAction::toggled, [this](bool p_checked){
-    DisableObjectItems();
+  connect(m_selectAction, &QAction::triggered, [this](){
     m_toolMode = eSelectionMode;
-    if (p_checked) {
-      m_hoveredItem = nullptr;
-      m_selectedItem = nullptr;
-    }
+    DisableObjectItems();
+    m_hoveredItem = nullptr;
   });
+  m_actionToolModeMap[m_selectAction] = eSelectionMode;
 
-  m_polygonAction = new QAction("P", groupAction);
+  m_polygonAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/polygonToolIcon.png"), "Polygon (P)", groupAction);
   m_polygonAction->setShortcut(QKeySequence(Qt::Key_P));
   m_toolbar->addAction(m_polygonAction);
   m_polygonAction->setCheckable(true);
-  connect(m_polygonAction, &QAction::triggered, [this](){ m_toolMode = ePolygonMode; DisableObjectItems(); });
+  m_actionToolModeMap[m_polygonAction] = ePolygonMode;
+  m_objectTypeAction[CreateLevelObjectsListModel::ePolygonObjectType] = m_polygonAction;
 
-  auto tapeAction = new QAction("T", groupAction);
-  tapeAction->setShortcut(QKeySequence(Qt::Key_T));
-  m_toolbar->addAction(tapeAction);
-  tapeAction->setCheckable(true);
-  connect(tapeAction, &QAction::triggered, [this](){ m_toolMode = eTapeMode; DisableObjectItems(); });
-  m_objectTypeAction[CreateLevelModel::eTape] = tapeAction;
+  m_tapeAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/tapeToolIcon.png"), "Tape (T)", groupAction);
+  m_tapeAction->setShortcut(QKeySequence(Qt::Key_T));
+  m_toolbar->addAction(m_tapeAction);
+  m_tapeAction->setCheckable(true);
+  m_actionToolModeMap[m_tapeAction] = eTapeMode;
+  m_objectTypeAction[CreateLevelObjectsListModel::eTapeObjectType] = m_tapeAction;
 
-  auto mirrorAction = new QAction("M", groupAction);
-  mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
-  m_toolbar->addAction(mirrorAction);
-  mirrorAction->setCheckable(true);
-  connect(mirrorAction, &QAction::triggered, [this](){ m_toolMode = eMirrorMode; DisableObjectItems(); });
-  m_objectTypeAction[CreateLevelModel::eMirror] = mirrorAction;
+  m_mirrorAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/mirrorToolIcon.png"), "Mirror (M)", groupAction);
+  m_mirrorAction->setShortcut(QKeySequence(Qt::Key_M));
+  m_toolbar->addAction(m_mirrorAction);
+  m_mirrorAction->setCheckable(true);
+  m_actionToolModeMap[m_mirrorAction] = eMirrorMode;
+  m_objectTypeAction[CreateLevelObjectsListModel::eMirrorObjectType] = m_mirrorAction;
 
-  auto oneWayAction = new QAction("O", groupAction);
-  oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
-  m_toolbar->addAction(oneWayAction);
-  oneWayAction->setCheckable(true);
-  connect(oneWayAction, &QAction::triggered, [this](){ m_toolMode = eOneWayMode; DisableObjectItems(); });
-  m_objectTypeAction[CreateLevelModel::eOneWay] = oneWayAction;
+  m_oneWayAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/oneWayToolIcon.png"), "One Way (O)", groupAction);
+  m_oneWayAction->setShortcut(QKeySequence(Qt::Key_O));
+  m_toolbar->addAction(m_oneWayAction);
+  m_oneWayAction->setCheckable(true);
+  m_actionToolModeMap[m_oneWayAction] = eOneWayMode;
+  m_objectTypeAction[CreateLevelObjectsListModel::eOneWayObjectType] = m_oneWayAction;
 
-  auto portalAction = new QAction("R", groupAction);
-  portalAction->setShortcut(QKeySequence(Qt::Key_R));
-  m_toolbar->addAction(portalAction);
-  portalAction->setCheckable(true);
-  connect(portalAction, &QAction::triggered, [this](){ m_toolMode = ePortalMode; DisableObjectItems(); });
-  m_objectTypeAction[CreateLevelModel::ePortal] = portalAction;
+  m_portalAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/portalToolIcon.png"), "Portal (L)", groupAction);
+  m_portalAction->setShortcut(QKeySequence(Qt::Key_L));
+  m_toolbar->addAction(m_portalAction);
+  m_portalAction->setCheckable(true);
+  m_actionToolModeMap[m_portalAction] = ePortalMode;
+  m_objectTypeAction[CreateLevelObjectsListModel::ePortalObjectType] = m_portalAction;
 
-  m_objectTypeAction[CreateLevelModel::eTape]->trigger();
+  ConnectToolsActions();
+
+  m_objectTypeAction[CreateLevelObjectsListModel::ePolygonObjectType]->trigger();
+
+  connect(m_createLevelWidget, &CreateLevelWidget::CurrentObjectIndexChanged, this, &CreateLevelController::UpdateGraphicsSelection);
+
+  for (auto action: m_actionToolModeMap.keys()) {
+    m_createLevelWidget->addAction(action);
+  }
 }
 
 int CreateLevelController::GetLinesGoal() const {
-  return m_view->GetLinesGoal();
+  return m_createLevelWidget->GetLinesGoal();
 }
 
 int CreateLevelController::GetPartsGoal() const {
-  return m_view->GetPartsGoal();
+  return m_createLevelWidget->GetPartsGoal();
 }
 
 int CreateLevelController::GetMaxGapToWin() const {
-  return m_view->GetMaxGapToWin();
+  return m_createLevelWidget->GetMaxGapToWin();
 }
 
 int CreateLevelController::GetTolerance() const {
-  return m_view->GetTolerance();
-}
-
-void CreateLevelController::UpdateXVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
-  auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
-  vertex.SetX(p_value);
-
-  RedrawFromPolygons();
-}
-
-void CreateLevelController::UpdateYVertex(int p_value, QModelIndex const& p_index) {
-  auto* polygon = p_index.parent().data(CreateLevelModel::eObjectRole).value<ppxl::Polygon*>();
-  auto& vertex = polygon->GetVertices().at(static_cast<unsigned int>(p_index.row()));
-  vertex.SetY(p_value);
-
-  RedrawFromPolygons();
-}
-
-void CreateLevelController::TranslateXVertex(int p_value, QModelIndex const& p_index) {
-  auto shiftX = static_cast<double>(p_value - p_index.data().toInt());
-  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(-shiftX, 0.), false);
-  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(shiftX, 0.), true);
-}
-
-void CreateLevelController::TranslateYVertex(int p_value, QModelIndex const& p_index) {
-  auto shiftY = static_cast<double>(p_value - p_index.data().toInt());
-  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., -shiftY), false);
-  MoveVertex(p_index.parent().row(), p_index.row(), ppxl::Vector(0., shiftY), true);
+  return m_createLevelWidget->GetTolerance();
 }
 
 void CreateLevelController::SnapToGrid() {
-  auto currentIndex = m_view->GetSelectionModel()->currentIndex();
-
-  auto itemType = currentIndex.data(CreateLevelModel::eItemTypeRole).value<CreateLevelModel::ItemType>();
-  switch(itemType) {
-  case (CreateLevelModel::eObjectList): {
-    currentIndex = QModelIndex();
-    break;
-  } case (CreateLevelModel::eObject): {
-    break;
-  } case (CreateLevelModel::ePoint): {
-    currentIndex = currentIndex.parent();
-    break;
-  }
-  default: {
-    currentIndex = QModelIndex();
-    break;
-  }
-  }
-
+  auto currentIndex = m_createLevelWidget->FindCurrentPolygonIndex();
   if (currentIndex.isValid()) {
-    SnapCurrentPolygonToGrid(currentIndex);
+    SnapPolygonToGrid(currentIndex);
+    return;
+  }
+
+  currentIndex = m_createLevelWidget->FindCurrentObjectIndex();
+  if (currentIndex.isValid()) {
+    SnapObjectToGrid(currentIndex);
   }
 }
 
-void CreateLevelController::SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex) {
-  auto* polygonItem = m_model->itemFromIndex(p_currentIndex);
-
-  for (int row = 0; row < polygonItem->rowCount(); ++row) {
-    auto oldX = polygonItem->child(row, 1)->data(Qt::DisplayRole).toInt();
-    auto oldY = polygonItem->child(row, 2)->data(Qt::DisplayRole).toInt();
-
-    int caseSide = 50;
-    int nearestX = static_cast<int>(oldX)%50;
-    int nearestY = static_cast<int>(oldY)%50;
-    int newX = oldX;
-    int newY = oldY;
-
-    int threshold = 20;
-    if (nearestY < threshold)
-      newY = oldY - nearestY;
-    else if (nearestY > caseSide - threshold)
-      newY = oldY + (caseSide - nearestY);
-
-    if (nearestX < threshold)
-      newX = oldX - nearestX;
-    else if (nearestX > caseSide - threshold)
-      newX = oldX + (caseSide - nearestX);
-
-    if (oldX != newX || oldY != newY) {
-      MoveVertex(polygonItem->row(), row, ppxl::Vector(newX-oldX, newY-oldY), true);
+void CreateLevelController::SnapAllToGrid() {
+  for (int listRow = 0; listRow < m_objectsListModel->rowCount(); ++listRow) {
+    auto listIndex = m_objectsListModel->index(listRow, 0);
+    for (int row = 0; row < m_objectsListModel->rowCount(listIndex); ++row) {
+      auto index = m_objectsListModel->index(row, 0, listIndex);
+      if (m_objectsListModel->IsPolygonIndex(index)) {
+        SnapPolygonToGrid(index);
+      } else if (m_objectsListModel->IsObjectIndex(index)) {
+        SnapObjectToGrid(index);
+      }
     }
+  }
+}
+
+ppxl::Point CreateLevelController::FindNearestGridNode(ppxl::Point const& p_point) {
+  auto gridNode = p_point;
+  auto x = p_point.GetX();
+  auto y = p_point.GetY();
+
+  int caseSide = 50;
+  int threshold = 20;
+  int nearestX = static_cast<int>(x)%caseSide;
+  int nearestY = static_cast<int>(y)%caseSide;
+
+  if (nearestX < threshold)
+    gridNode.SetX(x - nearestX);
+  else if (nearestX > caseSide - threshold)
+    gridNode.SetX(x - nearestX + caseSide);
+
+  if (nearestY < threshold)
+    gridNode.SetY(y - nearestY);
+  else if (nearestY > caseSide - threshold)
+    gridNode.SetY(y - nearestY + caseSide);
+
+  return gridNode;
+}
+
+void CreateLevelController::SnapObjectToGrid(QModelIndex const& p_currentIndex) {
+  auto object = m_objectsListModel->GetObjectFromIndex(p_currentIndex);
+
+  auto objctType = object->GetObjectType();
+  switch (objctType) {
+  case Object::eTape:{
+    m_objectsListModel->MoveObject(p_currentIndex, FindNearestGridNode(object->GetTopLeft()), Object::eTopLeft);
+    object->MoveControlPoint(FindNearestGridNode(object->GetBottomRight()), Object::eBottomRight);
+    break;
+  } case Object::eMirror:{
+    auto mirror = static_cast<Mirror*>(object);
+    if (static_cast<int>(mirror->GetX1()) == static_cast<int>(mirror->GetX2())
+      || static_cast<int>(mirror->GetY1()) == static_cast<int>(mirror->GetY2())
+      || static_cast<int>(std::abs(mirror->GetX2()-mirror->GetX1())) == static_cast<int>(mirror->GetY2()-mirror->GetY1())) {
+      object->MoveControlPoint(FindNearestGridNode(object->GetTopLeft()), Object::eTopLeft);
+      object->MoveControlPoint(FindNearestGridNode(object->GetBottomRight()), Object::eBottomRight);
+    }
+    break;
+  } case Object::eOneWay:{
+    auto oneWay = static_cast<OneWay*>(object);
+    if (static_cast<int>(oneWay->GetX1()) == static_cast<int>(oneWay->GetX2())
+      || static_cast<int>(oneWay->GetY1()) == static_cast<int>(oneWay->GetY2())
+      || static_cast<int>(std::abs(oneWay->GetX2()-oneWay->GetX1())) == static_cast<int>(oneWay->GetY2()-oneWay->GetY1())) {
+      object->MoveControlPoint(FindNearestGridNode(object->GetTopLeft()), Object::eTopLeft);
+      object->MoveControlPoint(FindNearestGridNode(object->GetBottomRight()), Object::eBottomRight);
+    }
+    break;
+  } case Object::ePortal:{
+    auto portal = static_cast<Portal*>(object);
+    if (static_cast<int>(portal->GetIn().GetA().GetX()) == static_cast<int>(portal->GetIn().GetB().GetX())
+      || static_cast<int>(portal->GetIn().GetA().GetY()) == static_cast<int>(portal->GetIn().GetB().GetY())
+      || static_cast<int>(std::abs(portal->GetIn().GetB().GetX()-portal->GetIn().GetA().GetX())) == static_cast<int>(portal->GetIn().GetB().GetY()-portal->GetIn().GetA().GetY())) {
+      object->MoveControlPoint(FindNearestGridNode(object->GetTopLeftYellow()), Object::eTopLeftYellow);
+      object->MoveControlPoint(FindNearestGridNode(object->GetBottomRightYellow()), Object::eBottomRightYellow);
+    }
+    if (static_cast<int>(portal->GetOut().GetA().GetX()) == static_cast<int>(portal->GetOut().GetB().GetX())
+      || static_cast<int>(portal->GetOut().GetA().GetY()) == static_cast<int>(portal->GetOut().GetB().GetY())
+      || static_cast<int>(std::abs(portal->GetOut().GetB().GetX()-portal->GetOut().GetA().GetX())) == static_cast<int>(portal->GetOut().GetB().GetY()-portal->GetOut().GetA().GetY())) {
+      object->MoveControlPoint(FindNearestGridNode(object->GetTopLeftBlue()), Object::eTopLeftBlue);
+      object->MoveControlPoint(FindNearestGridNode(object->GetBottomRightBlue()), Object::eBottomRightBlue);
+    }
+    break;
+  } default:
+    break;
+  }
+}
+
+void CreateLevelController::SnapPolygonToGrid(QModelIndex const& p_currentIndex) {
+  auto polygon = m_objectsListModel->GetPolygonFromIndex(p_currentIndex);
+
+  int vertexRow = 0;
+  for (auto vertex: polygon->GetVertices()) {
+    auto newVertex = FindNearestGridNode(vertex);
+    if (newVertex != vertex) {
+      MoveVertexAt(vertexRow, newVertex);
+    }
+    ++vertexRow;
   }
 }
 
 void CreateLevelController::CheckTestAvailable() {
-  // Check if a polygon has less than 3 vertices
-  for (auto* polygon: m_model->GetPolygonsList()) {
-    if (!polygon->HasEnoughVertices()) {
-      m_view->SetTestAvailable(false);
+  auto const& polygonsList = m_objectsListModel->GetPolygonsList();
+
+  for (auto polygon: polygonsList) {
+    // Check if a polygon has less than 3 vertices and is not crossed
+    if (!polygon->HasEnoughVertices() || !polygon->IsGoodPolygon()) {
+      m_createLevelWidget->SetTestAvailable(false);
       return;
     }
-  }
-
-  // Check polygon one by one
-  for (auto* polygon: m_model->GetPolygonsList()) {
-    if (!polygon->IsGoodPolygon()) {
-      m_view->SetTestAvailable(false);
-      return;
-    }
-  }
-
-  // Check intersections between polygons
-  for (auto* polygon1: m_model->GetPolygonsList()) {
-    for (auto* polygon2: m_model->GetPolygonsList()) {
-      if (polygon1 == polygon2) {
+    // Check intersections between polygons
+    for (auto* polygon2: polygonsList) {
+      if (polygon == polygon2) {
         continue;
       }
       for (auto const& vertex: polygon2->GetVertices()) {
-        if (polygon1->IsPointInside(vertex)) {
-          m_view->SetTestAvailable(false);
+        if (polygon->IsPointInside(vertex)) {
+          m_createLevelWidget->SetTestAvailable(false);
           return;
         }
       }
     }
   }
 
-  m_view->SetTestAvailable(true);
+  m_createLevelWidget->SetTestAvailable(true);
 }
 
 void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
@@ -263,28 +278,35 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
 
   switch(m_toolMode) {
   case eSelectionMode: {
-    SelectObjectUnderCursor();
-    m_selectedItem = m_hoveredItem;
-    m_hoveredItem = nullptr;
+    SelectObjectUnderCursor(p_event->pos());
     break;
   }
   case ePolygonMode: {
+    if (m_isNearVertex) {
+      m_createLevelWidget->setCursor(Qt::ClosedHandCursor);
+      m_createLevelWidget->SetCurrentVertexIndex(m_nearestVertexRow);
+    } else if (m_creatingNewPolygon) {
+      CreatePolygon();
+      InsertVertex(m_objectStartPoint);
+      m_creatingNewPolygon = false;
+    } else {
+      InsertVertex(m_objectStartPoint);
+    }
     break;
   }
   case eTapeMode:
   case eMirrorMode:
   case eOneWayMode:
   case ePortalMode: {
-    if (m_nearControlPoint) {
-      m_editingObject = true;
+    m_createLevelWidget->setCursor(Qt::ClosedHandCursor);
+    if (m_isNearControlPoint) {
       m_creatingObject = false;
+      FindNearestControlPoint(m_isNearControlPoint, m_nearestControlPoint, p_event->pos());
     } else {
-      m_editingObject = false;
       m_creatingObject = true;
       DisableObjectItems();
-      CreateObect();
+      CreateObject();
     }
-
     break;
   }
   }
@@ -299,6 +321,26 @@ void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
     break;
   }
   case ePolygonMode: {
+    if (m_mousePressed) {
+      if (m_nearestVertex != ppxl::Point()) {
+        auto newVertex = ppxl::Point(p_event->pos().x(), p_event->pos().y());
+        int vertexRow = m_nearestVertexRow;
+        ppxl::Vector direction(m_nearestVertex, newVertex);
+        if (vertexRow == -1) {
+          TranslatePolygon(direction);
+        } else {
+          MoveCurrentVertex(newVertex);
+        }
+        m_nearestVertex = newVertex;
+      }
+    } else {
+      FindNearestVertex(m_isNearVertex, m_nearestVertex, m_nearestVertexRow, p_event->pos());
+      if (m_isNearVertex) {
+        m_createLevelWidget->setCursor(Qt::OpenHandCursor);
+      } else {
+        m_createLevelWidget->setCursor(Qt::ArrowCursor);
+      }
+    }
     break;
   }
   case eTapeMode:
@@ -306,17 +348,13 @@ void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
   case eOneWayMode:
   case ePortalMode: {
     if (m_mousePressed) {
-      if (m_creatingObject) {
-        MoveNewObject(p_event->pos());
+      MoveObject(p_event->pos());
+    } else {
+      FindNearestControlPoint(m_isNearControlPoint, m_nearestControlPoint, p_event->pos());
+      if (m_isNearControlPoint) {
+        m_createLevelWidget->setCursor(Qt::OpenHandCursor);
       } else {
-        MoveExistingObject(p_event->pos());
-      }
-    } else if (m_selectedItem) {
-      bool nearControlPoint = false;
-      QPoint nearestControlPoint;
-      FindNearestControlPoint(nearControlPoint, nearestControlPoint, p_event->pos());
-      if (nearControlPoint) {
-        m_nearControlPoint = true;
+        m_createLevelWidget->setCursor(Qt::ArrowCursor);
       }
     }
     break;
@@ -324,12 +362,13 @@ void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
   }
 }
 
-void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
+void CreateLevelController::MouseReleaseEvent(QMouseEvent*) {
   m_objectStartPoint = QPoint();
   m_mousePressed = false;
 
   switch(m_toolMode) {
   case ePolygonMode: {
+    m_createLevelWidget->setCursor(Qt::OpenHandCursor);
     break;
   }
   case eTapeMode:
@@ -337,7 +376,13 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
   case eOneWayMode:
   case ePortalMode: {
     m_creatingObject = false;
-    m_editingObject = false;
+    m_createLevelWidget->setCursor(Qt::OpenHandCursor);
+    if (m_toolMode == ePortalMode) {
+      auto currentIndex = m_createLevelWidget->GetCurrentObjectIndex();
+      auto portal = static_cast<Portal*>(currentIndex.data(CreateLevelObjectsListModel::eObjectRole).value<Object*>());
+      portal->SetCreating(false);
+      currentIndex.data(CreateLevelObjectsListModel::eGraphicsItemRole).value<GraphicsObjectItem*>()->UpdateControlPoints();
+    }
     break;
   }
   default:
@@ -346,180 +391,175 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent* p_event) {
 }
 
 void CreateLevelController::DisableObjectItems() {
-  for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
-    auto objectListIndex = m_model->index(objectsListRow, 0);
-    for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
-      auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
-      auto item = m_model->itemFromIndex(objectIndex);
-      item->setData(CreateLevelModel::eDisabled, CreateLevelModel::eStateRole);
+  for (int objectsListRow = 0; objectsListRow < m_objectsListModel->rowCount(); ++objectsListRow) {
+    auto objectListIndex = m_objectsListModel->index(objectsListRow, 0);
+    for (int objectRow = 0; objectRow < m_objectsListModel->rowCount(objectListIndex); ++objectRow) {
+      auto objectIndex = m_objectsListModel->index(objectRow, 0, objectListIndex);
+      auto graphicsItem = m_objectsListModel->GetGraphicsFromIndex(objectIndex);
+      graphicsItem->SetState(GraphicsObjectItem::eDisabledState);
     }
   }
 }
 
-void CreateLevelController::FindNearestControlPoint(bool& nearControlPoint, QPoint& nearestControlPoint, QPoint const& p_pos) const {
-  if (m_selectedItem) {
-    auto object = m_selectedItem->data(CreateLevelModel::eGraphicsItemRole).value<GraphicsObjectItem*>();
+void CreateLevelController::FindNearestVertex(bool& p_isNearVertex, ppxl::Point& p_nearestVertex, int& p_nearestVertexRow, QPoint const& p_pos) const {
+  auto currentIndex = m_createLevelWidget->FindCurrentPolygonIndex();
+  ppxl::Polygon* polygon = m_objectsListModel->FindPolygonFromIndex(currentIndex);
 
-    auto controlPoints = object->GetControlPoints();
-    for (auto const& controlPoint: controlPoints) {
+  p_isNearVertex = false;
+  p_nearestVertex = ppxl::Point();
+  p_nearestVertexRow = -1;
+
+  if (polygon) {
+    auto vertices = polygon->GetVertices();
+    auto pos = ppxl::Point(p_pos.x(), p_pos.y());
+    for (auto row = 0ul; row < vertices.size(); ++row) {
+      auto vertex = polygon->GetVertices().at(row);
+      if (ppxl::Point::Distance(pos, vertex) < 10) {
+        p_isNearVertex = true;
+        p_nearestVertex = vertex;
+        p_nearestVertexRow = row;
+        return;
+      }
+    }
+    if (vertices.size() > 2 && ppxl::Point::Distance(pos, polygon->Barycenter()) < 10) {
+      p_isNearVertex = true;
+      p_nearestVertex = polygon->Barycenter();
+    }
+  }
+
+}
+
+void CreateLevelController::FindNearestControlPoint(bool& p_isNearControlPoint, QPair<QPoint, Object::ControlPointType>& p_nearestControlPoint, QPoint const& p_pos) const {
+  auto currentIndex = m_createLevelWidget->FindCurrentObjectIndex();
+  GraphicsObjectItem* graphicsObjectItem = nullptr;
+  if (currentIndex.isValid()) {
+    graphicsObjectItem = m_objectsListModel->GetGraphicsFromIndex(currentIndex);
+  }
+
+  if (graphicsObjectItem) {
+    auto controlPoints = graphicsObjectItem->GetControlPoints();
+    for (auto const& controlPointAndType: controlPoints) {
+      auto controlPoint = controlPointAndType.first;
       if (ppxl::Point::Distance(ppxl::Point(controlPoint.x(), controlPoint.y()), ppxl::Point(p_pos.x(), p_pos.y())) < 10) {
-        nearControlPoint = true;
-        nearestControlPoint = controlPoint;
+        p_isNearControlPoint = true;
+        p_nearestControlPoint = controlPointAndType;
         return;
       }
     }
   }
+
+  p_isNearControlPoint = false;
+  p_nearestControlPoint = QPair<QPoint, Object::ControlPointType>();
 }
 
-void CreateLevelController::SelectObjectUnderCursor() {
-  if (m_hoveredItem) {
-    for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
-      auto objectListIndex = m_model->index(objectsListRow, 0);
-      for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
-        auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
-        auto item = m_model->itemFromIndex(objectIndex);
-        if (item == m_hoveredItem) {
-          m_objectTypeAction[item->data(CreateLevelModel::eObjectTypeRole).value<CreateLevelModel::ObjectType>()]->trigger();
-          item->setData(CreateLevelModel::eSelected, CreateLevelModel::eStateRole);
-          auto selectionModel = m_view->GetSelectionModel();
-          selectionModel->setCurrentIndex(item->index(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+void CreateLevelController::SelectObjectUnderCursor(QPoint const& p_pos) {
+  ppxl::Point pos(p_pos.x(), p_pos.y());
+
+  for (int listRow = 0; listRow < m_objectsListModel->rowCount(); ++listRow) {
+    auto listIndex = m_objectsListModel->index(listRow, 0);
+    for (int row = 0; row < m_objectsListModel->rowCount(listIndex); ++row) {
+      auto index = m_objectsListModel->index(row, 0, listIndex);
+      auto graphicsItem = m_objectsListModel->GetGraphicsFromIndex(index);
+      auto item = m_objectsListModel->itemFromIndex(index);
+      if (m_hoveredItem == item) {
+        if (graphicsItem->Intersect(pos)) {
+          graphicsItem->SetState(GraphicsObjectItem::eSelectedState);
+          m_createLevelWidget->SetCurrentObjectOrPolygonIndex(index);
         } else {
-          item->setData(CreateLevelModel::eDisabled, CreateLevelModel::eStateRole);
+          graphicsItem->SetState(GraphicsObjectItem::eDisabledState);
         }
       }
     }
   }
 }
 
-void CreateLevelController::CreateObect() {
+void CreateLevelController::CreateObject(Object* p_object) {
+  QStandardItem* item = nullptr;
+  GraphicsObjectItem* graphicsItem = nullptr;
   switch(m_toolMode) {
   case eTapeMode: {
-    auto item = m_model->AddTape(Tape(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.));
-    m_view->CreateGraphicsObjectFromItem(item);
+    auto tape = static_cast<Tape*>(p_object);
+    if (!tape) {
+      tape = new Tape(m_objectStartPoint.x(), m_objectStartPoint.y(), 0., 0.);
+    }
+    graphicsItem = new GraphicsTapeItem(tape);
+    item = m_objectsListModel->AddTape(tape, graphicsItem);
     break;
   }
   case eMirrorMode: {
-    auto item = m_model->AddMirror(Mirror(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y()));
-    m_view->CreateGraphicsObjectFromItem(item);
+    auto mirror = static_cast<Mirror*>(p_object);
+    if (!mirror) {
+      mirror = new Mirror(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y());
+    }
+    graphicsItem = new GraphicsMirrorItem(mirror);
+    item = m_objectsListModel->AddMirror(mirror, graphicsItem);
     break;
   }
   case eOneWayMode: {
-    auto item = m_model->AddOneWay(OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y()));
-    m_view->CreateGraphicsObjectFromItem(item);
+    auto oneWay = static_cast<OneWay*>(p_object);
+    if (!oneWay) {
+      oneWay = new OneWay(m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y());
+    }
+    graphicsItem = new GraphicsOneWayItem(oneWay);
+    item = m_objectsListModel->AddOneWay(oneWay, graphicsItem);
     break;
   }
   case ePortalMode: {
-    auto item = m_model->AddPortal(Portal(
-      m_objectStartPoint.x(), m_objectStartPoint.y(), m_objectStartPoint.x(), m_objectStartPoint.y(),
-      m_objectStartPoint.x()+10, m_objectStartPoint.y(), m_objectStartPoint.x()+10, m_objectStartPoint.y()));
-    m_view->CreateGraphicsObjectFromItem(item);
+    auto shift = 10;
+    auto portal = static_cast<Portal*>(p_object);
+    if (!portal) {
+      portal = new Portal(
+        m_objectStartPoint.x()-shift, m_objectStartPoint.y(), m_objectStartPoint.x()-shift, m_objectStartPoint.y(),
+        m_objectStartPoint.x()+shift, m_objectStartPoint.y(), m_objectStartPoint.x()+shift, m_objectStartPoint.y());
+    }
+    graphicsItem = new GraphicsPortalItem(portal);
+    item = m_objectsListModel->AddPortal(portal, graphicsItem);
     break;
   }
   default:
     break;
   }
+
+  if (item) {
+    m_createLevelWidget->AddGraphicsItem(graphicsItem);
+    graphicsItem->SetState(GraphicsObjectItem::eSelectedState);
+    connect(graphicsItem, &GraphicsObjectItem::StateChanged, m_createLevelWidget, &CreateLevelWidget::UpdateView);
+    m_createLevelWidget->SetCurrentObjectOrPolygonIndex(item->index());
+    m_createLevelWidget->ShowDetailListView();
+    m_objectsDetailModel->ResetCurrentObject(m_objectsListModel->GetObjectFromItem(item));
+  }
 }
 
-void CreateLevelController::MoveNewObject(const QPoint& p_pos) {
+void CreateLevelController::MoveObject(const QPoint& p_pos) {
+  Object::ControlPointType controlPointType;
   if (m_creatingObject) {
-    double nx;
-    double ny;
-    double ox = m_objectStartPoint.x();
-    double oy = m_objectStartPoint.y();
-
-    GetDiscreteEnd(p_pos, nx, ny);
-
-    switch(m_toolMode) {
-    case eTapeMode: {
-      auto x1 = qMin(m_objectStartPoint.x(), p_pos.x());
-      auto y1 = qMin(m_objectStartPoint.y(), p_pos.y());
-      auto x2 = qMax(m_objectStartPoint.x(), p_pos.x());
-      auto y2 = qMax(m_objectStartPoint.y(), p_pos.y());
-      Tape tape(x1, y1, x2-x1, y2-y1);
-      m_model->SetTape(m_model->GetTapesList().size()-1, &tape);
-      break;
-    }
-    case eMirrorMode: {
-      Mirror mirror(ox, oy, nx, ny);
-      m_model->SetMirror(m_model->GetMirrorsList().size()-1, &mirror);
-      break;
-    }
-    case eOneWayMode: {
-      OneWay oneWay(ox, oy, nx, ny);
-      m_model->SetOneWay(m_model->GetOneWaysList().size()-1, &oneWay);
-      break;
-    }
-    case ePortalMode: {
-      auto angle = ppxl::Vector::Angle(ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(ox+100, oy)), ppxl::Vector(ppxl::Point(ox, oy), ppxl::Point(nx, ny)))+(M_PI_4+M_PI_2)/3.;
-      Portal portal(ox, oy, nx, ny, ox+std::sin(angle)*20., oy+std::cos(angle)*20., nx+std::sin(angle)*20., ny+std::cos(angle)*20.);
-      m_model->SetPortal(m_model->GetPortalsList().size()-1, &portal);
-      break;
-    }
-    default:
-      break;
-    }
+    controlPointType = Object::eBottomRight;
+  } else {
+    controlPointType = m_nearestControlPoint.second;
   }
+
+  auto currentObjectIndex = m_createLevelWidget->GetCurrentObjectIndex();
+  auto currentGraphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentObjectIndex);
+  m_objectsListModel->MoveObject(currentObjectIndex, ppxl::Point(p_pos.x(), p_pos.y()), controlPointType);
+  m_objectsDetailModel->UpdateCurrentObject();
+  currentGraphicsItem->ComputeBoundingPolygon();
 }
 
-void CreateLevelController::MoveExistingObject(const QPoint& p_pos) {
-  if (m_editingObject) {
+void CreateLevelController::HighlightObjectUnderCursor(QPoint const& p_pos) {
+  m_hoveredItem = nullptr;
+  ppxl::Point pos(p_pos.x(), p_pos.y());
 
-  }
-}
-
-void CreateLevelController::GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny) {
-  auto ox = static_cast<double>(m_objectStartPoint.x());
-  auto oy = static_cast<double>(m_objectStartPoint.y());
-  auto px = static_cast<double>(p_pos.x());
-  auto py = static_cast<double>(p_pos.y());
-  auto radius = ppxl::Point::Distance(ppxl::Point(ox, oy), ppxl::Point(px, py));
-
-  p_nx = 2.*m_view->GetSceneRectWidth();
-  p_ny = 2.*m_view->GetSceneRectHeight();
-  double minDist = -1;
-  for (int k = 0; k < 24; ++k) {
-    auto dk = static_cast<double>(k);
-    auto dx = radius*std::cos(dk*M_PI/12.)+ox;
-    auto dy = radius*std::sin(dk*M_PI/12.)+oy;
-
-    auto dist = ppxl::Point::Distance(ppxl::Point(px, py), ppxl::Point(dx, dy));
-    if (minDist < 0 || dist < minDist) {
-      p_nx = dx;
-      p_ny = dy;
-      minDist = dist;
-    }
-  }
-}
-
-void CreateLevelController::HighlightObjectUnderCursor(const QPoint& p_pos) {
-  Object* objectUnderCursor = nullptr;
-  for (auto object: m_model->GetObjectsList()) {
-    if (object->Intersect(ppxl::Point(p_pos.x(), p_pos.y()), 10.)) {
-      objectUnderCursor = object;
-      break;
-    }
-  }
-
-  for (int objectsListRow = 0; objectsListRow < m_model->rowCount(); ++objectsListRow) {
-    auto objectListIndex = m_model->index(objectsListRow, 0);
-    for (int objectRow = 0; objectRow < m_model->rowCount(objectListIndex); ++objectRow) {
-      auto objectIndex = m_model->index(objectRow, 0, objectListIndex);
-      auto item = m_model->itemFromIndex(objectIndex);
-      bool isRightObject = item->data(CreateLevelModel::eItemTypeRole) == CreateLevelModel::eObject;
-      Q_ASSERT_X(isRightObject, "CreateLevelController::HighlightObjectUnderCursor",
-        tr("This item %1 has no object").arg(item->text()).toStdString().c_str());
-      auto object = item->data(CreateLevelModel::eObjectRole).value<Object*>();
-      if (object != nullptr) {
-        if (objectUnderCursor == nullptr) {
-          item->setData(ObjectModel::eHighlightDown, CreateLevelModel::eStateRole);
-          m_hoveredItem = nullptr;
+  for (int listRow = 0; listRow < m_objectsListModel->rowCount(); ++listRow) {
+    auto listIndex = m_objectsListModel->index(listRow, 0);
+    for (int row = 0; row < m_objectsListModel->rowCount(listIndex); ++row) {
+      auto index = m_objectsListModel->index(row, 0, listIndex);
+      auto graphicsItem = m_objectsListModel->GetGraphicsFromIndex(index);
+      if (graphicsItem) {
+        if (graphicsItem->Intersect(pos)) {
+          graphicsItem->SetState(GraphicsObjectItem::eHighlightUpState);
+          m_hoveredItem = m_objectsListModel->itemFromIndex(index);
         } else {
-          if (object == objectUnderCursor) {
-            item->setData(ObjectModel::eHighlightUp, CreateLevelModel::eStateRole);
-            m_hoveredItem = item;
-          } else {
-            item->setData(ObjectModel::eHighlightDown, CreateLevelModel::eStateRole);
-          }
+          graphicsItem->SetState(GraphicsObjectItem::eHighlightDownState);
         }
       }
     }
@@ -527,111 +567,143 @@ void CreateLevelController::HighlightObjectUnderCursor(const QPoint& p_pos) {
 }
 
 void CreateLevelController::NewLevel() {
-  m_undoStack->clear();
-  m_model->ClearPolygons();
-  m_view->ResetGameInfo();
-  Redraw();
+  m_objectStartPoint = QPoint();
+  m_creatingNewPolygon = true;
+  m_creatingObject = false;
+  m_mousePressed = false;
+  m_isNearVertex = false;
+  m_nearestVertex = ppxl::Point();
+  m_nearestVertexRow = -1;
+  m_isNearControlPoint = false;
+  m_nearestControlPoint = {};
+  m_hoveredItem = nullptr;
+
+  m_createLevelWidget->ClearImage();
+  m_objectsListModel->Clear();
+  m_objectsDetailModel->clear();
+  m_vertexListModel->clear();
+  m_createLevelWidget->ResetGameInfo();
 }
 
 void CreateLevelController::OpenLevel(const QString& p_fileName) {
-  m_undoStack->clear();
-
+  NewLevel();
   Parser parser(p_fileName);
-  m_view->SetLinesGoal(parser.GetLinesGoal());
-  m_view->SetPartsGoal(parser.GetPartsGoal());
-  m_view->SetMaxGapToWin(parser.GetMaxGapToWin());
-  m_view->SetTolerance(parser.GetTolerance());
-  m_model->SetPolygonsList(parser.GetPolygonsList());
-
-  Redraw();
-}
-
-void CreateLevelController::RedrawFromPolygons() {
-  m_view->ClearImage();
-  m_view->RedrawFromPolygons();
-}
-
-void CreateLevelController::Redraw() {
-  m_view->ClearImage();
-  m_view->Redraw();
-}
-
-void CreateLevelController::UndoRedo() {
-  auto selectionModel = m_view->GetSelectionModel();
-  auto selection = m_model->GetSelection();
-  auto polygonRow = selection.last().first;
-  auto vertexRow = selection.last().second;
-
-  auto polygonsIndex = m_model->index(0, 0);
-  if (polygonRow == -1 && vertexRow == -1) {
-    selectionModel->setCurrentIndex(polygonsIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-  } else {
-    auto polygonIndex = m_model->index(polygonRow, 0, polygonsIndex);
-    if (vertexRow == -1) {
-      selectionModel->setCurrentIndex(polygonIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-    } else {
-      auto vertexIndex = m_model->index(vertexRow, 0, polygonIndex);
-      selectionModel->setCurrentIndex(vertexIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-    }
+  m_createLevelWidget->SetLinesGoal(parser.GetLinesGoal());
+  m_createLevelWidget->SetPartsGoal(parser.GetPartsGoal());
+  m_createLevelWidget->SetMaxGapToWin(parser.GetMaxGapToWin());
+  m_createLevelWidget->SetTolerance(parser.GetTolerance());
+  for (auto const& polygon: parser.GetPolygonsList()){
+    CreatePolygon(polygon);
   }
-  Redraw();
-}
-
-void CreateLevelController::InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon) {
-  QUndoCommand* addPolygonCommand = new AddPolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_polygon, p_polygonRow, -1);
-  m_undoStack->push(addPolygonCommand);
-}
-
-void CreateLevelController::AppendPolygon(ppxl::Polygon const& p_polygon) {
-  InsertPolygon(m_model->rowCount(), p_polygon);
-}
-
-void CreateLevelController::RemovePolygon(int p_polygonRow) {
-  int newPolygonRow = p_polygonRow;
-  if (m_model->rowCount() == 0) {
-    newPolygonRow = -1;
-  } else {
-    if (p_polygonRow == m_model->rowCount()-1) {
-      newPolygonRow = p_polygonRow-1;
-    }
+  m_toolMode = eTapeMode;
+  for (auto const& tape: parser.GetTapesList()) {
+    CreateObject(new Tape(tape));
   }
-
-  auto* polygon = m_model->GetPolygonsList().at(p_polygonRow);
-
-  QUndoCommand* removePolygonCommand = new RemovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, *polygon, newPolygonRow, -1);
-  m_undoStack->push(removePolygonCommand);
+  m_toolMode = eMirrorMode;
+  for (auto const& tape: parser.GetMirrorsList()) {
+    CreateObject(new Mirror(tape));
+  }
+  m_toolMode = eOneWayMode;
+  for (auto const& tape: parser.GetOneWaysList()) {
+    CreateObject(new OneWay(tape));
+  }
+  m_toolMode = ePortalMode;
+  for (auto const& tape: parser.GetPortalsList()) {
+    CreateObject(new Portal(tape));
+  }
+  m_selectAction->trigger();
 }
 
-void CreateLevelController::MovePolygon(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack) {
-  if (p_pushToStack) {
-    QUndoCommand* movePolygonCommand = new MovePolygonCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_direction, p_polygonRow, -1);
-    m_undoStack->push(movePolygonCommand);
+/// REWORK
+void CreateLevelController::UpdateGraphicsSelection(QModelIndex const& p_current, QModelIndex const&) {
+  DisableObjectItems();
+  auto objectListType = CreateLevelObjectsListModel::eUnknownObjectListType;
+  QModelIndex listIndex;
+  if (m_objectsListModel->IsObjectIndex(p_current)) {
+    m_objectsListModel->GetGraphicsFromIndex(p_current)->SetState(GraphicsObjectItem::eSelectedState);
+    listIndex = p_current.parent();
   } else {
-    m_model->TranslatePolygon(p_polygonRow, p_direction);
+    listIndex = p_current;
+  }
+  objectListType = m_objectsListModel->GetListTypFromIndex(listIndex);
+
+  DisconnectToolsActions();
+  auto action = m_objectTypeAction[static_cast<CreateLevelObjectsListModel::ObjectType>(objectListType)];
+  m_toolMode = m_actionToolModeMap[action];
+  action->trigger();
+  /// NOT SURE
+  if (m_toolMode == ePolygonMode) {
+    m_createLevelWidget->ShowVertexListView();
+  } else {
+    m_createLevelWidget->ShowDetailListView();
+  }
+  ConnectToolsActions();
+}
+
+void CreateLevelController::ChangeCurrentTool() {
+  auto action = qobject_cast<QAction*>(sender());
+  m_toolMode = m_actionToolModeMap[action];
+  DisableObjectItems();
+  if (action == m_polygonAction) {
+    m_creatingNewPolygon = true;
+    m_createLevelWidget->ShowVertexListView();
+  } else if (action != m_selectAction) {
+    m_createLevelWidget->ShowDetailListView();
   }
 }
 
-void CreateLevelController::InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex) {
-  QUndoCommand* addVertexCommand = new AddVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_vertex, p_polygonRow, p_vertexRow);
-  m_undoStack->push(addVertexCommand);
-}
-
-void CreateLevelController::AppendVertex(int p_polygonRow, const ppxl::Point& p_vertex) {
-  InsertVertex(p_polygonRow, m_model->GetPolygonsItem()->child(p_polygonRow, 0)->rowCount(), p_vertex);
-}
-
-void CreateLevelController::RemoveVertex(int p_polygonRow, int p_vertexRow) {
-  auto const& vertex = m_model->GetPolygonsList().at(p_polygonRow)->GetVertices().at(static_cast<unsigned long>(p_vertexRow));
-
-  QUndoCommand* removeVertexCommand = new RemoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, vertex, p_polygonRow, 0);
-  m_undoStack->push(removeVertexCommand);
-}
-
-void CreateLevelController::MoveVertex(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack) {
-  if (p_pushToStack) {
-    QUndoCommand* moverVertexCommand = new MoveVertexCommand(m_model, m_view->GetSelectionModel(), p_polygonRow, p_vertexRow, p_direction, p_polygonRow, p_vertexRow);
-    m_undoStack->push(moverVertexCommand);
-  } else {
-    m_model->TranslateVertex(p_polygonRow, p_vertexRow, p_direction);
+void CreateLevelController::ConnectToolsActions() {
+  for (auto action: m_objectTypeAction) {
+    connect(action, &QAction::triggered, this, &CreateLevelController::ChangeCurrentTool);
   }
+}
+
+void CreateLevelController::DisconnectToolsActions() {
+  for (auto action: m_objectTypeAction) {
+    disconnect(action, &QAction::triggered, this, &CreateLevelController::ChangeCurrentTool);
+  }
+}
+
+void CreateLevelController::CreatePolygon(ppxl::Polygon const& p_polygon) {
+  auto polygon = new ppxl::Polygon(p_polygon);
+  auto polygonGraphicsItem = new GraphicsPolygonItem(polygon);
+  auto polygonItem = m_objectsListModel->AddPolygon(polygon, polygonGraphicsItem);
+
+  m_createLevelWidget->AddGraphicsItem(polygonGraphicsItem);
+  polygonGraphicsItem->SetState(GraphicsObjectItem::eSelectedState);
+  connect(polygonGraphicsItem, &GraphicsObjectItem::StateChanged, m_createLevelWidget, &CreateLevelWidget::UpdateView);
+  m_createLevelWidget->SetCurrentObjectOrPolygonIndex(polygonItem->index());
+  m_createLevelWidget->ShowVertexListView();
+  m_vertexListModel->SetPolygon(polygon);
+}
+
+void CreateLevelController::InsertVertex(const QPoint& p_pos) {
+  auto currentPolygonIndex = m_createLevelWidget->GetCurrentPolygonIndex();
+  auto currentVertexIndex = m_createLevelWidget->FindCurrentVertexIndex();
+  auto currentGraphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentPolygonIndex);
+  m_objectsListModel->InsertVertex(currentPolygonIndex.row(), currentVertexIndex.row()+1, ppxl::Point(p_pos.x(), p_pos.y()));
+  auto polygon = m_objectsListModel->GetPolygonFromIndex(currentPolygonIndex);
+  m_vertexListModel->SetPolygon(polygon);
+  m_createLevelWidget->SetCurrentVertexIndex(currentVertexIndex.row()+1);
+  currentGraphicsItem->ComputeBoundingPolygon();
+}
+
+void CreateLevelController::TranslatePolygon(ppxl::Vector const& p_direction) {
+  auto currentPolygonIndex = m_createLevelWidget->GetCurrentPolygonIndex();
+  m_objectsListModel->TranslatePolygon(currentPolygonIndex.row(), p_direction);
+  m_vertexListModel->Update();
+}
+
+void CreateLevelController::MoveCurrentVertex(ppxl::Point const& p_pos) {
+  MoveVertexAt(m_createLevelWidget->FindCurrentVertexIndex().row(), p_pos);
+}
+
+void CreateLevelController::MoveVertexAt(int p_vertexIndex, ppxl::Point const& p_pos) {
+  auto currentPolygonIndex = m_createLevelWidget->GetCurrentPolygonIndex();
+  m_objectsListModel->SetVertex(currentPolygonIndex.row(), p_vertexIndex, p_pos);
+  m_vertexListModel->Update();
+}
+
+void CreateLevelController::UpdateView() {
+  m_createLevelWidget->UpdateView();
 }

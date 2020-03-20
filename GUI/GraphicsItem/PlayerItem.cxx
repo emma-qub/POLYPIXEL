@@ -25,19 +25,19 @@ PlayerItem::~PlayerItem() = default;
 void PlayerItem::keyPressEvent(QKeyEvent* p_event) {
   switch (p_event->key()) {
   case Qt::Key_Left: {
-    Q_EMIT(Move(eLeft));
+    Q_EMIT Move(eLeft);
     break;
   } case Qt::Key_Up: {
-    Q_EMIT(Move(eUp));
+    Q_EMIT Move(eUp);
     break;
   } case Qt::Key_Right: {
-    Q_EMIT(Move(eRight));
+    Q_EMIT Move(eRight);
     break;
   } case Qt::Key_Down: {
-    Q_EMIT(Move(eDown));
+    Q_EMIT Move(eDown);
     break;
   } case Qt::Key_Return: {
-    Q_EMIT(Enter());
+    Q_EMIT Enter();
     break;
   } default:
     break;

@@ -125,8 +125,8 @@ QDomElement Serializer::TapeToNode(Tape const& p_tape, int p_id) {
   QDomElement element(m_doc.createElement("tape"));
   element.setAttribute("id", p_id);
 
-  element.setAttribute("x", p_tape.GetX());
-  element.setAttribute("y", p_tape.GetY());
+  element.setAttribute("x", p_tape.GetXmin());
+  element.setAttribute("y", p_tape.GetYmin());
   element.setAttribute("w", p_tape.GetW());
   element.setAttribute("h", p_tape.GetH());
 

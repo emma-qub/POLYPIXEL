@@ -12,7 +12,7 @@ class OptionsWidget: public QWidget {
 public:
   explicit OptionsWidget(QWidget* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void Done();
 
 private:

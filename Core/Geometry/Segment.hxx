@@ -35,8 +35,8 @@ public:
 
   inline Point GetA() const { return m_a; }
   inline Point GetB() const { return m_b; }
-  inline void setA(Point const& p_a) { m_a = p_a; }
-  inline void setB(Point const& p_b) { m_b = p_b; }
+  inline void SetA(Point const& p_a) { m_a = p_a; }
+  inline void SetB(Point const& p_b) { m_b = p_b; }
 
   Point GetCenter() const;
   Vector GetNormal() const;
@@ -52,6 +52,7 @@ public:
   Intersection ComputeIntersection(Segment const& p_segment) const;
   static Point IntersectionPoint(Segment const& AB, Segment const& PQ);
 
+  bool PointIsInBoundingBox(const Point& C) const;
   bool PointIsOnSegment(Point const& C, double p_tolerence = DBL_EPSILON) const;
 
   void Translate(Vector const& p_direction);

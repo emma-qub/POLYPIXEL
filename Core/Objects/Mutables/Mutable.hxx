@@ -19,6 +19,8 @@ public:
 
   virtual ppxl::Point GetObjectPosition() const = 0;
 
+  virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+
 private:
   Object* m_object;
   int m_roundNumber;

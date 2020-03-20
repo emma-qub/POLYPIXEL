@@ -104,7 +104,7 @@ void Slicer::ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& l
     ppxl::Point B = deviateLine.GetB();
     ppxl::Vector lu = firstLineLength * ppxl::Vector(A, B).Normalize();
     ppxl::Point BB(lu.GetX(), lu.GetY());
-    deviateLine.setB(A + BB);
+    deviateLine.SetB(A + BB);
 
     // Push line and its reflexion
     lines.push_back(deviateLines.at(0));

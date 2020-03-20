@@ -236,25 +236,34 @@ Point Segment::IntersectionPoint(Segment const& AB, Segment const& PQ) {
   return Point(A + tAB);
 }
 
+bool Segment::PointIsInBoundingBox(Point const& C) const {
+  return std::min(m_a.GetX(), m_b.GetX()) <= C.GetX()
+    && C.GetX() <= std::max(m_a.GetX(), m_b.GetX())
+    && std::min(m_a.GetY(), m_b.GetY()) <= C.GetY()
+    && C.GetY() <= std::max(m_a.GetY(), m_b.GetY());
+}
+
 bool Segment::PointIsOnSegment(Point const& C, double p_tolerence) const {
   auto A = m_a;
   auto B = m_b;
 
   auto crossproduct = (C.GetY() - A.GetY()) * (B.GetX() - A.GetX()) - (C.GetX() - A.GetX()) * (B.GetY() - A.GetY());
 
-  // Compare with p_tolerence
+  // Point C is not too far from segment
   if (std::abs(crossproduct) > p_tolerence*Length())
     return false;
 
-  auto dotproduct = (C.GetX() - A.GetX()) * (B.GetX() - A.GetX()) + (C.GetY() - A.GetY())*(B.GetY() - A.GetY());
-  if (dotproduct < 0)
-    return false;
+  // Point C is between A and B
+  return (A.GetX() - C.GetX()) * (B.GetX() - C.GetX()) + (A.GetY() - C.GetY())*(B.GetY() - C.GetY()) <= DBL_EPSILON;
+//  auto dotproduct = (C.GetX() - A.GetX()) * (B.GetX() - A.GetX()) + (C.GetY() - A.GetY())*(B.GetY() - A.GetY());
+//  if (dotproduct < 0)
+//    return false;
 
-  auto squaredlengthba = (B.GetX() - A.GetX())*(B.GetX() - A.GetX()) + (B.GetY() - A.GetY())*(B.GetY() - A.GetY());
-  if (dotproduct > squaredlengthba)
-    return false;
+//  auto squaredlengthba = (B.GetX() - A.GetX())*(B.GetX() - A.GetX()) + (B.GetY() - A.GetY())*(B.GetY() - A.GetY());
+//  if (dotproduct > squaredlengthba)
+//    return false;
 
-  return true;
+//  return true;
 }
 
 bool operator==(Segment const& p_segment1, Segment const& p_segment2) {

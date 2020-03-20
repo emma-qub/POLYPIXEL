@@ -5,7 +5,7 @@
 #include <QStateMachine>
 
 class AchievementsWidget;
-class CreateLevelModel;
+class CreateLevelObjectsListModel;
 class CreateLevelWidget;
 class CreateLevelController;
 class GameWidget;

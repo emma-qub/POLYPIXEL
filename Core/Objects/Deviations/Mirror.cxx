@@ -72,3 +72,41 @@ std::vector<ppxl::Segment> Mirror::DeviateLine(ppxl::Segment const& p_line) cons
 
   return deviatedLines;
 }
+
+void Mirror::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointType p_controlPointType) {
+  auto endPoint = p_point;
+
+  switch (p_controlPointType) {
+  case eBottomRight: {
+    ppxl::Point::GetDiscreteEndPoint(m_line.GetA(), p_point, endPoint);
+    m_line.SetB(endPoint);
+    break;
+  } case eTopLeft: {
+    ppxl::Point::GetDiscreteEndPoint(m_line.GetB(), p_point, endPoint);
+    m_line.SetA(endPoint);
+    break;
+  } case eCenter: {
+    m_line.Translate(ppxl::Vector(m_line.GetCenter(), p_point));
+    break;
+  } default:
+    break;
+  }
+}
+
+ppxl::Point Mirror::GetControlPoint(Object::ControlPointType p_controlPointType) const {
+  switch (p_controlPointType) {
+  case eTopLeft:{
+    return ppxl::Point(m_line.GetA());
+    break;
+  }case eCenter:{
+    return ppxl::Point(m_line.GetCenter());
+    break;
+  } case eBottomRight:{
+    return ppxl::Point(m_line.GetB());
+    break;
+  }  default:
+    break;
+  }
+
+  return ppxl::Point(-1, -1);
+}

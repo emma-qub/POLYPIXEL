@@ -1,11 +1,11 @@
 #include "CreateLevelCommands.hxx"
 
-#include "GUI/Models/CreateLevelModel.hxx"
+#include "GUI/Models/CreateLevelObjectsListModel.hxx"
 
 #include <QStandardItem>
 #include <QItemSelectionModel>
 
-UndoCommand::UndoCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, QUndoCommand* p_parent):
+UndoCommand::UndoCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, QUndoCommand* p_parent):
   QUndoCommand(p_parent),
   m_model(p_model),
   m_selectionModel(p_selectionModel) {
@@ -15,7 +15,7 @@ UndoCommand::~UndoCommand() = default;
 
 
 
-AddVertexCommand::AddVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
+AddVertexCommand::AddVertexCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
   ppxl::Point const& p_vertex, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -30,18 +30,18 @@ AddVertexCommand::AddVertexCommand(CreateLevelModel* p_model, QItemSelectionMode
 AddVertexCommand::~AddVertexCommand() = default;
 
 void AddVertexCommand::undo() {
-  m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
-  m_model->PopSelection();
+//  m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
+//  m_model->PopSelection();
 }
 
 void AddVertexCommand::redo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
 
-RemoveVertexCommand::RemoveVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
+RemoveVertexCommand::RemoveVertexCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
   ppxl::Point const& p_vertex, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -56,18 +56,18 @@ RemoveVertexCommand::RemoveVertexCommand(CreateLevelModel* p_model, QItemSelecti
 RemoveVertexCommand::~RemoveVertexCommand() = default;
 
 void RemoveVertexCommand::undo() {
-  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
-  m_model->PopSelection();
+//  m_model->InsertVertex(m_polygonRow, m_vertexRow, m_vertex);
+//  m_model->PopSelection();
 }
 
 void RemoveVertexCommand::redo() {
-  m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->RemoveVertexAt(m_polygonRow, m_vertexRow);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
 
-MoveVertexCommand::MoveVertexCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
+MoveVertexCommand::MoveVertexCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow, int p_vertexRow,
   ppxl::Vector const& p_direction, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -83,18 +83,18 @@ MoveVertexCommand::MoveVertexCommand(CreateLevelModel* p_model, QItemSelectionMo
 MoveVertexCommand::~MoveVertexCommand() = default;
 
 void MoveVertexCommand::undo() {
-  m_model->TranslateVertex(m_polygonRow, m_vertexRow, -m_direction);
-  m_model->PopSelection();
+//  m_model->TranslateVertex(m_polygonRow, m_vertexRow, -m_direction);
+//  m_model->PopSelection();
 }
 
 void MoveVertexCommand::redo() {
-  m_model->TranslateVertex(m_polygonRow, m_vertexRow, m_direction);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->TranslateVertex(m_polygonRow, m_vertexRow, m_direction);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
 
-AddPolygonCommand::AddPolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+AddPolygonCommand::AddPolygonCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
   ppxl::Polygon const& p_polygon, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -108,18 +108,18 @@ AddPolygonCommand::AddPolygonCommand(CreateLevelModel* p_model, QItemSelectionMo
 AddPolygonCommand::~AddPolygonCommand() = default;
 
 void AddPolygonCommand::undo() {
-  m_model->RemovePolygonAt(m_polygonRow);
-  m_model->PopSelection();
+//  m_model->RemovePolygonAt(m_polygonRow);
+//  m_model->PopSelection();
 }
 
 void AddPolygonCommand::redo() {
-  m_model->InsertPolygon(m_polygonRow, m_polygon);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->InsertPolygon(m_polygonRow, m_polygon);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
 
-RemovePolygonCommand::RemovePolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+RemovePolygonCommand::RemovePolygonCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
   ppxl::Polygon const& p_polygon, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -133,18 +133,18 @@ RemovePolygonCommand::RemovePolygonCommand(CreateLevelModel* p_model, QItemSelec
 RemovePolygonCommand::~RemovePolygonCommand() = default;
 
 void RemovePolygonCommand::undo() {
-  m_model->InsertPolygon(m_polygonRow, m_polygon);
-  m_model->PopSelection();
+//  m_model->InsertPolygon(m_polygonRow, m_polygon);
+//  m_model->PopSelection();
 }
 
 void RemovePolygonCommand::redo() {
-  m_model->RemovePolygonAt(m_polygonRow);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->RemovePolygonAt(m_polygonRow);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }
 
 
 
-MovePolygonCommand::MovePolygonCommand(CreateLevelModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
+MovePolygonCommand::MovePolygonCommand(CreateLevelObjectsListModel* p_model, QItemSelectionModel* p_selectionModel, int p_polygonRow,
   ppxl::Vector const& p_direction, int p_selectionPolygonRow, int p_selectionVertexRow, QUndoCommand* p_parent):
   UndoCommand(p_model, p_selectionModel, p_parent),
   m_polygonRow(p_polygonRow),
@@ -158,11 +158,11 @@ MovePolygonCommand::MovePolygonCommand(CreateLevelModel* p_model, QItemSelection
 MovePolygonCommand::~MovePolygonCommand() = default;
 
 void MovePolygonCommand::undo() {
-  m_model->TranslatePolygon(m_polygonRow, -m_direction);
-  m_model->PopSelection();
+//  m_model->TranslatePolygon(m_polygonRow, -m_direction);
+//  m_model->PopSelection();
 }
 
 void MovePolygonCommand::redo() {
-  m_model->TranslatePolygon(m_polygonRow, m_direction);
-  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
+//  m_model->TranslatePolygon(m_polygonRow, m_direction);
+//  m_model->PushSelection(m_selectionPolygonRow, m_selectionVertexRow);
 }

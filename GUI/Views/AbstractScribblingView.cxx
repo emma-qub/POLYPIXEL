@@ -15,7 +15,7 @@
 AbstractScribblingView::AbstractScribblingView(QWidget* p_parent):
   QGraphicsView(p_parent),
   m_scene(nullptr),
-  m_penWidth(5),
+  m_penWidth(7),
   m_polygonModel(nullptr),
   m_penColor(),
   m_canScribble(false),
@@ -63,7 +63,9 @@ bool AbstractScribblingView::GetCanScribble() const {
 void AbstractScribblingView::ClearImage() {
   for (auto* item: m_scene->items()) {
     m_scene->removeItem(item);
+    delete item;
   }
+  m_graphicsPolygonList.clear();
 
   update();
 }
@@ -130,7 +132,7 @@ void AbstractScribblingView::DrawObjects() {
     switch (objectType) {
     case Object::eTape: {
       auto tape = static_cast<Tape*>(object);
-      scene()->addRect(tape->GetX(), tape->GetY(), tape->GetW(), tape->GetH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
+      scene()->addRect(tape->GetXmin(), tape->GetYmax(), tape->GetW(), tape->GetH(), QPen(QBrush(QColor("#ff9900")), 3), QBrush(QColor("#ff9900"), Qt::BDiagPattern));
       break;
     } case Object::eOneWay: {
       auto oneWay = static_cast<OneWay*>(object);

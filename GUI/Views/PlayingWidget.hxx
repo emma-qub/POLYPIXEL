@@ -38,7 +38,7 @@ public:
   void EndLevel();
   void DisplayGameOver();
 
-signals:
+Q_SIGNALS:
   void Scribbling(QPoint const& p_startPoint);
   void Moving(QPoint const& p_currentPoint);
   void Slicing(QPoint const& p_endPoint);

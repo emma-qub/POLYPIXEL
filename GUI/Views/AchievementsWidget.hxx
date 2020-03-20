@@ -12,7 +12,7 @@ class AchievementsWidget: public QWidget {
 public:
   explicit AchievementsWidget(QWidget* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void Done();
 
 private:

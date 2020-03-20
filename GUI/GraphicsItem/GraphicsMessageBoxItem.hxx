@@ -64,7 +64,7 @@ public:
   void Close();
   void DisplayText();
 
-signals:
+Q_SIGNALS:
   void Done();
 
 protected:

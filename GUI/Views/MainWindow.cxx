@@ -12,7 +12,7 @@
 #include "WorldsView.hxx"
 #include "MapView.hxx"
 
-#include "GUI/Models/CreateLevelModel.hxx"
+#include "GUI/Models/CreateLevelObjectsListModel.hxx"
 //#include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/LevelsModel.hxx"
 #include "GUI/Models/WorldsModel.hxx"
@@ -45,11 +45,12 @@ MainWindow::MainWindow(QWidget* p_parent):
   m_mapView(new MapView) {
 
   m_toolbar = new QToolBar;
-  addToolBar(m_toolbar);
+  addToolBar(Qt::LeftToolBarArea, m_toolbar);
   m_toolbar->setOrientation(Qt::Vertical);
-  m_toolbar->setAllowedAreas(Qt::NoToolBarArea);
-  m_toolbar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-  m_toolbar->move(50, 50);
+  m_toolbar->setAllowedAreas(Qt::LeftToolBarArea);
+  m_toolbar->setMovable(false);
+  //m_toolbar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+  //m_toolbar->move(50, 50);
 
   m_createLevelController->SetToolBar(m_toolbar);
 
@@ -118,7 +119,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   pauseState->addTransition(m_pauseWidget, &PauseWidget::LevelsRequested, mapState);
   //achievementsState->addTransition(m_achievementsWidget, &AchievementsWidget::Done, worldsState);
   createLevelState->addTransition(m_createLevelWidget, &CreateLevelWidget::TestLevelRequested, testLevelState);
-  createLevelState->addTransition(m_createLevelWidget, &CreateLevelWidget::Done, mainMenuState);
+  createLevelState->addTransition(m_createLevelWidget, &CreateLevelWidget::CreateLevelDone, mainMenuState);
   testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::AmendLevelRequested, createLevelState);
   testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::Done, mainMenuState);
   optionsState->addTransition(m_optionsWidget, &OptionsWidget::Done, mainMenuState);
@@ -126,7 +127,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
     if (m_centralWidget->currentWidget() == m_createLevelWidget) {
       m_createLevelWidget->InitViews();
-      m_createLevelController->Redraw();
+      m_createLevelController->UpdateView();
       m_toolbar->show();
     } else {
       m_toolbar->hide();

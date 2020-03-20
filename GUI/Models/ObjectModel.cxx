@@ -325,17 +325,17 @@ void OneWayModel::AddOneWay(OneWay const& p_oneWay) {
     << new QStandardItem(QString::number(line.GetB().GetX(), 'f', 0))
     << new QStandardItem(QString::number(line.GetB().GetY(), 'f', 0)));
 
-  auto direction = p_oneWay.GetDirection();
-  auto directionItem = new QStandardItem(tr("Direction"));
-  directionItem->appendRow(QList<QStandardItem*>()
-    << new QStandardItem(QString::number(direction.GetX(), 'f', 3))
-    << new QStandardItem(QString::number(direction.GetY(), 'f', 3))
+  auto normal = p_oneWay.GetNormal();
+  auto normalItem = new QStandardItem(tr("Normal"));
+  normalItem->appendRow(QList<QStandardItem*>()
+    << new QStandardItem(QString::number(normal.GetX(), 'f', 3))
+    << new QStandardItem(QString::number(normal.GetY(), 'f', 3))
     << new QStandardItem
     << new QStandardItem);
 
   auto oneWayItem = new QStandardItem(tr("%1 #%2").arg(p_oneWay.GetName().c_str()).arg(m_oneWaysList.size()));
   oneWayItem->appendRow(QList<QStandardItem*>() << lineItem << new QStandardItem << new QStandardItem << new QStandardItem);
-  oneWayItem->appendRow(QList<QStandardItem*>() << directionItem << new QStandardItem << new QStandardItem << new QStandardItem);
+  oneWayItem->appendRow(QList<QStandardItem*>() << normalItem << new QStandardItem << new QStandardItem << new QStandardItem);
 
   m_objectsItem->appendRow(QList<QStandardItem*>() << oneWayItem << new QStandardItem << new QStandardItem << new QStandardItem);
   RegisterObject(oneWay, oneWayItem);
@@ -358,7 +358,7 @@ void OneWayModel::SetObject(int p_index, Object* p_object) {
   lineItem->child(0, 2)->setText(QString::number(line.GetB().GetX(), 'f', 0));
   lineItem->child(0, 3)->setText(QString::number(line.GetB().GetY(), 'f', 0));
   auto directionItem = oneWayItem->child(1, 0);
-  auto direction = oneWay->GetDirection();
+  auto direction = oneWay->GetNormal();
   directionItem->child(0, 0)->setText(QString::number(direction.GetX(), 'f', 3));
   directionItem->child(0, 1)->setText(QString::number(direction.GetY(), 'f', 3));
 }
@@ -378,10 +378,10 @@ void TapeModel::AddTape(Tape const& p_tape) {
   m_tapesList << tape;
   AddObject(tape);
 
-  auto left = p_tape.GetX();
-  auto top = p_tape.GetY();
-  auto right = left + p_tape.GetW();
-  auto bottom = top + p_tape.GetH();
+  auto left = p_tape.GetX1();
+  auto top = p_tape.GetY1();
+  auto right = p_tape.GetX2();
+  auto bottom = p_tape.GetY2();
   auto tapeItem = new QStandardItem(tr("%1 #%2").arg(p_tape.GetName().c_str()).arg(m_tapesList.size()));
   tapeItem->appendRow(QList<QStandardItem*>()
     << new QStandardItem(QString::number(left, 'f', 0))
@@ -395,19 +395,12 @@ void TapeModel::AddTape(Tape const& p_tape) {
 
 void TapeModel::SetObject(int p_index, Object* p_object) {
   assert(p_object->GetObjectType() == Object::eTape);
-  auto newTape = static_cast<Tape*>(p_object);
-
-  // Update Tape
-  auto tape = m_tapesList.at(p_index);
-  tape->SetX(newTape->GetX());
-  tape->SetY(newTape->GetY());
-  tape->SetW(newTape->GetW());
-  tape->SetH(newTape->GetH());
+  auto tape = static_cast<Tape*>(p_object);
 
   // Update Tape Item
   auto tapeItem = m_objectsItem->child(p_index, 0);
-  tapeItem->child(0, 0)->setText(QString::number(tape->GetX(), 'f', 0));
-  tapeItem->child(0, 1)->setText(QString::number(tape->GetY(), 'f', 0));
-  tapeItem->child(0, 2)->setText(QString::number(tape->GetX()+tape->GetW(), 'f', 0));
-  tapeItem->child(0, 3)->setText(QString::number(tape->GetY()+tape->GetH(), 'f', 0));
+  tapeItem->child(0, 0)->setText(QString::number(tape->GetX1(), 'f', 0));
+  tapeItem->child(0, 1)->setText(QString::number(tape->GetY1(), 'f', 0));
+  tapeItem->child(0, 2)->setText(QString::number(tape->GetX2(), 'f', 0));
+  tapeItem->child(0, 3)->setText(QString::number(tape->GetY2(), 'f', 0));
 }

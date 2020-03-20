@@ -12,11 +12,14 @@ public:
   ~Portal() override;
 
   inline ppxl::Segment GetIn() const { return m_in; }
-  void SetIn(ppxl::Segment const& p_in);
+  inline void SetIn(ppxl::Segment const& p_in) { m_in = p_in; };
   inline ppxl::Segment GetOut() const { return m_out; }
-  void SetOut(ppxl::Segment const& p_out);
-  inline ppxl::Vector GetNormalIn() const { return m_normalIn; }
-  inline ppxl::Vector GetNormalOut() const { return m_normalOut; }
+  inline void SetOut(ppxl::Segment const& p_out) { m_out = p_out; };
+  inline ppxl::Vector GetNormalIn() const { return m_in.GetNormal(); }
+  inline ppxl::Vector GetNormalOut() const { return m_out.GetNormal(); }
+
+  inline void SetCreating(bool p_creating) { m_creating = p_creating; }
+  inline bool IsCreating() const { return m_creating; }
 
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
@@ -25,12 +28,13 @@ public:
   std::vector<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const override;
   std::vector<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
 
+  virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+  ppxl::Point GetControlPoint(ControlPointType p_controlPointType) const override;
+
 private:
   ppxl::Segment m_in;
   ppxl::Segment m_out;
-
-  ppxl::Vector m_normalIn;
-  ppxl::Vector m_normalOut;
+  bool m_creating;
 };
 
 #endif

@@ -30,6 +30,7 @@ public:
   void RemoveVertex(unsigned int p_position);
   void ReplaceVertex(unsigned int p_position, Point const& p_newVertex);
 
+  void SetVertexAt(Point const& p_vertex, unsigned int p_position);
   void Translate(Vector const& p_direction);
   void Translate(double p_x, double p_y);
   void Homothetie(Point const& p_origin, double p_scale);

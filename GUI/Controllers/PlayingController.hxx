@@ -51,7 +51,7 @@ public:
   void RestartLevel();
   void Redraw();
 
-signals:
+Q_SIGNALS:
   void GoToMapRequested(bool p_moveToNextLevel);
 
 protected:

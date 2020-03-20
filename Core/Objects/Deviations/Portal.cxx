@@ -6,29 +6,16 @@ Portal::Portal(double xaIn, double p_yaIn, double p_xbIn, double p_ybIn, double 
   Deviation(),
   m_in(ppxl::Segment(xaIn, p_yaIn, p_xbIn, p_ybIn)),
   m_out(ppxl::Segment(p_xaOut, p_yaOut, p_xbOut, p_ybOut)),
-  m_normalIn(m_in.GetNormal()),
-  m_normalOut(m_out.GetNormal()) {
+  m_creating(true) {
 }
 
 Portal::Portal(ppxl::Segment const& p_in, ppxl::Segment const& p_out):
   Deviation(),
   m_in(p_in),
-  m_out(p_out),
-  m_normalIn(m_in.GetNormal()),
-  m_normalOut(m_out.GetNormal()) {
+  m_out(p_out) {
 }
 
 Portal::~Portal() = default;
-
-void Portal::SetIn(ppxl::Segment const& p_in) {
-  m_in = p_in;
-  m_normalIn = m_in.GetNormal();
-}
-
-void Portal::SetOut(ppxl::Segment const& p_out) {
-  m_out = p_out;
-  m_normalOut = m_out.GetNormal();
-}
 
 Object::ObjectType Portal::GetObjectType() const {
   return ePortal;
@@ -125,4 +112,77 @@ std::vector<ppxl::Segment> Portal::DeviateLine2(ppxl::Segment const& p_line) con
   }
 
   return deviatedLines;
+}
+
+void Portal::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointType p_controlPointType) {
+  auto endPoint = p_point;
+
+  switch (p_controlPointType) {
+  case eBottomRight: {
+    auto inOut = ppxl::Point::Distance(m_in.GetA(), m_out.GetA());
+    ppxl::Point::GetDiscreteEndPoint(m_in.GetA(), p_point, endPoint);
+
+    m_in.SetB(endPoint);
+
+    auto normalOut = GetNormalOut();
+    if (!normalOut.IsNull()) {
+      auto startPointOut = m_in.GetA().Translated(-inOut*normalOut);
+      m_out.SetA(startPointOut);
+      endPoint.Translated(-inOut*normalOut);
+    }
+    m_out.SetB(endPoint);
+
+    break;
+  } case eBottomRightYellow: {
+    ppxl::Point::GetDiscreteEndPoint(m_in.GetA(), p_point, endPoint);
+    m_in.SetB(endPoint);
+    break;
+  } case eCenterYellow: {
+    m_in.Translate(ppxl::Vector(m_in.GetCenter(), p_point));
+    break;
+  } case eTopLeftYellow: {
+    ppxl::Point::GetDiscreteEndPoint(m_in.GetB(), p_point, endPoint);
+    m_in.SetA(endPoint);
+    break;
+  } case eBottomRightBlue: {
+    ppxl::Point::GetDiscreteEndPoint(m_out.GetA(), p_point, endPoint);
+    m_out.SetB(endPoint);
+    break;
+  } case eCenterBlue: {
+    m_out.Translate(ppxl::Vector(m_out.GetCenter(), p_point));
+    break;
+  } case eTopLeftBlue: {
+    ppxl::Point::GetDiscreteEndPoint(m_out.GetB(), p_point, endPoint);
+    m_out.SetA(endPoint);
+    break;
+  } default:
+    break;
+  }
+}
+
+ppxl::Point Portal::GetControlPoint(Object::ControlPointType p_controlPointType) const {
+  switch (p_controlPointType) {
+  case eTopLeftYellow:{
+    return ppxl::Point(m_in.GetA());
+    break;
+  } case eCenterYellow:{
+    return ppxl::Point(m_in.GetCenter());
+    break;
+  } case eBottomRightYellow:{
+    return ppxl::Point(m_in.GetB());
+    break;
+  } case eTopLeftBlue:{
+    return ppxl::Point(m_out.GetA());
+    break;
+  } case eCenterBlue:{
+    return ppxl::Point(m_out.GetCenter());
+    break;
+  } case eBottomRightBlue:{
+    return ppxl::Point(m_out.GetB());
+    break;
+  } default:
+    break;
+  }
+
+  return ppxl::Point(-1, -1);
 }

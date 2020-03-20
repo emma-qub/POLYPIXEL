@@ -50,6 +50,8 @@ public:
   static double Distance(Point const& p_point1, Point const& p_point2);
   static Point Middle(Point const& p_point1, Point const& p_point2);
 
+  static void GetDiscreteEndPoint(Point const& p_startRealPoint, Point const& p_realEndPoint, Point& p_discreteEndPoint);
+
   friend std::ostream& operator<<(std::ostream& p_os, Point const& p_point);
   friend QDebug operator<<(QDebug p_debug, Point const& p_point);
 

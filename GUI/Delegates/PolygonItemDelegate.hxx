@@ -15,7 +15,7 @@ public:
   void setModelData(QWidget* p_editor, QAbstractItemModel* p_model, QModelIndex const& p_index) const override;
   void updateEditorGeometry(QWidget* p_editor, QStyleOptionViewItem const& p_option, QModelIndex const& p_index) const override;
 
-signals:
+Q_SIGNALS:
   void ValueXChanged(int p_value, QModelIndex const& p_index) const;
   void ValueYChanged(int p_value, QModelIndex const& p_index) const;
   void EditionXDone(int p_value, QModelIndex const& p_index) const;

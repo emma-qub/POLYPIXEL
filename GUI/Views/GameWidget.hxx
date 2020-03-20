@@ -25,7 +25,7 @@ public:
   void PlayLevel(QString const& p_levelPath);
   void RestartLevel();
 
-signals:
+Q_SIGNALS:
   void PauseRequested();
   void GoToMapRequested(bool p_moveToNextLevel);
 

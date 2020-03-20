@@ -12,7 +12,7 @@ class LoadingWidget: public QWidget {
 public:
   explicit LoadingWidget(QWidget* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void LoadingDone();
 
 protected:

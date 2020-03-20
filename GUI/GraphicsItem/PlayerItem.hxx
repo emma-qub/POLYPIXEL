@@ -22,7 +22,7 @@ public:
 
   void keyPressEvent(QKeyEvent* p_event) override;
 
-signals:
+Q_SIGNALS:
   void Move(Direction p_direction);
   void Enter();
 

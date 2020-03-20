@@ -21,7 +21,7 @@ LoadingWidget::LoadingWidget(QWidget* parent):
   m_progressBar->setFixedWidth(100);
   connect(m_progressBar, &QProgressBar::valueChanged, this, [this](int p_value) {
     if (p_value >= 100) {
-      Q_EMIT(LoadingDone());
+      Q_EMIT LoadingDone();
     }
   });
 

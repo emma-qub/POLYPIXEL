@@ -6,9 +6,10 @@
 #include "Core/Geometry/Polygon.hxx"
 #include "Core/Geometry/Point.hxx"
 #include "GUI/Views/CreateLevelWidget.hxx"
-#include "GUI/Models/CreateLevelModel.hxx"
+#include "GUI/Models/CreateLevelObjectsListModel.hxx"
+#include "GUI/Models/CreateLevelObjectsDetailModel.hxx"
+#include "GUI/Models/CreateLevelVertexListModel.hxx"
 
-class ObjectModel;
 class QUndoStack;
 class QStandardItem;
 class QToolBar;
@@ -32,71 +33,82 @@ public:
 
   void SetToolBar(QToolBar* p_toolbar);
 
-  inline CreateLevelModel* GetPolygonModel() const { return m_model; }
+  inline CreateLevelObjectsListModel* GetPolygonModel() const { return m_objectsListModel; }
   int GetLinesGoal() const;
   int GetPartsGoal() const;
   int GetMaxGapToWin() const;
   int GetTolerance() const;
 
-  void RedrawFromPolygons();
-  void Redraw();
-  void UndoRedo();
-
-  void InsertPolygon(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void AppendPolygon(ppxl::Polygon const& p_polygon);
-  void RemovePolygon(int p_polygonRow);
-  void MovePolygon(int p_polygonRow, const ppxl::Vector& p_direction, bool p_pushToStack = true);
-
-  void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
-  void AppendVertex(int p_polygonRow, ppxl::Point const& p_vertex);
-  void RemoveVertex(int p_polygonRow, int p_vertexRow);
-  void MoveVertex(int p_polygonRow, int p_vertexRow, ppxl::Vector const& p_direction, bool p_pushToStack = true);
+  void UpdateView();
 
 protected:
-  void UpdateXVertex(int p_value, const QModelIndex& p_index);
-  void UpdateYVertex(int p_value, const QModelIndex& p_index);
-  void TranslateXVertex(int p_value, const QModelIndex& p_index);
-  void TranslateYVertex(int p_value, const QModelIndex& p_index);
+  void CreatePolygon(const ppxl::Polygon& p_polygon = ppxl::Polygon());
+  void TranslatePolygon(ppxl::Vector const& p_direction);
+  void InsertVertex(QPoint const& p_pos);
+  void MoveCurrentVertex(ppxl::Point const& p_pos);
+  void MoveVertexAt(int p_vertexIndex, ppxl::Point const& p_pos);
+
   void SnapToGrid();
-  void SnapCurrentPolygonToGrid(QModelIndex const& p_currentIndex);
+  void SnapAllToGrid();
+  void SnapObjectToGrid(QModelIndex const& p_currentIndex);
+  void SnapPolygonToGrid(QModelIndex const& p_currentIndex);
   void CheckTestAvailable();
 
   void MousePressEvent(QMouseEvent* p_event);
   void MouseMoveEvent(QMouseEvent* p_event);
-  void MouseReleaseEvent(QMouseEvent* p_event);
+  void MouseReleaseEvent(QMouseEvent*);
 
   void DisableObjectItems();
-  void SelectObjectUnderCursor();
-  void CreateObect();
-  void FindNearestControlPoint(bool& nearControlPoint, QPoint& nearestControlPoint, const QPoint& p_pos) const;
-  void MoveNewObject(QPoint const& p_pos);
-  void MoveExistingObject(QPoint const& p_pos);
-  void GetDiscreteEnd(QPoint const& p_pos, double& p_nx, double& p_ny);
+  void SelectObjectUnderCursor(QPoint const& p_pos);
+  void CreateObject(Object* p_object = nullptr);
+  void FindNearestVertex(bool& p_isNearVertex, ppxl::Point& p_nearestVertex, int& p_nearestVertexRow, QPoint const& p_pos) const;
+  void FindNearestControlPoint(bool& p_isNearControlPoint, QPair<QPoint, Object::ControlPointType>& p_nearestControlPoint, QPoint const& p_pos) const;
+  void MoveObject(QPoint const& p_pos);
   void HighlightObjectUnderCursor(QPoint const& p_pos);
 
   void NewLevel();
   void OpenLevel(QString const& p_fileName);
 
-private:
-  CreateLevelModel* m_model;
-  CreateLevelWidget* m_view;
-  QUndoStack* m_undoStack;
-  QToolBar* m_toolbar;
+  void UpdateGraphicsSelection(QModelIndex const& p_current, QModelIndex const&);
 
+  void ChangeCurrentTool();
+  void ConnectToolsActions();
+  void DisconnectToolsActions();
+
+  ppxl::Point FindNearestGridNode(ppxl::Point const& p_point);
+
+private:
+  CreateLevelObjectsListModel* m_objectsListModel;
+  CreateLevelObjectsDetailModel* m_objectsDetailModel;
+  CreateLevelVertexListModel* m_vertexListModel;
+  CreateLevelWidget* m_createLevelWidget;
+
+  QToolBar* m_toolbar;
   ToolMode m_toolMode;
 
   QAction* m_selectAction;
   QAction* m_polygonAction;
-  QMap<CreateLevelModel::ObjectType, QAction*> m_objectTypeAction;
+  QAction* m_tapeAction;
+  QAction* m_mirrorAction;
+  QAction* m_oneWayAction;
+  QAction* m_portalAction;
+
+  QMap<CreateLevelObjectsListModel::ObjectType, QAction*> m_objectTypeAction;
+  QMap<QAction*, ToolMode> m_actionToolModeMap;
 
   QPoint m_objectStartPoint;
+
+  bool m_creatingNewPolygon;
   bool m_creatingObject;
-  bool m_editingObject;
+
   bool m_mousePressed;
-  bool m_nearControlPoint;
+  bool m_isNearVertex;
+  ppxl::Point m_nearestVertex;
+  int m_nearestVertexRow;
+  bool m_isNearControlPoint;
+  QPair<QPoint, Object::ControlPointType> m_nearestControlPoint;
 
   QStandardItem* m_hoveredItem;
-  QStandardItem* m_selectedItem;
 };
 
 #endif

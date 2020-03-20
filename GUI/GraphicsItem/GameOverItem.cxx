@@ -249,7 +249,7 @@ void GameOverItem::CloseToMap(bool p_moveToNextLevel) {
   animation->addAnimation(dialogAnimation);
   animation->addAnimation(overlayAnimation);
   animation->start(QAbstractAnimation::DeleteWhenStopped);
-  connect(animation, &QPropertyAnimation::finished, this, [this, p_moveToNextLevel](){Q_EMIT(GoToMapRequested(p_moveToNextLevel));});
+  connect(animation, &QPropertyAnimation::finished, this, [this, p_moveToNextLevel](){Q_EMIT GoToMapRequested(p_moveToNextLevel);});
   connect(animation, &QPropertyAnimation::finished, this, [this](){hide();m_overlayItem->hide();});
 
   animation->start(QAbstractAnimation::DeleteWhenStopped);

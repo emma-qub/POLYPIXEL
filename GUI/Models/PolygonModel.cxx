@@ -1,5 +1,4 @@
 #include "PolygonModel.hxx"
-#include "PolygonItem.hxx"
 
 #include <random>
 
@@ -34,9 +33,11 @@ void PolygonModel::InitColor() {
 
 void PolygonModel::InsertPolygon(int p_row, ppxl::Polygon const& p_polygon) {
   auto polygon = new ppxl::Polygon(p_polygon);
-  auto polygonItem = new PolygonItem(polygon, m_color);
+  auto polygonItem = new QStandardItem;
+  polygonItem->setData(m_color, Qt::DecorationRole);
   polygonItem->setData(ePolygon, eItemTypeRole);
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon*>(polygon), ePolygonRole);
+  polygonItem->setText(QString("Polygon %1").arg(p_row));
 
   m_polygonsItem->insertRow(p_row, QList<QStandardItem*>() << polygonItem << new QStandardItem << new QStandardItem);
   m_polygons << polygon;
@@ -52,7 +53,7 @@ void PolygonModel::SetPolygonsList(QList<ppxl::Polygon> const& p_polygonsList) {
     AppendPolygon(polygon);
   }
 
-  Q_EMIT(PolygonListChanged());
+  Q_EMIT PolygonListChanged();
 }
 
 void PolygonModel::RemovePolygonAt(int p_polygonRow) {

@@ -47,6 +47,10 @@ void Polygon::InsertVertex(Point const& p_vertex, unsigned int p_position) {
   m_vertices.insert(m_vertices.begin()+p_position, p_vertex);
 }
 
+void Polygon::SetVertexAt(Point const& p_vertex, unsigned int p_position) {
+  m_vertices[p_position] = p_vertex;
+}
+
 void Polygon::AppendVertex(Point const& p_vertex) {
   m_vertices.push_back(p_vertex);
 }

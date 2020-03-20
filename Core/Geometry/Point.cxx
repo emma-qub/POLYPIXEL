@@ -6,6 +6,7 @@
 #include <cmath>    // sqrt, pow, abs
 #include <cfloat>   // DBL_EPSILON
 #include <random>
+#include <limits>
 
 namespace ppxl {
 
@@ -126,6 +127,34 @@ double Point::Distance(Point const& p_point1, Point const& p_point2) {
 
 Point Point::Middle(Point const& p_point1, Point const& p_point2) {
   return Point((p_point1.GetX() + p_point2.GetX())/2., (p_point1.GetY() + p_point2.GetY())/2.);
+}
+
+void Point::GetDiscreteEndPoint(Point const& p_startRealPoint, Point const& p_realEndPoint, Point& p_discreteEndPoint) {
+  auto ox = p_startRealPoint.GetX();
+  auto oy = p_startRealPoint.GetY();
+  auto px = p_realEndPoint.GetX();
+  auto py = p_realEndPoint.GetY();
+  auto pdx = p_discreteEndPoint.GetX();
+  auto pdy = p_discreteEndPoint.GetY();
+  auto radius = ppxl::Point::Distance(ppxl::Point(ox, oy), ppxl::Point(px, py));
+
+  pdx = 0;
+  pdy = 0;
+  double minDist = 0.;
+  for (int k = 0; k < 24; ++k) {
+    auto dk = static_cast<double>(k);
+    auto dx = radius*std::cos(dk*M_PI/12.)+ox;
+    auto dy = radius*std::sin(dk*M_PI/12.)+oy;
+
+    auto dist = ppxl::Point::Distance(ppxl::Point(px, py), ppxl::Point(dx, dy));
+    if (k == 0 || dist < minDist) {
+      pdx = dx;
+      pdy = dy;
+      minDist = dist;
+    }
+  }
+  p_discreteEndPoint.SetX(pdx);
+  p_discreteEndPoint.SetY(pdy);
 }
 
 std::ostream& operator<<(std::ostream& p_os, Point const& p_point) {

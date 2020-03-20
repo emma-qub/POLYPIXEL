@@ -27,7 +27,7 @@ public:
   void CloseToPlay();
   void CloseToCancel();
 
-signals:
+Q_SIGNALS:
   void StartLevelRequested();
   void CancelLevelRequested();
 

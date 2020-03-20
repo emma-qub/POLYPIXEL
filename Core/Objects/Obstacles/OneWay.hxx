@@ -13,8 +13,15 @@ public:
   ~OneWay() override;
 
   inline ppxl::Segment GetLine() const { return m_line; }
-  void SetLine(ppxl::Segment const& p_line) { m_line = p_line; m_direction = m_line.GetNormal(); }
-  inline ppxl::Vector GetDirection() const { return m_direction; }
+  void SetLine(ppxl::Segment const& p_line) { m_line = p_line; }
+  inline ppxl::Vector GetNormal() const { return m_line.GetNormal(); }
+
+  inline double GetX1() const { return m_line.GetA().GetX(); }
+  inline double GetY1() const { return m_line.GetA().GetY(); }
+  inline double GetX2() const { return m_line.GetB().GetX(); }
+  inline double GetY2() const { return m_line.GetB().GetY(); }
+  inline double GetNX() const { return m_line.GetNormal().GetX(); }
+  inline double GetNY() const { return m_line.GetNormal().GetY(); }
 
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
@@ -22,9 +29,11 @@ public:
   bool Intersect(ppxl::Point const& p_point, double p_tolerence = DBL_EPSILON) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
+  virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+  ppxl::Point GetControlPoint(ControlPointType p_controlPointType) const override;
+
 private:
   ppxl::Segment m_line;
-  ppxl::Vector m_direction;
 };
 
 #endif

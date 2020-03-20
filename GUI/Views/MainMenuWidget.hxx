@@ -12,7 +12,7 @@ class MainMenuWidget: public QWidget {
 public:
   explicit MainMenuWidget(QWidget* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void PlayRequested();
   void CreateLevelRequested();
   void OptionsRequested();

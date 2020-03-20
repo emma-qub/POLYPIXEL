@@ -26,7 +26,7 @@ public:
   void SetTolerance(int p_tolerance);
   void PlayLevel();
 
-signals:
+Q_SIGNALS:
   void Done();
   void AmendLevelRequested();
 

@@ -7,15 +7,15 @@
 #include "Core/Geometry/Vector.hxx"
 #include "Core/Geometry/Polygon.hxx"
 
-class CreateLevelModel;
-class ObjectModel;
+class GraphicsObjectItem;
+class CreateLevelObjectsListModel;
+class CreateLevelObjectsDetailModel;
+class CreateLevelVertexListModel;
 class CreateLevelScribblingView;
 class QLabel;
 class QPushButton;
 class QTreeView;
 class QItemSelectionModel;
-class QUndoView;
-class QUndoStack;
 class QSpinBox;
 class QStackedWidget;
 class QStandardItem;
@@ -47,56 +47,68 @@ public:
   void SetTolerance(int p_value);
   void ResetGameInfo();
 
-  void SetModel(CreateLevelModel* p_model);
-  void SetUndoStack(QUndoStack* p_undoStack);
-  QItemSelectionModel* GetSelectionModel() const;
+  void SetObjectsListModel(CreateLevelObjectsListModel* p_objectsListModel);
+  void SetObjectsDetailModel(CreateLevelObjectsDetailModel* p_objectsDetailModel);
+  void SetVertexListModel(CreateLevelVertexListModel* p_vertexListModel);
+
+  QModelIndex GetCurrentObjectIndex() const;
+  QModelIndex FindCurrentObjectIndex() const;
+  QModelIndex GetCurrentPolygonIndex() const;
+  QModelIndex FindCurrentPolygonIndex() const;
+  QModelIndex GetCurrentVertexIndex() const;
+  QModelIndex FindCurrentVertexIndex() const;
+  void SetCurrentVertexIndex(int p_vertexRow);
+  void SetCurrentObjectOrPolygonIndex(QModelIndex const& p_polygonIndex);
 
   void DrawFromModel();
   void ClearImage();
-  void Redraw();
-  void RedrawFromPolygons();
 
   void SetTestAvailable(bool p_enable);
 
-  qreal GetSceneRectWidth() const;
-  qreal GetSceneRectHeight() const;
+  void ShowDetailListView();
+  void ShowVertexListView();
 
-  void CreateGraphicsObjectFromItem(QStandardItem* p_item);
+  void UpdateView();
 
-signals:
+  void AddGraphicsItem(GraphicsObjectItem* p_graphicsItem);
+
+Q_SIGNALS:
   void TestLevelRequested();
-  void Done();
-  void PolygonInserted(int p_polygonRow, ppxl::Polygon const& p_polygon);
-  void PolygonRemoved(int p_polygonRow);
-  void PolygonMoved(int p_polygonRow, ppxl::Vector const& p_direction, bool p_pushToStack);
-  void VertexInserted(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
-  void VertexRemoved(int p_polygonRow, int p_vertexRow);
-  void VertexMoved(int p_polygonRow, int p_vertexRow, const ppxl::Vector& p_direction, bool p_pushToStack);
-  void PolygonSelected();
-  void ValueXChanged(int p_value, QModelIndex const& p_index);
-  void ValueYChanged(int p_value, QModelIndex const& p_index);
-  void EditionXDone(int p_value, QModelIndex const& p_index);
-  void EditionYDone(int p_value, QModelIndex const& p_index);
-  void SnappedToGrid();
+  void CreateLevelDone();
+  void SnapToGridRequested();
+  void SnapAllToGridRequested();
   void NewLevelRequested();
   void OpenLevelRequested(QString const& p_fileName);
-  void ToolActivated(ToolMode p_tool);
   void MousePressed(QMouseEvent* p_event);
   void MouseMoved(QMouseEvent* p_event);
   void MouseReleased(QMouseEvent* p_event);
+  void CurrentObjectIndexChanged(QModelIndex const& p_current, QModelIndex const& p_previous);
 
 protected:
+  enum ViewType {
+    eDetailView,
+    eVertexView
+  };
+
   void UpdateMaxGapToWinPrefix(int p_value);
   void UpdateTolerancePrefix(int p_value);
+
+  bool ConfirmClear();
+  void ConfirmNewLevel();
+  void ConfirmOpenLevel();
 
 private:
   QLabel* m_createLevelLabel;
   QPushButton* m_testLevelButton;
   QPushButton* m_menuButton;
-  CreateLevelModel* m_model;
+  CreateLevelObjectsListModel* m_objectsListModel;
+  CreateLevelObjectsDetailModel* m_objectsDetailModel;
+  CreateLevelVertexListModel* m_vertexListModel;
   CreateLevelScribblingView* m_scribblingView;
-  QTreeView* m_treeView;
-  QUndoView* m_undoView;
+  QTreeView* m_objectsListTreeView;
+  QTreeView* m_objectsDetailTreeView;
+  QTreeView* m_vertexTreeView;
+  QStackedWidget* m_detailVertexStackWidget;
   QSpinBox* m_linesGoalSpinBox;
   QSpinBox* m_partsGoalSpinBox;
   QSpinBox* m_maxGapToWinSpinBox;

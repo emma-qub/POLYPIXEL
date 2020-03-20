@@ -20,7 +20,7 @@ public:
   void CloseToReplay();
   void CloseToMap(bool p_moveToNextLevel);
 
-signals:
+Q_SIGNALS:
   void ReplayRequested();
   void GoToMapRequested(bool p_moveToNextLevel);
 

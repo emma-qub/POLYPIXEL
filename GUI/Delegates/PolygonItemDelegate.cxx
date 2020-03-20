@@ -18,12 +18,12 @@ QWidget* PolygonItemDelegate::createEditor(QWidget* p_parent, const QStyleOption
   if (p_index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>() == PolygonModel::eX) {
     editor = new QSpinBox(p_parent);
     connect(editor, QOverload<int>::of(&QSpinBox::valueChanged), this, [this, p_index](int p_value) {
-      Q_EMIT(ValueXChanged(p_value, p_index));
+      Q_EMIT ValueXChanged(p_value, p_index);
     });
   } else if (p_index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>() == PolygonModel::eY) {
     editor = new QSpinBox(p_parent);
     connect(editor, QOverload<int>::of(&QSpinBox::valueChanged), this, [this, p_index](int p_value) {
-      Q_EMIT(ValueYChanged(p_value, p_index));
+      Q_EMIT ValueYChanged(p_value, p_index);
     });
   }
 
@@ -51,9 +51,9 @@ void PolygonItemDelegate::setModelData(QWidget* p_editor, QAbstractItemModel* p_
     auto editor = qobject_cast<QSpinBox*>(p_editor);
 
     if (p_index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>() == PolygonModel::eX) {
-      Q_EMIT(EditionXDone(editor->value(), p_index));
+      Q_EMIT EditionXDone(editor->value(), p_index);
     } else if (p_index.data(PolygonModel::eItemTypeRole).value<PolygonModel::ItemType>() == PolygonModel::eY) {
-      Q_EMIT(EditionYDone(editor->value(), p_index));
+      Q_EMIT EditionYDone(editor->value(), p_index);
     }
   }
 }

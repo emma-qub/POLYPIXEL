@@ -12,7 +12,7 @@ class PauseWidget: public QWidget {
 public:
   explicit PauseWidget(QWidget* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void ResumeRequested();
   void RestartRequested();
   void LevelsRequested();

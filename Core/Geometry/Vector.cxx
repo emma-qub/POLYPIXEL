@@ -103,19 +103,17 @@ double Vector::SquaredNorm() const {
 
 
 Vector Vector::Normalized() const {
-  double p_vectorNorm = Norm();
-  if (p_vectorNorm == 0.) {
+  if (IsNull()) {
     return Vector();
     //throw std::runtime_error("Vector is nul, cannot normalize it. (Vector Vector::normalized() const)");
   }
 
-  double n = 1. / p_vectorNorm;
+  double n = 1. / Norm();
   return Vector(m_x*n, m_y*n);
 }
 
 Vector& Vector::Normalize() {
-  double p_vectorNorm = Norm();
-  if (p_vectorNorm == 0.)
+  if (IsNull())
   {
     SetX(0.);
     SetY(0.);
@@ -123,10 +121,15 @@ Vector& Vector::Normalize() {
     //throw std::runtime_error("Vector is nul, cannot normalize it. (Vector& Vector::normalize())");
   }
 
-  double n = 1. / p_vectorNorm;
+  double n = 1. / Norm();
   m_x *= n;
   m_y *= n;
   return *this;
+}
+
+bool Vector::IsNull() const
+{
+  return Norm() == 0.;
 }
 
 double Vector::Determinant(Vector const& p_vector1, Vector const& p_vector2) {

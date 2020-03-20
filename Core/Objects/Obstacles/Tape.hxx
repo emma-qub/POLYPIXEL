@@ -9,22 +9,20 @@ public:
   Tape(double p_x, double p_y, double p_w, double p_h);
   ~Tape() override;
 
-  inline double GetX() const { return m_x; }
-  inline void SetX(double p_x) { m_x = p_x; }
+  inline double GetX1() const { return m_x1; }
+  inline double GetY1() const { return m_y1; }
 
-  inline double GetY() const { return m_y; }
-  inline void SetY(double p_y) { m_y = p_y; }
+  inline double GetX2() const { return m_x2; }
+  inline double GetY2() const { return m_y2; }
 
-  inline double GetW() const { return m_w; }
-  inline void SetW(double p_w) { m_w = p_w; }
+  inline double GetXmin() const { return std::min(m_x1, m_x2); }
+  inline double GetYmin() const { return std::min(m_y1, m_y2); }
 
-  inline double GetH() const { return m_h; }
-  inline void SetH(double p_h) { m_h = p_h; }
+  inline double GetXmax() const { return std::max(m_x1, m_x2); }
+  inline double GetYmax() const { return std::max(m_y1, m_y2); }
 
-  inline double GetLeft() const { return m_x; }
-  inline double GetTop() const { return m_y; }
-  inline double GetRight() const { return m_x + m_w; }
-  inline double GetBottom() const { return m_y + m_h; }
+  inline double GetW() const { return std::abs(m_x2 - m_x1); }
+  inline double GetH() const { return std::abs(m_y2 - m_y1); }
 
   CategoryType GetCategoryType() const override;
   ObjectType GetObjectType() const override;
@@ -32,15 +30,18 @@ public:
   bool Intersect(ppxl::Point const& p_point, double p_tolerence = DBL_EPSILON) const override;
   bool Crossing(ppxl::Segment const& p_line) const override;
 
+  virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+  ppxl::Point GetControlPoint(ControlPointType p_controlPointType) const override;
+
 protected:
   std::vector<ppxl::Point> GetTapeVertices() const;
   std::vector<ppxl::Segment> GetTapeEdges() const;
 
 private:
-  double m_x;
-  double m_y;
-  double m_w;
-  double m_h;
+  double m_x1;
+  double m_y1;
+  double m_x2;
+  double m_y2;
 };
 
 #endif

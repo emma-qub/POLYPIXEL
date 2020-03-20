@@ -14,7 +14,7 @@ public:
 
   void InitView();
 
-signals:
+Q_SIGNALS:
   void PlayLevelRequested(QString const& p_levelPath);
   void CancelLevelRequested();
 

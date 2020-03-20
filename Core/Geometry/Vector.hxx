@@ -51,6 +51,8 @@ public:
   Vector Normalized() const;
   Vector& Normalize();
 
+  bool IsNull() const;
+
   static double Determinant(Vector const& p_vector1, Vector const& p_vector2);
   static bool AreColinear(Vector const& p_vector1, Vector const& p_vector2);
   static bool AreOrthogonal(Vector const& p_vector1, Vector const& p_vector2);

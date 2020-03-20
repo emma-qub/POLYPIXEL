@@ -18,7 +18,7 @@ public:
 
   void SetSaveButtonEnable(bool p_enable);
 
-signals:
+Q_SIGNALS:
   void RestartRequested();
   void SaveLevelRequested();
 
