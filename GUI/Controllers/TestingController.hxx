@@ -4,13 +4,13 @@
 #include "GUI/Controllers/PlayingController.hxx"
 
 class ObjectModel;
-class TestingView;
+class TestingWidget;
 
 class TestingController: public PlayingController {
   Q_OBJECT
 
 public:
-  TestingController(TestingView* p_view, QObject* p_parent);
+  TestingController(TestingWidget* p_view, QObject* p_parent);
 
   void SetPolygonsItem(PolygonModel* p_model);
 
@@ -31,7 +31,7 @@ protected:
   void SaveLevel();
 
 private:
-  TestingView* m_view;
+  TestingWidget* m_view;
   QList<ppxl::Polygon> m_polygonsList;
 };
 

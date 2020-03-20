@@ -1,19 +1,19 @@
 #include "TestingController.hxx"
 
-#include "GUI/Views/TestingView.hxx"
+#include "GUI/Views/TestingWidget.hxx"
 #include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
 #include "Parser/Serializer.hxx"
 
 #include <QFileDialog>
 
-TestingController::TestingController(TestingView* p_view, QObject* p_parent):
+TestingController::TestingController(TestingWidget* p_view, QObject* p_parent):
   PlayingController(p_view, p_parent) {
 
-  m_view = static_cast<TestingView*>(p_view);
+  m_view = static_cast<TestingWidget*>(p_view);
 
-  connect(m_view, &TestingView::RestartRequested, this, &TestingController::Restart);
-  connect(m_view, &TestingView::SaveLevelRequested, this, &TestingController::SaveLevel);
+  connect(m_view, &TestingWidget::RestartRequested, this, &TestingController::Restart);
+  connect(m_view, &TestingWidget::SaveLevelRequested, this, &TestingController::SaveLevel);
 }
 
 void TestingController::SetPolygonsItem(PolygonModel* p_model) {
@@ -68,7 +68,7 @@ void TestingController::PlayLevel() {
   Redraw();
 
   connect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
-  connect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
+  connect(m_view, &TestingWidget::Moving, this, &TestingController::DisplayAreas);
 }
 
 void TestingController::Redraw() {
@@ -111,7 +111,7 @@ void TestingController::CheckWinning() {
     m_view->EndLevel();
 
     disconnect(m_polygonModel, &PolygonModel::PolygonListChanged, this, &TestingController::Redraw);
-    disconnect(m_view, &TestingView::Moving, this, &TestingController::DisplayAreas);
+    disconnect(m_view, &TestingWidget::Moving, this, &TestingController::DisplayAreas);
   }
 }
 

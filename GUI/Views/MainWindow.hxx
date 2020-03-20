@@ -4,18 +4,18 @@
 #include <QMainWindow>
 #include <QStateMachine>
 
-class AchievementsView;
+class AchievementsWidget;
 class CreateLevelModel;
-class CreateLevelView;
+class CreateLevelWidget;
 class CreateLevelController;
-class GameView;
+class GameWidget;
 class PolygonModel;
 class GameController;
-class LoadingView;
-class MainMenuView;
-class OptionsView;
-class PauseView;
-class TestLevelView;
+class LoadingWidget;
+class MainMenuWidget;
+class OptionsWidget;
+class PauseWidget;
+class TestLevelWidget;
 class TestLevelController;
 class MapView;
 class QStackedWidget;
@@ -36,16 +36,16 @@ private:
   QStateMachine m_stateMachine;
 
   QStackedWidget* m_centralWidget;
-  AchievementsView* m_achievementsView;
-  CreateLevelView* m_createLevelView;
+  AchievementsWidget* m_achievementsWidget;
+  CreateLevelWidget* m_createLevelWidget;
   CreateLevelController* m_createLevelController;
-  GameView* m_gameView;
+  GameWidget* m_gameWidget;
   GameController* m_gameController;
-  LoadingView* m_loadingView;
-  MainMenuView* m_mainMenuView;
-  OptionsView* m_optionsView;
-  PauseView* m_pauseView;
-  TestLevelView* m_testLevelView;
+  LoadingWidget* m_loadingWidget;
+  MainMenuWidget* m_mainMenuWidget;
+  OptionsWidget* m_optionsWidget;
+  PauseWidget* m_pauseWidget;
+  TestLevelWidget* m_testLevelWidget;
   TestLevelController* m_testLevelController;
   MapView* m_mapView;
 

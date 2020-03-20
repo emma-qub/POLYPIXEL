@@ -3,13 +3,13 @@
 #include "Core/Geometry/Vector.hxx"
 #include "GUI/Models/PolygonModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
-#include "GUI/Views/PlayingView.hxx"
+#include "GUI/Views/PlayingWidget.hxx"
 #include "Parser/Parser.hxx"
 #include "Parser/Serializer.hxx"
 
 #include <cmath>
 
-PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
+PlayingController::PlayingController(PlayingWidget* p_view, QObject* p_parent):
   QObject(p_parent),
   m_slicer(),
   m_polygonModel(new PolygonModel(this)),
@@ -25,13 +25,13 @@ PlayingController::PlayingController(PlayingView* p_view, QObject* p_parent):
     << new OneWayModel(this)
     << new PortalModel(this);
 
-  connect(m_view, &PlayingView::Scribbling, this, &PlayingController::SetStartPoint);
-  connect(m_view, &PlayingView::Moving, this, &PlayingController::MoveLine);
-  connect(m_view, &PlayingView::Slicing, this, &PlayingController::SliceIt);
-  connect(m_view, &PlayingView::ControlPressed, this, &PlayingController::InvertScribbleLine);
-  connect(m_view, &PlayingView::ControlReleased, this, &PlayingController::InvertScribbleLine);
-  connect(m_view, &PlayingView::ReplayRequested, this, &PlayingController::RestartLevel);
-  connect(m_view, &PlayingView::GoToMapRequested, this, &PlayingController::GoToMapRequested);
+  connect(m_view, &PlayingWidget::Scribbling, this, &PlayingController::SetStartPoint);
+  connect(m_view, &PlayingWidget::Moving, this, &PlayingController::MoveLine);
+  connect(m_view, &PlayingWidget::Slicing, this, &PlayingController::SliceIt);
+  connect(m_view, &PlayingWidget::ControlPressed, this, &PlayingController::InvertScribbleLine);
+  connect(m_view, &PlayingWidget::ControlReleased, this, &PlayingController::InvertScribbleLine);
+  connect(m_view, &PlayingWidget::ReplayRequested, this, &PlayingController::RestartLevel);
+  connect(m_view, &PlayingWidget::GoToMapRequested, this, &PlayingController::GoToMapRequested);
 }
 
 void PlayingController::InitView() {

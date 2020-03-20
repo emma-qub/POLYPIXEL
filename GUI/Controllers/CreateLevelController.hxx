@@ -5,7 +5,7 @@
 
 #include "Core/Geometry/Polygon.hxx"
 #include "Core/Geometry/Point.hxx"
-#include "GUI/Views/CreateLevelView.hxx"
+#include "GUI/Views/CreateLevelWidget.hxx"
 #include "GUI/Models/CreateLevelModel.hxx"
 
 class ObjectModel;
@@ -27,7 +27,7 @@ public:
     ePortalMode
   };
 
-  explicit CreateLevelController(CreateLevelView* p_view,  QObject *parent = nullptr);
+  explicit CreateLevelController(CreateLevelWidget* p_view,  QObject *parent = nullptr);
   ~CreateLevelController() override;
 
   void SetToolBar(QToolBar* p_toolbar);
@@ -79,7 +79,7 @@ protected:
 
 private:
   CreateLevelModel* m_model;
-  CreateLevelView* m_view;
+  CreateLevelWidget* m_view;
   QUndoStack* m_undoStack;
   QToolBar* m_toolbar;
 

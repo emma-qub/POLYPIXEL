@@ -1,5 +1,5 @@
-#ifndef CREATELEVELVIEW_HXX
-#define CREATELEVELVIEW_HXX
+#ifndef CREATELEVELWIDGET_HXX
+#define CREATELEVELWIDGET_HXX
 
 #include <QWidget>
 
@@ -20,7 +20,7 @@ class QSpinBox;
 class QStackedWidget;
 class QStandardItem;
 
-class CreateLevelView: public QWidget {
+class CreateLevelWidget: public QWidget {
   Q_OBJECT
 
 public:
@@ -33,9 +33,9 @@ public:
     ePortalTool
   };
 
-  explicit CreateLevelView(QWidget* parent = nullptr);
+  explicit CreateLevelWidget(QWidget* parent = nullptr);
 
-  void InitView();
+  void InitViews();
 
   int GetLinesGoal() const;
   void SetLinesGoal(int p_value);

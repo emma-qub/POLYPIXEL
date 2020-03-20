@@ -1,14 +1,14 @@
 #include "MainWindow.hxx"
 
-#include "AchievementsView.hxx"
-#include "CreateLevelView.hxx"
-#include "GameView.hxx"
+#include "AchievementsWidget.hxx"
+#include "CreateLevelWidget.hxx"
+#include "GameWidget.hxx"
 #include "LevelsView.hxx"
-#include "LoadingView.hxx"
-#include "MainMenuView.hxx"
-#include "OptionsView.hxx"
-#include "PauseView.hxx"
-#include "TestLevelView.hxx"
+#include "LoadingWidget.hxx"
+#include "MainMenuWidget.hxx"
+#include "OptionsWidget.hxx"
+#include "PauseWidget.hxx"
+#include "TestLevelWidget.hxx"
 #include "WorldsView.hxx"
 #include "MapView.hxx"
 
@@ -31,17 +31,17 @@ MainWindow::MainWindow(QWidget* p_parent):
   QMainWindow(p_parent),
   m_stateMachine(this),
   m_centralWidget(new QStackedWidget),
-  m_achievementsView(new AchievementsView),
-  m_createLevelView(new CreateLevelView),
-  m_createLevelController(new CreateLevelController(m_createLevelView, this)),
-  m_gameView(new GameView),
-  m_gameController(new GameController(m_gameView, this)),
-  m_loadingView(new LoadingView),
-  m_mainMenuView(new MainMenuView),
-  m_optionsView(new OptionsView),
-  m_pauseView(new PauseView),
-  m_testLevelView(new TestLevelView),
-  m_testLevelController(new TestLevelController(m_testLevelView, this)),
+  m_achievementsWidget(new AchievementsWidget),
+  m_createLevelWidget(new CreateLevelWidget),
+  m_createLevelController(new CreateLevelController(m_createLevelWidget, this)),
+  m_gameWidget(new GameWidget),
+  m_gameController(new GameController(m_gameWidget, this)),
+  m_loadingWidget(new LoadingWidget),
+  m_mainMenuWidget(new MainMenuWidget),
+  m_optionsWidget(new OptionsWidget),
+  m_pauseWidget(new PauseWidget),
+  m_testLevelWidget(new TestLevelWidget),
+  m_testLevelController(new TestLevelController(m_testLevelWidget, this)),
   m_mapView(new MapView) {
 
   m_toolbar = new QToolBar;
@@ -55,25 +55,25 @@ MainWindow::MainWindow(QWidget* p_parent):
 
   QFontDatabase::addApplicationFont(":/fonts/PICOPIXEL.ttf");
 
-  m_centralWidget->addWidget(m_achievementsView);
-  m_centralWidget->addWidget(m_createLevelView);
+  m_centralWidget->addWidget(m_achievementsWidget);
+  m_centralWidget->addWidget(m_createLevelWidget);
   m_centralWidget->addWidget(m_mapView);
-  m_centralWidget->addWidget(m_gameView);
-  m_centralWidget->addWidget(m_loadingView);
-  m_centralWidget->addWidget(m_mainMenuView);
-  m_centralWidget->addWidget(m_optionsView);
-  m_centralWidget->addWidget(m_pauseView);
-  m_centralWidget->addWidget(m_testLevelView);
+  m_centralWidget->addWidget(m_gameWidget);
+  m_centralWidget->addWidget(m_loadingWidget);
+  m_centralWidget->addWidget(m_mainMenuWidget);
+  m_centralWidget->addWidget(m_optionsWidget);
+  m_centralWidget->addWidget(m_pauseWidget);
+  m_centralWidget->addWidget(m_testLevelWidget);
 
   setCentralWidget(m_centralWidget);
 
   auto loadingState = new QState(&m_stateMachine);
   connect(loadingState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_loadingView);
+    m_centralWidget->setCurrentWidget(m_loadingWidget);
   });
   auto mainMenuState = new QState(&m_stateMachine);
   connect(mainMenuState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_mainMenuView);
+    m_centralWidget->setCurrentWidget(m_mainMenuWidget);
   });
   auto mapState = new QState(&m_stateMachine);
   connect(mapState, &QState::entered, this, [this]() {
@@ -81,71 +81,71 @@ MainWindow::MainWindow(QWidget* p_parent):
   });
   auto gameState = new QState(&m_stateMachine);
   connect(gameState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_gameView);
+    m_centralWidget->setCurrentWidget(m_gameWidget);
   });
   auto pauseState = new QState(&m_stateMachine);
   connect(pauseState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_pauseView);
+    m_centralWidget->setCurrentWidget(m_pauseWidget);
   });
   auto achievementsState = new QState(&m_stateMachine);
   connect(achievementsState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_achievementsView);
+    m_centralWidget->setCurrentWidget(m_achievementsWidget);
   });
   auto createLevelState = new QState(&m_stateMachine);
   connect(createLevelState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_createLevelView);
+    m_centralWidget->setCurrentWidget(m_createLevelWidget);
   });
   auto testLevelState = new QState(&m_stateMachine);
   connect(testLevelState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_testLevelView);
+    m_centralWidget->setCurrentWidget(m_testLevelWidget);
   });
   auto optionsState = new QState(&m_stateMachine);
   connect(optionsState, &QState::entered, this, [this]() {
-    m_centralWidget->setCurrentWidget(m_optionsView);
+    m_centralWidget->setCurrentWidget(m_optionsWidget);
   });
 
-  loadingState->addTransition(m_loadingView, &LoadingView::LoadingDone, mainMenuState);
-  mainMenuState->addTransition(m_mainMenuView, &MainMenuView::PlayRequested, mapState);
-  mainMenuState->addTransition(m_mainMenuView, &MainMenuView::CreateLevelRequested, createLevelState);
-  mainMenuState->addTransition(m_mainMenuView, &MainMenuView::OptionsRequested, optionsState);
+  loadingState->addTransition(m_loadingWidget, &LoadingWidget::LoadingDone, mainMenuState);
+  mainMenuState->addTransition(m_mainMenuWidget, &MainMenuWidget::PlayRequested, mapState);
+  mainMenuState->addTransition(m_mainMenuWidget, &MainMenuWidget::CreateLevelRequested, createLevelState);
+  mainMenuState->addTransition(m_mainMenuWidget, &MainMenuWidget::OptionsRequested, optionsState);
   mapState->addTransition(m_mapView, &MapView::PlayLevelRequested, gameState);
   //worldsState->addTransition(m_worldsView, &WorldsView::AchievementsRequested, achievementsState);
   //worldsState->addTransition(m_worldsView, &WorldsView::Done, mainMenuState);
-  gameState->addTransition(m_gameView, &GameView::PauseRequested, pauseState);
-  gameState->addTransition(m_gameView, &GameView::GoToMapRequested, mapState);
-  pauseState->addTransition(m_pauseView, &PauseView::ResumeRequested, gameState);
-  pauseState->addTransition(m_pauseView, &PauseView::RestartRequested, gameState);
-  pauseState->addTransition(m_pauseView, &PauseView::LevelsRequested, mapState);
-  //achievementsState->addTransition(m_achievementsView, &AchievementsView::Done, worldsState);
-  createLevelState->addTransition(m_createLevelView, &CreateLevelView::TestLevelRequested, testLevelState);
-  createLevelState->addTransition(m_createLevelView, &CreateLevelView::Done, mainMenuState);
-  testLevelState->addTransition(m_testLevelView, &TestLevelView::AmendLevelRequested, createLevelState);
-  testLevelState->addTransition(m_testLevelView, &TestLevelView::Done, mainMenuState);
-  optionsState->addTransition(m_optionsView, &OptionsView::Done, mainMenuState);
+  gameState->addTransition(m_gameWidget, &GameWidget::PauseRequested, pauseState);
+  gameState->addTransition(m_gameWidget, &GameWidget::GoToMapRequested, mapState);
+  pauseState->addTransition(m_pauseWidget, &PauseWidget::ResumeRequested, gameState);
+  pauseState->addTransition(m_pauseWidget, &PauseWidget::RestartRequested, gameState);
+  pauseState->addTransition(m_pauseWidget, &PauseWidget::LevelsRequested, mapState);
+  //achievementsState->addTransition(m_achievementsWidget, &AchievementsWidget::Done, worldsState);
+  createLevelState->addTransition(m_createLevelWidget, &CreateLevelWidget::TestLevelRequested, testLevelState);
+  createLevelState->addTransition(m_createLevelWidget, &CreateLevelWidget::Done, mainMenuState);
+  testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::AmendLevelRequested, createLevelState);
+  testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::Done, mainMenuState);
+  optionsState->addTransition(m_optionsWidget, &OptionsWidget::Done, mainMenuState);
 
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
-    if (m_centralWidget->currentWidget() == m_createLevelView) {
-      m_createLevelView->InitView();
+    if (m_centralWidget->currentWidget() == m_createLevelWidget) {
+      m_createLevelWidget->InitViews();
       m_createLevelController->Redraw();
       m_toolbar->show();
     } else {
       m_toolbar->hide();
 
-      if (m_centralWidget->currentWidget() == m_testLevelView) {
-        m_testLevelView->InitView();
-      } else if (m_centralWidget->currentWidget() == m_gameView) {
-        m_gameView->InitView();
-        m_gameView->PlayLevel(m_currentLevel);
+      if (m_centralWidget->currentWidget() == m_testLevelWidget) {
+        m_testLevelWidget->InitView();
+      } else if (m_centralWidget->currentWidget() == m_gameWidget) {
+        m_gameWidget->InitView();
+        m_gameWidget->PlayLevel(m_currentLevel);
       } else if (m_centralWidget->currentWidget() == m_mapView) {
         m_mapView->InitView();
       }
     }
   });
 
-  connect(m_createLevelView, &CreateLevelView::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
-  connect(m_pauseView, &PauseView::RestartRequested, m_gameController, &GameController::RestartLevel);
+  connect(m_createLevelWidget, &CreateLevelWidget::TestLevelRequested, this, &MainWindow::SetModelsToTestController);
+  connect(m_pauseWidget, &PauseWidget::RestartRequested, m_gameController, &GameController::RestartLevel);
   connect(m_mapView, &MapView::PlayLevelRequested, this, &MainWindow::SetCurrentLevel);
-  connect(m_gameView, &GameView::GoToMapRequested, this, &MainWindow::GoToMap);
+  connect(m_gameWidget, &GameWidget::GoToMapRequested, this, &MainWindow::GoToMap);
 
   m_stateMachine.setInitialState(loadingState);
   m_stateMachine.start();
@@ -157,7 +157,7 @@ MainWindow::MainWindow(QWidget* p_parent):
 MainWindow::~MainWindow() = default;
 
 void MainWindow::SetModelsToTestController() {
-  m_centralWidget->setCurrentWidget(m_testLevelView);
+  m_centralWidget->setCurrentWidget(m_testLevelWidget);
 
   m_testLevelController->SetLinesGoal(m_createLevelController->GetLinesGoal());
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());

@@ -1,16 +1,16 @@
-#ifndef MAINMENUVIEW_HXX
-#define MAINMENUVIEW_HXX
+#ifndef MAINMENUWIDGET_HXX
+#define MAINMENUWIDGET_HXX
 
 #include <QWidget>
 
 class QLabel;
 class QtMaterialContainedButton;
 
-class MainMenuView : public QWidget {
+class MainMenuWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit MainMenuView(QWidget* parent = nullptr);
+  explicit MainMenuWidget(QWidget* parent = nullptr);
 
 signals:
   void PlayRequested();

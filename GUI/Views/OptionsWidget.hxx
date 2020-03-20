@@ -1,16 +1,16 @@
-#ifndef OPTIONVIEW_HXX
-#define OPTIONVIEW_HXX
+#ifndef OPTIONWIDGET_HXX
+#define OPTIONWIDGET_HXX
 
 #include <QWidget>
 
 class QLabel;
 class QPushButton;
 
-class OptionsView : public QWidget {
+class OptionsWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit OptionsView(QWidget* parent = nullptr);
+  explicit OptionsWidget(QWidget* parent = nullptr);
 
 signals:
   void Done();

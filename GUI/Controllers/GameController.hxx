@@ -3,13 +3,13 @@
 
 #include <QObject>
 
-class GameView;
+class GameWidget;
 
 class GameController: public QObject {
   Q_OBJECT
 
 public:
-  GameController(GameView* p_view, QObject* p_parent = nullptr);
+  GameController(GameWidget* p_view, QObject* p_parent = nullptr);
   ~GameController() override;
 
   void PlayLevel(QString const& p_levelPath);
@@ -17,7 +17,7 @@ public:
   void Update();
 
 private:
-  GameView* m_view;
+  GameWidget* m_view;
 };
 
 #endif

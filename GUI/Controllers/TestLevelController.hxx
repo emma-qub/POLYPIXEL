@@ -7,13 +7,13 @@
 
 class PolygonModel;
 class ObjectModel;
-class TestLevelView;
+class TestLevelWidget;
 
 class TestLevelController: public QObject {
   Q_OBJECT
 
 public:
-  explicit TestLevelController(TestLevelView* p_view, QObject* p_parent = nullptr);
+  explicit TestLevelController(TestLevelWidget* p_view, QObject* p_parent = nullptr);
 
   void SetPolygonModel(PolygonModel* p_polygonModel);
   void SetObjectModelsList(const QList<ObjectModel*>& p_objectModelList);
@@ -24,7 +24,7 @@ public:
   void PlayLevel();
 
 private:
-  TestLevelView* m_view;
+  TestLevelWidget* m_view;
 };
 
 #endif

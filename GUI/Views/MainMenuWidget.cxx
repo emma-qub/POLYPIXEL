@@ -1,4 +1,4 @@
-#include "MainMenuView.hxx"
+#include "MainMenuWidget.hxx"
 
 #include "GUI/Components/qtmaterialcontainedbutton.h"
 
@@ -9,7 +9,7 @@
 #include <QStyleOption>
 
 
-MainMenuView::MainMenuView(QWidget* parent):
+MainMenuWidget::MainMenuWidget(QWidget* parent):
   QWidget(parent),
   m_worldsButton(new QtMaterialContainedButton("Play")),
   m_createLevelButton(new QtMaterialContainedButton("Create Level")),
@@ -42,12 +42,12 @@ MainMenuView::MainMenuView(QWidget* parent):
   m_optionsButton->setFixedWidth(buttonWidth);
   m_optionsButton->setFont(buttonFont);
 
-  connect(m_worldsButton, &QPushButton::clicked, this, &MainMenuView::PlayRequested);
-  connect(m_createLevelButton, &QPushButton::clicked, this, &MainMenuView::CreateLevelRequested);
-  connect(m_optionsButton, &QPushButton::clicked, this, &MainMenuView::OptionsRequested);
+  connect(m_worldsButton, &QPushButton::clicked, this, &MainMenuWidget::PlayRequested);
+  connect(m_createLevelButton, &QPushButton::clicked, this, &MainMenuWidget::CreateLevelRequested);
+  connect(m_optionsButton, &QPushButton::clicked, this, &MainMenuWidget::OptionsRequested);
 }
 
-void MainMenuView::paintEvent(QPaintEvent* p_event) {
+void MainMenuWidget::paintEvent(QPaintEvent* p_event) {
   QPainter p(this);
   QPainter painter(this);
   QRect drawingRect(0, 0, width(), height());

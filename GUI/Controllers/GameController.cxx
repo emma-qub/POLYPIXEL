@@ -1,7 +1,7 @@
 #include "GameController.hxx"
-#include "GUI/Views/GameView.hxx"
+#include "GUI/Views/GameWidget.hxx"
 
-GameController::GameController(GameView* p_view, QObject* p_parent):
+GameController::GameController(GameWidget* p_view, QObject* p_parent):
   QObject(p_parent),
   m_view(p_view) {
 }

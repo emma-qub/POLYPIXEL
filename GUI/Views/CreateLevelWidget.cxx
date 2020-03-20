@@ -1,4 +1,4 @@
-#include "CreateLevelView.hxx"
+#include "CreateLevelWidget.hxx"
 #include "GUI/Models/CreateLevelModel.hxx"
 #include "GUI/Models/ObjectModel.hxx"
 #include "GUI/Views/CreateLevelScribblingView.hxx"
@@ -16,7 +16,7 @@
 #include <QStackedWidget>
 #include <QMouseEvent>
 
-CreateLevelView::CreateLevelView(QWidget* parent):
+CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   QWidget(parent),
   m_createLevelLabel(new QLabel("Create your level")),
   m_testLevelButton(new QPushButton("Test")),
@@ -55,34 +55,34 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   mainLayout->setStretchFactor(viewLayout, 1);
   setLayout(mainLayout);
 
-  connect(m_testLevelButton, &QPushButton::clicked, this, &CreateLevelView::TestLevelRequested);
-  connect(m_menuButton, &QPushButton::clicked, this, &CreateLevelView::Done);
+  connect(m_testLevelButton, &QPushButton::clicked, this, &CreateLevelWidget::TestLevelRequested);
+  connect(m_menuButton, &QPushButton::clicked, this, &CreateLevelWidget::Done);
 
-  connect(m_scribblingView, &CreateLevelScribblingView::PolygonInserted, this, &CreateLevelView::PolygonInserted);
-  connect(m_scribblingView, &CreateLevelScribblingView::PolygonRemoved, this, &CreateLevelView::PolygonRemoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::PolygonMoved, this, &CreateLevelView::PolygonMoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::VertexInserted, this, &CreateLevelView::VertexInserted);
-  connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelView::VertexRemoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelView::VertexMoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::SnappedToGrid, this, &CreateLevelView::SnappedToGrid);
-  connect(m_scribblingView, &CreateLevelScribblingView::NewLevelRequested, this, &CreateLevelView::NewLevelRequested);
-  connect(m_scribblingView, &CreateLevelScribblingView::OpenLevelRequested, this, &CreateLevelView::OpenLevelRequested);
-  connect(m_scribblingView, &CreateLevelScribblingView::MousePressed, this, &CreateLevelView::MousePressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::MouseMoved, this, &CreateLevelView::MouseMoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::MouseReleased, this, &CreateLevelView::MouseReleased);
+  connect(m_scribblingView, &CreateLevelScribblingView::PolygonInserted, this, &CreateLevelWidget::PolygonInserted);
+  connect(m_scribblingView, &CreateLevelScribblingView::PolygonRemoved, this, &CreateLevelWidget::PolygonRemoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::PolygonMoved, this, &CreateLevelWidget::PolygonMoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::VertexInserted, this, &CreateLevelWidget::VertexInserted);
+  connect(m_scribblingView, &CreateLevelScribblingView::VertexRemoved, this, &CreateLevelWidget::VertexRemoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::VertexMoved, this, &CreateLevelWidget::VertexMoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::SnappedToGrid, this, &CreateLevelWidget::SnappedToGrid);
+  connect(m_scribblingView, &CreateLevelScribblingView::NewLevelRequested, this, &CreateLevelWidget::NewLevelRequested);
+  connect(m_scribblingView, &CreateLevelScribblingView::OpenLevelRequested, this, &CreateLevelWidget::OpenLevelRequested);
+  connect(m_scribblingView, &CreateLevelScribblingView::MousePressed, this, &CreateLevelWidget::MousePressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::MouseMoved, this, &CreateLevelWidget::MouseMoved);
+  connect(m_scribblingView, &CreateLevelScribblingView::MouseReleased, this, &CreateLevelWidget::MouseReleased);
 
   auto itemDelegate = new PolygonItemDelegate(m_treeView);
   m_treeView->setItemDelegate(itemDelegate);
-  connect(itemDelegate, &PolygonItemDelegate::ValueXChanged, this, &CreateLevelView::ValueXChanged);
-  connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelView::ValueYChanged);
-  connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelView::EditionXDone);
-  connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelView::EditionYDone);
+  connect(itemDelegate, &PolygonItemDelegate::ValueXChanged, this, &CreateLevelWidget::ValueXChanged);
+  connect(itemDelegate, &PolygonItemDelegate::ValueYChanged, this, &CreateLevelWidget::ValueYChanged);
+  connect(itemDelegate, &PolygonItemDelegate::EditionXDone, this, &CreateLevelWidget::EditionXDone);
+  connect(itemDelegate, &PolygonItemDelegate::EditionYDone, this, &CreateLevelWidget::EditionYDone);
 
-  ///connect(m_polygonTreeView, &QTreeView::clicked, this, &CreateLevelView::PolygonSelected);
+  ///connect(m_polygonTreeView, &QTreeView::clicked, this, &CreateLevelWidget::PolygonSelected);
 
   // Game info
-  connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateMaxGapToWinPrefix);
-  connect(m_toleranceSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelView::UpdateTolerancePrefix);
+  connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateMaxGapToWinPrefix);
+  connect(m_toleranceSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateTolerancePrefix);
 
   m_linesGoalSpinBox->setRange(1, 25);
   m_linesGoalSpinBox->setFixedWidth(80);
@@ -99,63 +99,63 @@ CreateLevelView::CreateLevelView(QWidget* parent):
   ResetGameInfo();
 }
 
-void CreateLevelView::InitView() {
+void CreateLevelWidget::InitViews() {
   m_scribblingView->InitView();
   m_scribblingView->setFocus();
 }
 
-int CreateLevelView::GetLinesGoal() const {
+int CreateLevelWidget::GetLinesGoal() const {
   return m_linesGoalSpinBox->value();
 }
 
-void CreateLevelView::SetLinesGoal(int p_value) {
+void CreateLevelWidget::SetLinesGoal(int p_value) {
   m_linesGoalSpinBox->setValue(p_value);
 }
 
-int CreateLevelView::GetPartsGoal() const {
+int CreateLevelWidget::GetPartsGoal() const {
   return m_partsGoalSpinBox->value();
 }
 
-void CreateLevelView::SetPartsGoal(int p_value) {
+void CreateLevelWidget::SetPartsGoal(int p_value) {
   m_partsGoalSpinBox->setValue(p_value);
 }
 
-int CreateLevelView::GetMaxGapToWin() const {
+int CreateLevelWidget::GetMaxGapToWin() const {
   return m_maxGapToWinSpinBox->value();
 }
 
-void CreateLevelView::SetMaxGapToWin(int p_value) {
+void CreateLevelWidget::SetMaxGapToWin(int p_value) {
   m_maxGapToWinSpinBox->setValue(p_value);
 }
 
-int CreateLevelView::GetTolerance() const {
+int CreateLevelWidget::GetTolerance() const {
   return m_toleranceSpinBox->value();
 }
 
-void CreateLevelView::SetTolerance(int p_value) {
+void CreateLevelWidget::SetTolerance(int p_value) {
   m_toleranceSpinBox->setValue(p_value);
 }
 
-void CreateLevelView::ResetGameInfo() {
+void CreateLevelWidget::ResetGameInfo() {
   m_linesGoalSpinBox->setValue(1);
   m_partsGoalSpinBox->setValue(2);
   m_maxGapToWinSpinBox->setValue(50);
   m_toleranceSpinBox->setValue(10);
 }
 
-qreal CreateLevelView::GetSceneRectWidth() const {
+qreal CreateLevelWidget::GetSceneRectWidth() const {
   return m_scribblingView->GetSceneRectWidth();
 }
 
-qreal CreateLevelView::GetSceneRectHeight() const {
+qreal CreateLevelWidget::GetSceneRectHeight() const {
   return m_scribblingView->GetSceneRectHeight();
 }
 
-void CreateLevelView::CreateGraphicsObjectFromItem(QStandardItem* p_item) {
+void CreateLevelWidget::CreateGraphicsObjectFromItem(QStandardItem* p_item) {
   m_scribblingView->CreateGraphicsObjectFromItem(p_item);
 }
 
-void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
+void CreateLevelWidget::UpdateMaxGapToWinPrefix(int p_value) {
   if (3 <= p_value && p_value < 5) {
     m_maxGapToWinSpinBox->setSuffix(" (hard)");
   } else if (5 <= p_value && p_value < 20) {
@@ -165,7 +165,7 @@ void CreateLevelView::UpdateMaxGapToWinPrefix(int p_value) {
   }
 }
 
-void CreateLevelView::UpdateTolerancePrefix(int p_value) {
+void CreateLevelWidget::UpdateTolerancePrefix(int p_value) {
   if (p_value == 0) {
     m_toleranceSpinBox->setSuffix(" (insane)");
   } else if (p_value == 1) {
@@ -173,7 +173,7 @@ void CreateLevelView::UpdateTolerancePrefix(int p_value) {
   }
 }
 
-void CreateLevelView::SetModel(CreateLevelModel* p_model) {
+void CreateLevelWidget::SetModel(CreateLevelModel* p_model) {
   m_model = p_model;
   m_scribblingView->SetModel(p_model);
   m_treeView->setModel(p_model);
@@ -191,32 +191,32 @@ void CreateLevelView::SetModel(CreateLevelModel* p_model) {
   ///connect(selectionModel, &QItemSelectionModel::currentChanged, )
 }
 
-void CreateLevelView::SetUndoStack(QUndoStack* p_undoStack) {
+void CreateLevelWidget::SetUndoStack(QUndoStack* p_undoStack) {
   m_undoView->setStack(p_undoStack);
 }
 
-QItemSelectionModel* CreateLevelView::GetSelectionModel() const {
+QItemSelectionModel* CreateLevelWidget::GetSelectionModel() const {
   return m_treeView->selectionModel();
 }
 
-void CreateLevelView::DrawFromModel() {
+void CreateLevelWidget::DrawFromModel() {
   m_scribblingView->DrawFromModel();
 }
 
-void CreateLevelView::ClearImage() {
+void CreateLevelWidget::ClearImage() {
   m_scribblingView->ClearImage();
 }
 
-void CreateLevelView::RedrawFromPolygons() {
+void CreateLevelWidget::RedrawFromPolygons() {
   m_scribblingView->DrawFromCore();
 }
 
-void CreateLevelView::SetTestAvailable(bool p_enable)
+void CreateLevelWidget::SetTestAvailable(bool p_enable)
 {
   m_testLevelButton->setEnabled(p_enable);
 }
 
-void CreateLevelView::Redraw() {
+void CreateLevelWidget::Redraw() {
   ClearImage();
   DrawFromModel();
 }

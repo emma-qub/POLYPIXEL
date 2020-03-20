@@ -1,20 +1,20 @@
-#ifndef TESTLEVELVIEW_HXX
-#define TESTLEVELVIEW_HXX
+#ifndef TESTLEVELWIDGET_HXX
+#define TESTLEVELWIDGET_HXX
 
 #include <QWidget>
 
 class PolygonModel;
 class ObjectModel;
-class TestingView;
+class TestingWidget;
 class TestingController;
 class QLabel;
 class QPushButton;
 
-class TestLevelView: public QWidget {
+class TestLevelWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit TestLevelView(QWidget* p_parent = nullptr);
+  explicit TestLevelWidget(QWidget* p_parent = nullptr);
 
   void InitView();
 
@@ -34,7 +34,7 @@ private:
   QLabel* m_testLevelLabel;
   QPushButton* m_menuButton;
   QPushButton* m_amendLevelButton;
-  TestingView* m_view;
+  TestingWidget* m_view;
   TestingController* m_controller;
 };
 

@@ -1,9 +1,9 @@
 #include "TestLevelController.hxx"
 
 #include "GUI/Models/PolygonModel.hxx"
-#include "GUI/Views/TestLevelView.hxx"
+#include "GUI/Views/TestLevelWidget.hxx"
 
-TestLevelController::TestLevelController(TestLevelView* p_view, QObject* p_parent):
+TestLevelController::TestLevelController(TestLevelWidget* p_view, QObject* p_parent):
   QObject(p_parent),
   m_view(p_view) {
 }

@@ -1,10 +1,10 @@
-#include "AchievementsView.hxx"
+#include "AchievementsWidget.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 
-AchievementsView::AchievementsView(QWidget* parent):
+AchievementsWidget::AchievementsWidget(QWidget* parent):
   QWidget(parent),
   m_achievementsLabel(new QLabel("Achievements")),
   m_worldsButton(new QPushButton("Worlds")) {
@@ -15,5 +15,5 @@ AchievementsView::AchievementsView(QWidget* parent):
   mainLayout->setAlignment(Qt::AlignCenter | Qt::AlignHCenter);
   setLayout(mainLayout);
 
-  connect(m_worldsButton, &QPushButton::clicked, this, &AchievementsView::Done);
+  connect(m_worldsButton, &QPushButton::clicked, this, &AchievementsWidget::Done);
 }

@@ -1,16 +1,16 @@
-#ifndef PAUSEVIEW_HXX
-#define PAUSEVIEW_HXX
+#ifndef PAUSEWIDGET_HXX
+#define PAUSEWIDGET_HXX
 
 #include <QWidget>
 
 class QLabel;
 class QPushButton;
 
-class PauseView : public QWidget {
+class PauseWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit PauseView(QWidget* parent = nullptr);
+  explicit PauseWidget(QWidget* parent = nullptr);
 
 signals:
   void ResumeRequested();

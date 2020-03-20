@@ -11,7 +11,7 @@ TEMPLATE = app
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++14
+CONFIG += c++17
 
 SOURCES += \
     main.cxx \
@@ -67,20 +67,20 @@ SOURCES += \
     GUI/Models/PolygonModel.cxx \
     GUI/Models/PolygonItem.cxx \
     GUI/Views/AbstractScribblingView.cxx \
-    GUI/Views/AchievementsView.cxx \
+    GUI/Views/AchievementsWidget.cxx \
     GUI/Views/CreateLevelScribblingView.cxx \
-    GUI/Views/CreateLevelView.cxx \
-    GUI/Views/GameView.cxx \
-    GUI/Views/LoadingView.cxx \
-    GUI/Views/MainMenuView.cxx \
+    GUI/Views/CreateLevelWidget.cxx \
+    GUI/Views/GameWidget.cxx \
+    GUI/Views/LoadingWidget.cxx \
+    GUI/Views/MainMenuWidget.cxx \
     GUI/Views/MainWindow.cxx \
     GUI/Views/MapView.cxx \
-    GUI/Views/OptionsView.cxx \
-    GUI/Views/PauseView.cxx \
+    GUI/Views/OptionsWidget.cxx \
+    GUI/Views/PauseWidget.cxx \
     GUI/Views/PlayingScribblingView.cxx \
-    GUI/Views/PlayingView.cxx \
-    GUI/Views/TestingView.cxx \
-    GUI/Views/TestLevelView.cxx \
+    GUI/Views/PlayingWidget.cxx \
+    GUI/Views/TestingWidget.cxx \
+    GUI/Views/TestLevelWidget.cxx \
     Parser/Parser.cxx \
     Parser/Serializer.cxx
 
@@ -144,20 +144,20 @@ HEADERS += \
     GUI/Models/PolygonModel.hxx \
     GUI/Models/PolygonItem.hxx \
     GUI/Views/AbstractScribblingView.hxx \
-    GUI/Views/AchievementsView.hxx \
+    GUI/Views/AchievementsWidget.hxx \
     GUI/Views/CreateLevelScribblingView.hxx \
-    GUI/Views/CreateLevelView.hxx \
-    GUI/Views/GameView.hxx \
-    GUI/Views/LoadingView.hxx \
-    GUI/Views/MainMenuView.hxx \
+    GUI/Views/CreateLevelWidget.hxx \
+    GUI/Views/GameWidget.hxx \
+    GUI/Views/LoadingWidget.hxx \
+    GUI/Views/MainMenuWidget.hxx \
     GUI/Views/MainWindow.hxx \
     GUI/Views/MapView.hxx \
-    GUI/Views/OptionsView.hxx \
-    GUI/Views/PauseView.hxx \
+    GUI/Views/OptionsWidget.hxx \
+    GUI/Views/PauseWidget.hxx \
     GUI/Views/PlayingScribblingView.hxx \
-    GUI/Views/PlayingView.hxx \
-    GUI/Views/TestingView.hxx \
-    GUI/Views/TestLevelView.hxx \
+    GUI/Views/PlayingWidget.hxx \
+    GUI/Views/TestingWidget.hxx \
+    GUI/Views/TestLevelWidget.hxx \
     Parser/Parser.hxx \
     Parser/Serializer.hxx
 

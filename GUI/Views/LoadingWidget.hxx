@@ -1,16 +1,16 @@
-#ifndef LOADINGVIEW_HXX
-#define LOADINGVIEW_HXX
+#ifndef LOADINGWIDGET_HXX
+#define LOADINGWIDGET_HXX
 
 #include <QWidget>
 
 class QProgressBar;
 class QLabel;
 
-class LoadingView: public QWidget {
+class LoadingWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit LoadingView(QWidget* parent = nullptr);
+  explicit LoadingWidget(QWidget* parent = nullptr);
 
 signals:
   void LoadingDone();

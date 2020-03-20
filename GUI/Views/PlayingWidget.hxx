@@ -1,5 +1,5 @@
-#ifndef PLAYINGVIEW_HXX
-#define PLAYINGVIEW_HXX
+#ifndef PLAYINGWIDGET_HXX
+#define PLAYINGWIDGET_HXX
 
 #include <QWidget>
 
@@ -11,11 +11,11 @@ class PolygonModel;
 class PlayingScribblingView;
 class Object;
 
-class PlayingView: public QWidget {
+class PlayingWidget: public QWidget {
   Q_OBJECT
 
 public:
-  PlayingView(QWidget* p_parent = nullptr);
+  PlayingWidget(QWidget* p_parent = nullptr);
 
   void InitView();
 

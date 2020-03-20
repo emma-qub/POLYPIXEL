@@ -1,16 +1,16 @@
-#ifndef ACHIEVEMENTSVIEW_HXX
-#define ACHIEVEMENTSVIEW_HXX
+#ifndef ACHIEVEMENTSWIDGET_HXX
+#define ACHIEVEMENTSWIDGET_HXX
 
 #include <QWidget>
 
 class QLabel;
 class QPushButton;
 
-class AchievementsView: public QWidget {
+class AchievementsWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit AchievementsView(QWidget* parent = nullptr);
+  explicit AchievementsWidget(QWidget* parent = nullptr);
 
 signals:
   void Done();

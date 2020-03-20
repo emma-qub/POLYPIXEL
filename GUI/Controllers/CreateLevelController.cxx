@@ -1,7 +1,7 @@
 #include "CreateLevelController.hxx"
 
 #include "GUI/Models/ObjectModel.hxx"
-#include "GUI/Views/CreateLevelView.hxx"
+#include "GUI/Views/CreateLevelWidget.hxx"
 #include "GUI/Commands/CreateLevelCommands.hxx"
 #include "Parser/Parser.hxx"
 
@@ -13,7 +13,7 @@
 
 #include <cmath>
 
-CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p_parent):
+CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject* p_parent):
   QObject(p_parent),
   m_model(new CreateLevelModel(this)),
   m_view(p_view),
@@ -28,29 +28,29 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
   m_selectedItem(nullptr) {
 
   m_view->SetModel(m_model);
-  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelView::Redraw);
+  connect(m_model, &CreateLevelModel::dataChanged, m_view, &CreateLevelWidget::Redraw);
 
   m_view->SetUndoStack(m_undoStack);
 
-  connect(m_view, &CreateLevelView::PolygonInserted, this, &CreateLevelController::InsertPolygon);
-  connect(m_view, &CreateLevelView::PolygonRemoved, this, &CreateLevelController::RemovePolygon);
-  connect(m_view, &CreateLevelView::PolygonMoved, this, &CreateLevelController::MovePolygon);
-  connect(m_view, &CreateLevelView::VertexInserted, this, &CreateLevelController::InsertVertex);
-  connect(m_view, &CreateLevelView::VertexRemoved, this, &CreateLevelController::RemoveVertex);
-  connect(m_view, &CreateLevelView::VertexMoved, this, &CreateLevelController::MoveVertex);
+  connect(m_view, &CreateLevelWidget::PolygonInserted, this, &CreateLevelController::InsertPolygon);
+  connect(m_view, &CreateLevelWidget::PolygonRemoved, this, &CreateLevelController::RemovePolygon);
+  connect(m_view, &CreateLevelWidget::PolygonMoved, this, &CreateLevelController::MovePolygon);
+  connect(m_view, &CreateLevelWidget::VertexInserted, this, &CreateLevelController::InsertVertex);
+  connect(m_view, &CreateLevelWidget::VertexRemoved, this, &CreateLevelController::RemoveVertex);
+  connect(m_view, &CreateLevelWidget::VertexMoved, this, &CreateLevelController::MoveVertex);
 
-  connect(m_view, &CreateLevelView::MousePressed, this, &CreateLevelController::MousePressEvent);
-  connect(m_view, &CreateLevelView::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
-  connect(m_view, &CreateLevelView::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
+  connect(m_view, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
+  connect(m_view, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
+  connect(m_view, &CreateLevelWidget::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
 
-  connect(m_view, &CreateLevelView::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
-  connect(m_view, &CreateLevelView::ValueYChanged, this, &CreateLevelController::UpdateYVertex);
-  connect(m_view, &CreateLevelView::EditionXDone, this, &CreateLevelController::TranslateXVertex);
-  connect(m_view, &CreateLevelView::EditionYDone, this, &CreateLevelController::TranslateYVertex);
+  connect(m_view, &CreateLevelWidget::ValueXChanged, this, &CreateLevelController::UpdateXVertex);
+  connect(m_view, &CreateLevelWidget::ValueYChanged, this, &CreateLevelController::UpdateYVertex);
+  connect(m_view, &CreateLevelWidget::EditionXDone, this, &CreateLevelController::TranslateXVertex);
+  connect(m_view, &CreateLevelWidget::EditionYDone, this, &CreateLevelController::TranslateYVertex);
 
-  connect(m_view, &CreateLevelView::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
-  connect(m_view, &CreateLevelView::NewLevelRequested, this, &CreateLevelController::NewLevel);
-  connect(m_view, &CreateLevelView::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
+  connect(m_view, &CreateLevelWidget::SnappedToGrid, this, &CreateLevelController::SnapToGrid);
+  connect(m_view, &CreateLevelWidget::NewLevelRequested, this, &CreateLevelController::NewLevel);
+  connect(m_view, &CreateLevelWidget::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
 
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::UndoRedo);
   connect(m_undoStack, &QUndoStack::indexChanged, this, &CreateLevelController::CheckTestAvailable);
@@ -66,7 +66,7 @@ CreateLevelController::CreateLevelController(CreateLevelView* p_view, QObject* p
 CreateLevelController::~CreateLevelController() {
   // When QUndoStack is deleted, it emits a last indexChanged, calling Redraw
   // from the scribbling view, whose model is already deleted, so disconnect.
-  disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelView::Redraw);
+  disconnect(m_undoStack, &QUndoStack::indexChanged, m_view, &CreateLevelWidget::Redraw);
 }
 
 void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {

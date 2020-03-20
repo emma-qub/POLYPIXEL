@@ -1,15 +1,15 @@
-#ifndef TESTINGVIEW_HXX
-#define TESTINGVIEW_HXX
+#ifndef TESTINGWIDGET_HXX
+#define TESTINGWIDGET_HXX
 
-#include "GUI/Views/PlayingView.hxx"
+#include "GUI/Views/PlayingWidget.hxx"
 
 class QPushButton;
 
-class TestingView : public PlayingView {
+class TestingWidget: public PlayingWidget {
   Q_OBJECT
 
 public:
-  TestingView(QWidget* p_parent = nullptr);
+  TestingWidget(QWidget* p_parent = nullptr);
 
   void DrawText(ppxl::Point p_position, const QString& p_text, int p_weight);
 

@@ -1,5 +1,5 @@
-#ifndef GAMEVIEW_HXX
-#define GAMEVIEW_HXX
+#ifndef GAMEWIDGET_HXX
+#define GAMEWIDGET_HXX
 
 #include <QWidget>
 
@@ -9,14 +9,14 @@
 class QLabel;
 class QPushButton;
 class PolygonModel;
-class PlayingView;
+class PlayingWidget;
 class PlayingController;
 
-class GameView: public QWidget {
+class GameWidget: public QWidget {
   Q_OBJECT
 
 public:
-  explicit GameView(QWidget* p_parent = nullptr);
+  explicit GameWidget(QWidget* p_parent = nullptr);
 
   void InitView();
 
@@ -32,7 +32,7 @@ signals:
 private:
   QLabel* m_gameLabel;
   QPushButton* m_pauseButton;
-  PlayingView* m_playingView;
+  PlayingWidget* m_playingWidget;
   PlayingController* m_playingController;
 };
 

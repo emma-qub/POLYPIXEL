@@ -1,4 +1,4 @@
-#include "TestingView.hxx"
+#include "TestingWidget.hxx"
 
 #include "GUI/Views/PlayingScribblingView.hxx"
 
@@ -6,8 +6,8 @@
 #include <QLabel>
 #include <QPushButton>
 
-TestingView::TestingView(QWidget* p_parent):
-  PlayingView(p_parent),
+TestingWidget::TestingWidget(QWidget* p_parent):
+  PlayingWidget(p_parent),
   m_starsCountLabel(new QLabel("Stars: 0")),
   m_perfectLabel(new QLabel("Perfect: NO")),
   m_restartButton(new QPushButton("Restart")),
@@ -46,23 +46,23 @@ TestingView::TestingView(QWidget* p_parent):
   mainLayout->setColumnStretch(0, 4);
   mainLayout->setColumnStretch(1, 1);
 
-  connect(m_restartButton, &QPushButton::clicked, this, &TestingView::RestartRequested);
-  connect(m_saveButton, &QPushButton::clicked, this, &TestingView::SaveLevelRequested);
+  connect(m_restartButton, &QPushButton::clicked, this, &TestingWidget::RestartRequested);
+  connect(m_saveButton, &QPushButton::clicked, this, &TestingWidget::SaveLevelRequested);
 }
 
-void TestingView::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight) {
+void TestingWidget::DrawText(ppxl::Point p_position, const QString& p_text, int p_weight) {
   m_scribblingView->DrawText(p_position, p_text, p_weight);
 }
 
-void TestingView::UpdateStarsCount(int p_starsCount) {
+void TestingWidget::UpdateStarsCount(int p_starsCount) {
   m_starsCountLabel->setText(tr("Stars: %1").arg(p_starsCount));
 }
 
-void TestingView::UpdatePerfect(bool p_perfect) {
+void TestingWidget::UpdatePerfect(bool p_perfect) {
   QString perfect = p_perfect ? "YES": "NO";
   m_perfectLabel->setText(tr("perfect: %1").arg(perfect));
 }
 
-void TestingView::SetSaveButtonEnable(bool p_enable) {
+void TestingWidget::SetSaveButtonEnable(bool p_enable) {
   m_saveButton->setEnabled(p_enable);
 }

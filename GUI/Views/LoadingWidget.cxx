@@ -1,4 +1,4 @@
-#include "LoadingView.hxx"
+#include "LoadingWidget.hxx"
 
 #include <QProgressBar>
 #include <QTimer>
@@ -11,7 +11,7 @@
 
 
 
-LoadingView::LoadingView(QWidget* parent):
+LoadingWidget::LoadingWidget(QWidget* parent):
   QWidget(parent),
   m_progressBar(new QProgressBar),
   m_loadingLabel(new QLabel("Laoding...")) {
@@ -41,7 +41,7 @@ LoadingView::LoadingView(QWidget* parent):
   timer->start();
 }
 
-void LoadingView::paintEvent(QPaintEvent* p_event) {
+void LoadingWidget::paintEvent(QPaintEvent* p_event) {
  QPainter p(this);
  QPainter painter(this);
  QRect drawingRect(0, 0, width(), height());

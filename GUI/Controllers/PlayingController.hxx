@@ -9,7 +9,7 @@
 
 class PolygonModel;
 class ObjectModel;
-class PlayingView;
+class PlayingWidget;
 class Deviation;
 class Mutable;
 class Obstacle;
@@ -41,7 +41,7 @@ class PlayingController: public QObject {
   Q_OBJECT
 
 public:
-  PlayingController(PlayingView* p_view, QObject* p_parent = nullptr);
+  PlayingController(PlayingWidget* p_view, QObject* p_parent = nullptr);
 
   void InitView();
 
@@ -88,7 +88,7 @@ protected:
   QString m_levelPath;
 
 private:
-  PlayingView* m_view;
+  PlayingWidget* m_view;
   ppxl::Point m_startPoint;
   QPoint m_startQPoint;
 };

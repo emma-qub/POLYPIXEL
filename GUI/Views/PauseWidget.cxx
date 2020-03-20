@@ -1,10 +1,10 @@
-#include "PauseView.hxx"
+#include "PauseWidget.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 
-PauseView::PauseView(QWidget* parent):
+PauseWidget::PauseWidget(QWidget* parent):
   QWidget(parent),
   m_pauseLabel(new QLabel("Pause")),
   m_resumeButton(new QPushButton("Resume")),
@@ -19,7 +19,7 @@ PauseView::PauseView(QWidget* parent):
   mainLayout->setAlignment(Qt::AlignCenter | Qt::AlignHCenter);
   setLayout(mainLayout);
 
-  connect(m_resumeButton, &QPushButton::clicked, this, &PauseView::ResumeRequested);
-  connect(m_restartButton, &QPushButton::clicked, this, &PauseView::RestartRequested);
-  connect(m_levelsButton, &QPushButton::clicked, this, &PauseView::LevelsRequested);
+  connect(m_resumeButton, &QPushButton::clicked, this, &PauseWidget::ResumeRequested);
+  connect(m_restartButton, &QPushButton::clicked, this, &PauseWidget::RestartRequested);
+  connect(m_levelsButton, &QPushButton::clicked, this, &PauseWidget::LevelsRequested);
 }
