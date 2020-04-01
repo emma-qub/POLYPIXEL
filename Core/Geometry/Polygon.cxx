@@ -263,6 +263,20 @@ double Polygon::ComputeAngleFromPoint(double p_x, double p_y) {
   return res;
 }
 
+void Polygon::ComputeBoundingRect(double& p_left, double& p_top, double& p_right, double& p_bottom) const {
+  p_left = std::numeric_limits<double>::infinity();
+  p_top = std::numeric_limits<double>::infinity();
+  p_right = -std::numeric_limits<double>::infinity();
+  p_bottom = -std::numeric_limits<double>::infinity();
+
+  for (auto const& vertex: m_vertices) {
+    p_left = std::min(p_left, vertex.GetX());
+    p_top = std::min(p_top, vertex.GetY());
+    p_right = std::max(p_right, vertex.GetX());
+    p_bottom = std::max(p_bottom, vertex.GetY());
+  }
+}
+
 bool operator==(Polygon const& p_polygon1, Polygon const& p_polygon2) {
   if (p_polygon1.m_vertices.size() != p_polygon2.m_vertices.size()) {
     return false;

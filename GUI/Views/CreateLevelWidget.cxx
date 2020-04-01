@@ -75,7 +75,7 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
 
   auto m_removeAction = new QAction("Remove", this);
   m_removeAction->setShortcut(QKeySequence(Qt::Key_Delete));
-  //connect(m_removeAction, &QAction::triggered, this, &CreateLevelScribblingView::Remove);
+  connect(m_removeAction, &QAction::triggered, this, &CreateLevelWidget::KeyDeletePressed);
   addAction(m_removeAction);
 
   auto snapToGridAction = new QAction("Snap to grid", this);
@@ -267,6 +267,10 @@ void CreateLevelWidget::SetVertexListModel(CreateLevelVertexListModel* p_vertexL
       m_vertexTreeView->resizeColumnToContents(column);
     }
   });
+}
+
+QModelIndex CreateLevelWidget::GetCurrentIndex() const {
+  return m_objectsListTreeView->selectionModel()->currentIndex();
 }
 
 QModelIndex CreateLevelWidget::GetCurrentObjectIndex() const {

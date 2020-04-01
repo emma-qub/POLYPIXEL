@@ -52,6 +52,7 @@ public:
   void SetObjectsDetailModel(CreateLevelObjectsDetailModel* p_objectsDetailModel);
   void SetVertexListModel(CreateLevelVertexListModel* p_vertexListModel);
 
+  QModelIndex GetCurrentIndex() const;
   QModelIndex GetCurrentObjectIndex() const;
   QModelIndex FindCurrentObjectIndex() const;
   QModelIndex GetCurrentPolygonIndex() const;
@@ -90,6 +91,7 @@ Q_SIGNALS:
   void MouseReleased(QMouseEvent* p_event);
   void CurrentObjectIndexChanged(QModelIndex const& p_current, QModelIndex const& p_previous);
   void KeyReturnPressed();
+  void KeyDeletePressed();
   void KeyLeftPressed(bool p_shiftPressed);
   void KeyUpPressed(bool p_shiftPressed);
   void KeyRightPressed(bool p_shiftPressed);

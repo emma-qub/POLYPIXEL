@@ -50,6 +50,8 @@ public:
 
   double ComputeAngleFromPoint(double p_x, double p_y);
 
+  void ComputeBoundingRect(double& p_left, double& p_top, double& p_right, double& p_bottom) const;
+
   friend bool operator==(Polygon const& p_polygon1, Polygon const& p_polygon2);
 
   friend Polygon& operator<<(Polygon& p_polygon, Point const& p_vertex);

@@ -112,6 +112,8 @@ void GraphicsObjectItem::paint(QPainter* p_painter, const QStyleOptionGraphicsIt
   if (data(eStateRole).value<State>() == eSelectedState) {
     DrawControlPoints(p_painter);
   }
+
+  p_painter->drawRect(boundingRect());
 }
 
 QList<QColor> GraphicsObjectItem::GetHighlightedDownColors() const {
@@ -149,7 +151,7 @@ QRectF GraphicsPolygonItem::boundingRect() const {
     ymax = std::max(vertex.GetY(), ymax);
   }
 
-  return QRectF(QPointF(xmin, ymin), QPointF(xmax, ymax));
+  return QRectF(QPointF(xmin-30, ymin-30), QPointF(xmax+30, ymax+30));
 }
 
 void GraphicsPolygonItem::DrawObject(QPainter* p_painter) {
@@ -219,7 +221,7 @@ GraphicsTapeItem::GraphicsTapeItem(Tape* p_tape, QGraphicsItem* p_parent):
 GraphicsTapeItem::~GraphicsTapeItem() = default;
 
 QRectF GraphicsTapeItem::boundingRect() const {
-  return QRectF(m_tape->GetXmin(), m_tape->GetYmin(), m_tape->GetW(), m_tape->GetH());
+  return QRectF(m_tape->GetXmin()-5, m_tape->GetYmin()-5, m_tape->GetW()+10, m_tape->GetH()+10);
 }
 
 void GraphicsTapeItem::DrawObject(QPainter* p_painter) {
@@ -293,15 +295,13 @@ GraphicsMirrorItem::GraphicsMirrorItem(Mirror* p_mirror, QGraphicsItem* p_parent
 GraphicsMirrorItem::~GraphicsMirrorItem() = default;
 
 QRectF GraphicsMirrorItem::boundingRect() const {
-  auto line = m_mirror->GetLine();
-  auto A = line.GetA();
-  auto Ax = A.GetX();
-  auto Ay = A.GetY();
-  auto B = line.GetB();
-  auto Bx = B.GetX();
-  auto By = B.GetY();
+  double left;
+  double top;
+  double right;
+  double bottom;
+  m_boundingPolygon.ComputeBoundingRect(left, top, right, bottom);
 
-  return QRectF(qMin(Ax, Bx), qMin(Ay, By), qAbs(Bx-Ax), qAbs(By-Ay));
+  return QRectF(QPointF(left-5, top-5), QPointF(right+5, bottom+5));
 }
 
 void GraphicsMirrorItem::DrawObject(QPainter* p_painter) {
@@ -366,6 +366,7 @@ void GraphicsMirrorItem::ComputeBoundingPolygon() {
   for (auto const& vertex: graphicsPolygon) {
     m_boundingPolygon.AppendVertex(ppxl::Point(vertex.x(), vertex.y()));
   }
+  m_boundingPolygon.Translate(25*m_mirror->GetLine().GetNormal().Normalize());
 }
 
 QList<QPair<QPoint, Object::ControlPointType>> GraphicsMirrorItem::ComputeControlPoints() const {
@@ -399,14 +400,13 @@ GraphicsOneWayItem::GraphicsOneWayItem(OneWay* p_oneWay, QGraphicsItem* p_parent
 GraphicsOneWayItem::~GraphicsOneWayItem() = default;
 
 QRectF GraphicsOneWayItem::boundingRect() const {
-  auto line = m_oneWay->GetLine();
-  auto A = line.GetA();
-  auto Ax = A.GetX();
-  auto Ay = A.GetY();
-  auto B = line.GetB();
-  auto Bx = B.GetX();
-  auto By = B.GetY();
-  return QRectF(qMin(Ax, Bx), qMin(Ay, By), qAbs(Bx-Ax), qAbs(By-Ay));
+  double left;
+  double top;
+  double right;
+  double bottom;
+  m_boundingPolygon.ComputeBoundingRect(left, top, right, bottom);
+
+  return QRectF(QPointF(left-5, top-5), QPointF(right+5, bottom+5));
 }
 
 void GraphicsOneWayItem::DrawObject(QPainter* p_painter) {

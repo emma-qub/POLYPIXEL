@@ -151,7 +151,7 @@ void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
 void CreateLevelScribblingView::keyPressEvent(QKeyEvent* p_event) {
   auto shiftPressed = p_event->modifiers().testFlag(Qt::ShiftModifier);
   switch (p_event->key()) {
-  case Qt::Key_Return:{
+  case Qt::Key_Return: {
     Q_EMIT KeyReturnPressed();
     break;
   } case Qt::Key_Left: {

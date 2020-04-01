@@ -42,6 +42,7 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   connect(m_createLevelWidget, &CreateLevelWidget::SnapAllToGridRequested, this, &CreateLevelController::SnapAllToGrid);
   connect(m_createLevelWidget, &CreateLevelWidget::NewLevelRequested, this, &CreateLevelController::NewLevel);
   connect(m_createLevelWidget, &CreateLevelWidget::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyDeletePressed, this, &CreateLevelController::DeleteCurrent);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyReturnPressed, this, &CreateLevelController::PolygonComplete);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyLeftPressed, this, &CreateLevelController::MoveCurrentLeft);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyUpPressed, this, &CreateLevelController::MoveCurrentUp);
@@ -761,6 +762,28 @@ void CreateLevelController::PolygonComplete() {
     m_createLevelWidget->SetCurrentObjectOrPolygonIndex(currentPolygonIndex.parent());
   }
   m_creatingNewPolygon = true;
+}
+
+void CreateLevelController::DeleteCurrent() {
+  disconnect(m_createLevelWidget, &CreateLevelWidget::CurrentObjectIndexChanged, this, &CreateLevelController::UpdateGraphicsSelection);
+
+  auto currentIndex = m_createLevelWidget->GetCurrentIndex();
+  auto parentIndex = currentIndex.parent();
+  if (m_objectsListModel->IsObjectIndex(currentIndex)) {
+    delete m_objectsListModel->GetObjectFromIndex(currentIndex);
+  } else if (m_objectsListModel->IsPolygonIndex(currentIndex)) {
+    delete m_objectsListModel->GetPolygonFromIndex(currentIndex);
+  } else {
+    return;
+  }
+  auto graphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentIndex);
+  m_createLevelWidget->RemoveGraphicsItem(graphicsItem);
+  delete graphicsItem;
+  m_objectsListModel->removeRow(currentIndex.row(), parentIndex);
+
+  connect(m_createLevelWidget, &CreateLevelWidget::CurrentObjectIndexChanged, this, &CreateLevelController::UpdateGraphicsSelection);
+
+  m_createLevelWidget->SetCurrentObjectOrPolygonIndex(parentIndex);
 }
 
 void CreateLevelController::MoveCurrent(ppxl::Vector const& p_direction, bool p_shiftPressed) {

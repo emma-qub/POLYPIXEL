@@ -83,6 +83,7 @@ protected:
   ppxl::Point FindNearestGridNode(ppxl::Point const& p_point);
 
   void PolygonComplete();
+  void DeleteCurrent();
   void MoveCurrent(ppxl::Vector const& p_direction, bool p_shiftPressed);
   void MoveCurrentLeft(bool p_shiftPressed);
   void MoveCurrentUp(bool p_shiftPressed);
