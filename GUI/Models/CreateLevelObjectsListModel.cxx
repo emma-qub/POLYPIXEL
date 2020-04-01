@@ -90,6 +90,13 @@ void CreateLevelObjectsListModel::MoveObject(QModelIndex const& p_objectIndex, p
   Q_EMIT ObjectChanged();
 }
 
+void CreateLevelObjectsListModel::TranslateObject(QModelIndex const& p_objectIndex, ppxl::Vector const& p_direction) {
+  auto object = GetObjectFromIndex(p_objectIndex);
+  object->Translate(p_direction);
+
+  Q_EMIT ObjectChanged();
+}
+
 QStandardItem* CreateLevelObjectsListModel::AddPolygon(ppxl::Polygon* p_polygon, GraphicsPolygonItem* p_graphicsObjectItem) {
   auto color = GetRandomColor();
   auto polygonItem = new QStandardItem(tr("Polygon_%1").arg(m_polygonsItem->rowCount()));

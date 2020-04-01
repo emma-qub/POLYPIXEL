@@ -28,7 +28,8 @@ public:
   std::vector<ppxl::Segment> DeviateLine(ppxl::Segment const& p_line) const override;
   std::vector<ppxl::Segment> DeviateLine2(ppxl::Segment const& p_line) const;
 
-  virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+  void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) override;
+  void Translate(ppxl::Vector const& p_direction) override;
   ppxl::Point GetControlPoint(ControlPointType p_controlPointType) const override;
 
 private:

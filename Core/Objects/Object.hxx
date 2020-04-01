@@ -53,6 +53,7 @@ public:
   virtual std::string GetName() const = 0;
   virtual bool Intersect(ppxl::Point const& p_point, double p_tolerence = DBL_EPSILON) const = 0;
   virtual void MoveControlPoint(ppxl::Point const& p_point, ControlPointType p_controlPointType) = 0;
+  virtual void Translate(ppxl::Vector const& p_direction) = 0;
   virtual ppxl::Point GetControlPoint(ControlPointType p_controlPointType) const = 0;
 
   ppxl::Point GetLeft() const { return GetControlPoint(eLeft); };

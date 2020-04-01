@@ -33,6 +33,8 @@ public:
 
   void AddGraphicsItem(GraphicsObjectItem* p_graphicsItem);
 
+  int GetGraphicsItemCount() const;
+
 Q_SIGNALS:
   void SnappedToGrid();
   void NewLevelRequested();
@@ -40,11 +42,17 @@ Q_SIGNALS:
   void MousePressed(QMouseEvent* p_event);
   void MouseMoved(QMouseEvent* p_event);
   void MouseReleased(QMouseEvent* p_event);
+  void KeyReturnPressed();
+  void KeyLeftPressed(bool p_shiftPressed);
+  void KeyUpPressed(bool p_shiftPressed);
+  void KeyRightPressed(bool p_shiftPressed);
+  void KeyDownPressed(bool p_shiftPressed);
 
 protected:
   void mousePressEvent(QMouseEvent* p_event) override;
   void mouseMoveEvent(QMouseEvent* p_event) override;
   void mouseReleaseEvent(QMouseEvent* p_event) override;
+  void keyPressEvent(QKeyEvent* p_event) override;
 
 private:
   QGraphicsScene* m_scene;

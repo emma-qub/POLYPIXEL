@@ -64,6 +64,7 @@ protected:
   void FindNearestVertex(bool& p_isNearVertex, ppxl::Point& p_nearestVertex, int& p_nearestVertexRow, QPoint const& p_pos) const;
   void FindNearestControlPoint(bool& p_isNearControlPoint, QPair<QPoint, Object::ControlPointType>& p_nearestControlPoint, QPoint const& p_pos) const;
   void MoveObject(QPoint const& p_pos);
+  void TranslateObject(const ppxl::Vector& p_direction);
   void HighlightObjectUnderCursor(QPoint const& p_pos);
 
   void NewLevel();
@@ -76,6 +77,13 @@ protected:
   void DisconnectToolsActions();
 
   ppxl::Point FindNearestGridNode(ppxl::Point const& p_point);
+
+  void PolygonComplete();
+  void MoveCurrent(ppxl::Vector const& p_direction, bool p_shiftPressed);
+  void MoveCurrentLeft(bool p_shiftPressed);
+  void MoveCurrentUp(bool p_shiftPressed);
+  void MoveCurrentRight(bool p_shiftPressed);
+  void MoveCurrentDown(bool p_shiftPressed);
 
 private:
   CreateLevelObjectsListModel* m_objectsListModel;

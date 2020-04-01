@@ -119,8 +119,7 @@ void AbstractScribblingView::DrawFromModel() {
     for (auto const& vertex: polygon->GetVertices()) {
       verticesList << QPointF(vertex.GetX(), vertex.GetY());
     }
-    auto graphicsPolygonItem = new GraphicsPolygonItem(QPolygonF(verticesList));
-    graphicsPolygonItem->setPen(m_pen);
+    auto graphicsPolygonItem = new GraphicsPolygonItem(polygon);
     m_scene->addItem(graphicsPolygonItem);
     m_graphicsPolygonList << graphicsPolygonItem;
   }

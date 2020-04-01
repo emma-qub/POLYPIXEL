@@ -83,6 +83,11 @@ Q_SIGNALS:
   void MouseMoved(QMouseEvent* p_event);
   void MouseReleased(QMouseEvent* p_event);
   void CurrentObjectIndexChanged(QModelIndex const& p_current, QModelIndex const& p_previous);
+  void KeyReturnPressed();
+  void KeyLeftPressed(bool p_shiftPressed);
+  void KeyUpPressed(bool p_shiftPressed);
+  void KeyRightPressed(bool p_shiftPressed);
+  void KeyDownPressed(bool p_shiftPressed);
 
 protected:
   enum ViewType {
@@ -96,6 +101,8 @@ protected:
   bool ConfirmClear();
   void ConfirmNewLevel();
   void ConfirmOpenLevel();
+
+  int GetGraphicsItemCount() const;
 
 private:
   QLabel* m_createLevelLabel;

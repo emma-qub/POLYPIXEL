@@ -1,4 +1,5 @@
 #include "Core/Objects/Obstacles/Tape.hxx"
+#include "Core/Geometry/Vector.hxx"
 
 Tape::Tape(double p_x, double p_y, double p_w, double p_h):
   Obstacle(),
@@ -84,6 +85,15 @@ void Tape::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointType
   } default:
     break;
   }
+}
+
+void Tape::Translate(ppxl::Vector const& p_direction) {
+  auto x = p_direction.GetX();
+  auto y = p_direction.GetY();
+  m_x1 += x;
+  m_y1 += y;
+  m_x2 += x;
+  m_y2 += y;
 }
 
 ppxl::Point Tape::GetControlPoint(Object::ControlPointType p_controlPointType) const {

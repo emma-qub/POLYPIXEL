@@ -52,6 +52,10 @@ void OneWay::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointTy
   }
 }
 
+void OneWay::Translate(const ppxl::Vector& p_direction) {
+  m_line.Translate(p_direction);
+}
+
 ppxl::Point OneWay::GetControlPoint(Object::ControlPointType p_controlPointType) const {
   switch (p_controlPointType) {
   case eTopLeft:{

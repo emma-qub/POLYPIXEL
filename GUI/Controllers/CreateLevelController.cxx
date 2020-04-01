@@ -41,19 +41,11 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   connect(m_createLevelWidget, &CreateLevelWidget::SnapAllToGridRequested, this, &CreateLevelController::SnapAllToGrid);
   connect(m_createLevelWidget, &CreateLevelWidget::NewLevelRequested, this, &CreateLevelController::NewLevel);
   connect(m_createLevelWidget, &CreateLevelWidget::OpenLevelRequested, this, &CreateLevelController::OpenLevel);
-
-  auto polygonDoneAction = new QAction("PolygonDone", m_createLevelWidget);
-  polygonDoneAction->setShortcut(QKeySequence(Qt::Key_Return));
-  m_createLevelWidget->addAction(polygonDoneAction);
-  connect(polygonDoneAction, &QAction::triggered, this, [this](){
-    auto currentPolygonIndex = m_createLevelWidget->FindCurrentPolygonIndex();
-    auto currentGraphicsPolygon = m_objectsListModel->GetGraphicsFromIndex(currentPolygonIndex);
-    if (currentGraphicsPolygon) {
-      currentGraphicsPolygon->SetState(GraphicsObjectItem::eDisabledState);
-      m_createLevelWidget->SetCurrentObjectOrPolygonIndex(currentPolygonIndex.parent());
-    }
-    m_creatingNewPolygon = true;
-  });
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyReturnPressed, this, &CreateLevelController::PolygonComplete);
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyLeftPressed, this, &CreateLevelController::MoveCurrentLeft);
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyUpPressed, this, &CreateLevelController::MoveCurrentUp);
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyRightPressed, this, &CreateLevelController::MoveCurrentRight);
+  connect(m_createLevelWidget, &CreateLevelWidget::KeyDownPressed, this, &CreateLevelController::MoveCurrentDown);
 }
 
 CreateLevelController::~CreateLevelController() = default;
@@ -530,7 +522,7 @@ void CreateLevelController::CreateObject(Object* p_object) {
   }
 }
 
-void CreateLevelController::MoveObject(const QPoint& p_pos) {
+void CreateLevelController::MoveObject(QPoint const& p_pos) {
   Object::ControlPointType controlPointType;
   if (m_creatingObject) {
     controlPointType = Object::eBottomRight;
@@ -541,6 +533,14 @@ void CreateLevelController::MoveObject(const QPoint& p_pos) {
   auto currentObjectIndex = m_createLevelWidget->GetCurrentObjectIndex();
   auto currentGraphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentObjectIndex);
   m_objectsListModel->MoveObject(currentObjectIndex, ppxl::Point(p_pos.x(), p_pos.y()), controlPointType);
+  m_objectsDetailModel->UpdateCurrentObject();
+  currentGraphicsItem->ComputeBoundingPolygon();
+}
+
+void CreateLevelController::TranslateObject(ppxl::Vector const& p_direction) {
+  auto currentObjectIndex = m_createLevelWidget->GetCurrentObjectIndex();
+  auto currentGraphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentObjectIndex);
+  m_objectsListModel->TranslateObject(currentObjectIndex, p_direction);
   m_objectsDetailModel->UpdateCurrentObject();
   currentGraphicsItem->ComputeBoundingPolygon();
 }
@@ -650,6 +650,8 @@ void CreateLevelController::ChangeCurrentTool() {
   } else if (action != m_selectAction) {
     m_createLevelWidget->ShowDetailListView();
   }
+  /// NOT WORKING ON SELECTION TOOL
+  /// m_createLevelWidget->SetCurrentObjectOrPolygonIndex(m_objectsListModel->index(m_toolMode-1, 0));
 }
 
 void CreateLevelController::ConnectToolsActions() {
@@ -706,4 +708,43 @@ void CreateLevelController::MoveVertexAt(int p_vertexIndex, ppxl::Point const& p
 
 void CreateLevelController::UpdateView() {
   m_createLevelWidget->UpdateView();
+}
+
+void CreateLevelController::PolygonComplete() {
+  auto currentPolygonIndex = m_createLevelWidget->FindCurrentPolygonIndex();
+  auto currentGraphicsPolygon = m_objectsListModel->GetGraphicsFromIndex(currentPolygonIndex);
+  if (currentGraphicsPolygon) {
+    currentGraphicsPolygon->SetState(GraphicsObjectItem::eDisabledState);
+    m_createLevelWidget->SetCurrentObjectOrPolygonIndex(currentPolygonIndex.parent());
+  }
+  m_creatingNewPolygon = true;
+}
+
+void CreateLevelController::MoveCurrent(ppxl::Vector const& p_direction, bool p_shiftPressed) {
+  auto direction = p_direction;
+  if (p_shiftPressed) {
+    direction *= 10;
+  }
+
+  if (m_createLevelWidget->FindCurrentObjectIndex().isValid()) {
+    TranslateObject(direction);
+  } else if (m_createLevelWidget->FindCurrentPolygonIndex().isValid()) {
+    TranslatePolygon(direction);
+  }
+}
+
+void CreateLevelController::MoveCurrentLeft(bool p_shiftPressed) {
+  MoveCurrent({-1, 0}, p_shiftPressed);
+}
+
+void CreateLevelController::MoveCurrentUp(bool p_shiftPressed) {
+  MoveCurrent({0, -1}, p_shiftPressed);
+}
+
+void CreateLevelController::MoveCurrentRight(bool p_shiftPressed) {
+  MoveCurrent({1, 0}, p_shiftPressed);
+}
+
+void CreateLevelController::MoveCurrentDown(bool p_shiftPressed) {
+  MoveCurrent({0, 1}, p_shiftPressed);
 }

@@ -101,6 +101,8 @@ public:
   QStandardItem* AddPortal(Object* p_portal, GraphicsObjectItem* p_portalGraphicsItem);
   //  Move
   void MoveObject(QModelIndex const& p_objectIndex, ppxl::Point const& p_pos, Object::ControlPointType p_controlPointType);
+  // Translate
+  void TranslateObject(const QModelIndex& p_objectIndex, const ppxl::Vector& p_direction);
 
   // All
   void Clear();

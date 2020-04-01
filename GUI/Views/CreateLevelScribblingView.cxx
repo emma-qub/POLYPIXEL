@@ -99,6 +99,10 @@ void CreateLevelScribblingView::AddGraphicsItem(GraphicsObjectItem* p_graphicsIt
   m_scene->addItem(p_graphicsItem);
 }
 
+int CreateLevelScribblingView::GetGraphicsItemCount() const {
+  return m_scene->items().count();
+}
+
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
   Q_EMIT MousePressed(p_event);
 }
@@ -109,4 +113,29 @@ void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
 
 void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
   Q_EMIT MouseReleased(p_event);
+}
+
+void CreateLevelScribblingView::keyPressEvent(QKeyEvent* p_event) {
+  auto shiftPressed = p_event->modifiers().testFlag(Qt::ShiftModifier);
+  switch (p_event->key()) {
+  case Qt::Key_Return:{
+    Q_EMIT KeyReturnPressed();
+    break;
+  } case Qt::Key_Left: {
+    Q_EMIT KeyLeftPressed(shiftPressed);
+    break;
+  } case Qt::Key_Up: {
+    Q_EMIT KeyUpPressed(shiftPressed);
+    break;
+  } case Qt::Key_Right: {
+    Q_EMIT KeyRightPressed(shiftPressed);
+    break;
+  } case Qt::Key_Down: {
+    Q_EMIT KeyDownPressed(shiftPressed);
+    break;
+  } default:
+    break;
+  }
+
+  QGraphicsView::keyPressEvent(p_event);
 }

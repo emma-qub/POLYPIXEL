@@ -6,22 +6,10 @@
 
 #include "Core/Geometry/Segment.hxx"
 #include "Core/Geometry/Vector.hxx"
+#include "GUI/GraphicsItem/GraphicsObjectItem.hxx"
 
 class PolygonModel;
 class Object;
-
-class GraphicsPolygonItem: public QObject, public QGraphicsPolygonItem {
-  Q_OBJECT
-  Q_PROPERTY(QPointF pos READ pos WRITE setPos)
-
-public:
-  explicit GraphicsPolygonItem(QGraphicsItem* p_parent = nullptr): QGraphicsPolygonItem(p_parent) {}
-  explicit GraphicsPolygonItem(QPolygonF const& p_polygon, QGraphicsItem* p_parent = nullptr):
-    QGraphicsPolygonItem(p_polygon, p_parent) {}
-
-  ~GraphicsPolygonItem() override = default;
-
-};
 
 class AbstractScribblingView: public QGraphicsView {
   Q_OBJECT

@@ -160,6 +160,11 @@ void Portal::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointTy
   }
 }
 
+void Portal::Translate(const ppxl::Vector& p_direction) {
+  m_in.Translate(p_direction);
+  m_out.Translate(p_direction);
+}
+
 ppxl::Point Portal::GetControlPoint(Object::ControlPointType p_controlPointType) const {
   switch (p_controlPointType) {
   case eTopLeftYellow:{

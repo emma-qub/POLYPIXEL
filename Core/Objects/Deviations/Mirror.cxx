@@ -93,6 +93,10 @@ void Mirror::MoveControlPoint(const ppxl::Point& p_point, Object::ControlPointTy
   }
 }
 
+void Mirror::Translate(const ppxl::Vector& p_direction) {
+  m_line.Translate(p_direction);
+}
+
 ppxl::Point Mirror::GetControlPoint(Object::ControlPointType p_controlPointType) const {
   switch (p_controlPointType) {
   case eTopLeft:{

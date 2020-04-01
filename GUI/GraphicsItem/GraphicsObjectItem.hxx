@@ -21,6 +21,7 @@ class QStandardItem;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class GraphicsObjectItem: public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_INTERFACES(QGraphicsItem)
 
 public:
   enum ItemRole {

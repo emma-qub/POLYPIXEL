@@ -98,9 +98,15 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   addAction(openAction);
   connect(openAction, &QAction::triggered, this, &CreateLevelWidget::ConfirmOpenLevel);
 
+  // Scribble view signals forward
   connect(m_scribblingView, &CreateLevelScribblingView::MousePressed, this, &CreateLevelWidget::MousePressed);
   connect(m_scribblingView, &CreateLevelScribblingView::MouseMoved, this, &CreateLevelWidget::MouseMoved);
   connect(m_scribblingView, &CreateLevelScribblingView::MouseReleased, this, &CreateLevelWidget::MouseReleased);
+  connect(m_scribblingView, &CreateLevelScribblingView::KeyReturnPressed, this, &CreateLevelWidget::KeyReturnPressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::KeyLeftPressed, this, &CreateLevelWidget::KeyLeftPressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::KeyUpPressed, this, &CreateLevelWidget::KeyUpPressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::KeyRightPressed, this, &CreateLevelWidget::KeyRightPressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::KeyDownPressed, this, &CreateLevelWidget::KeyDownPressed);
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateMaxGapToWinPrefix);
@@ -294,8 +300,12 @@ void CreateLevelWidget::SetCurrentVertexIndex(int p_vertexRow) {
   m_vertexTreeView->selectionModel()->setCurrentIndex(m_vertexListModel->index(p_vertexRow, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
-void CreateLevelWidget::SetCurrentObjectOrPolygonIndex(QModelIndex const& p_polygonIndex) {
-  m_objectsListTreeView->selectionModel()->setCurrentIndex(p_polygonIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+void CreateLevelWidget::SetCurrentObjectOrPolygonIndex(QModelIndex const& p_index) {
+  if (p_index.isValid()) {
+    m_objectsListTreeView->selectionModel()->setCurrentIndex(p_index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+  } else {
+    m_objectsListTreeView->selectionModel()->clearCurrentIndex();
+  }
 }
 
 void CreateLevelWidget::ClearImage() {
@@ -312,7 +322,8 @@ void CreateLevelWidget::UpdateView() {
 }
 
 bool CreateLevelWidget::ConfirmClear() {
-  return QMessageBox::question(this, tr("Clear"), tr("You are currently creating a level, your modifications will be lost.\nContinue?")) == QMessageBox::Yes;
+  return (GetGraphicsItemCount() == 1 ||
+    QMessageBox::question(this, tr("Clear"), tr("You are currently creating a level, your modifications will be lost.\nContinue?")) == QMessageBox::Yes);
 }
 
 void CreateLevelWidget::ConfirmNewLevel() {
@@ -328,4 +339,8 @@ void CreateLevelWidget::ConfirmOpenLevel() {
       Q_EMIT OpenLevelRequested(fileName);
     }
   }
+}
+
+int CreateLevelWidget::GetGraphicsItemCount() const {
+  return m_scribblingView->GetGraphicsItemCount();
 }
