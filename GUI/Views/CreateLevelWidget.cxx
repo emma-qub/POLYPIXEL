@@ -107,6 +107,8 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::KeyUpPressed, this, &CreateLevelWidget::KeyUpPressed);
   connect(m_scribblingView, &CreateLevelScribblingView::KeyRightPressed, this, &CreateLevelWidget::KeyRightPressed);
   connect(m_scribblingView, &CreateLevelScribblingView::KeyDownPressed, this, &CreateLevelWidget::KeyDownPressed);
+  connect(m_scribblingView, &CreateLevelScribblingView::SelectionChanged, this, &CreateLevelWidget::SelectionChanged);
+
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateMaxGapToWinPrefix);
@@ -171,8 +173,25 @@ void CreateLevelWidget::ResetGameInfo() {
   m_toleranceSpinBox->setValue(10);
 }
 
-void CreateLevelWidget::AddGraphicsItem(GraphicsObjectItem* p_graphicsItem) {
+void CreateLevelWidget::AddGraphicsItem(QGraphicsItem* p_graphicsItem) {
   m_scribblingView->AddGraphicsItem(p_graphicsItem);
+}
+
+QList<QGraphicsItem*> CreateLevelWidget::GetGraphicsItemsList() const {
+  return m_scribblingView->GetGraphicsItemsList();
+}
+
+void CreateLevelWidget::RemoveGraphicsItem(QGraphicsItem* p_graphicsItem) {
+  m_scribblingView->RemoveGraphicsItem(p_graphicsItem);
+}
+
+void CreateLevelWidget::SetRubberBandDragMode(bool p_rubberBandOn) {
+  m_scribblingView->SetRubberBandDragMode(p_rubberBandOn);
+}
+
+void CreateLevelWidget::SetSelectionArea(const QRect& p_rect) {
+
+  m_scribblingView->SetSelectionArea(p_rect);
 }
 
 void CreateLevelWidget::ShowDetailListView() {

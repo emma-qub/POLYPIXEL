@@ -14,6 +14,8 @@ GraphicsObjectItem::GraphicsObjectItem(QGraphicsItem* p_parent):
   QGraphicsItem(p_parent){
 
   SetState(eDisabledState);
+
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 GraphicsObjectItem::~GraphicsObjectItem() = default;
@@ -108,10 +110,7 @@ void GraphicsObjectItem::paint(QPainter* p_painter, const QStyleOptionGraphicsIt
 {
   DrawObject(p_painter);
   if (data(eStateRole).value<State>() == eSelectedState) {
-    setZValue(1000);
     DrawControlPoints(p_painter);
-  } else {
-    setZValue(100);
   }
 }
 
@@ -547,7 +546,6 @@ bool GraphicsPortalItem::Intersect(const ppxl::Point& p_point) const {
 }
 
 QList<QPair<QPoint, Object::ControlPointType>> GraphicsPortalItem::ComputeControlPoints() const {
-
   auto lineIn = m_portal->GetIn();
   auto A = lineIn.GetA();
   auto Ax = A.GetX();
@@ -585,4 +583,28 @@ QList<QColor> GraphicsPortalItem::GetEnabledColors() const {
 
 QList<QColor> GraphicsPortalItem::GetDisabledColors() const {
   return {QColor("#bdbdbd"), QColor("#9e9e9e")};
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// RECTANGLE SELECTION
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+GraphicsRectangleSelectionItem::GraphicsRectangleSelectionItem(QGraphicsItem* p_parent):
+  QGraphicsRectItem(p_parent) {
+}
+
+GraphicsRectangleSelectionItem::~GraphicsRectangleSelectionItem() = default;
+
+void GraphicsRectangleSelectionItem::paint(QPainter* p_painter, const QStyleOptionGraphicsItem*, QWidget*) {
+  p_painter->save();
+
+  QColor selectionColorBorder(56, 172, 236);
+  QColor selectionColorInside = selectionColorBorder;
+  selectionColorInside.setAlpha(64);
+  p_painter->setPen(QPen(selectionColorBorder, 2));
+  p_painter->setBrush(QBrush(selectionColorInside));
+
+  p_painter->drawRoundedRect(rect(), 3, 3);
+
+  p_painter->restore();
 }

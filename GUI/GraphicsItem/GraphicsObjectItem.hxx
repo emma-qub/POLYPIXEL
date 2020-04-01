@@ -47,6 +47,7 @@ public:
 
   virtual bool Intersect(ppxl::Point const& p_point) const;
   virtual void ComputeBoundingPolygon() = 0;
+  inline ppxl::Polygon GetBoundingPolygon() { return m_boundingPolygon; }
 
 Q_SIGNALS:
   void StateChanged();
@@ -228,6 +229,19 @@ protected:
 private:
   Portal* m_portal;
   ppxl::Polygon m_boundingPolygonOut;
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// RECTANGLE SELECTION
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class GraphicsRectangleSelectionItem: public QGraphicsRectItem {
+public:
+  GraphicsRectangleSelectionItem(QGraphicsItem* p_parent = nullptr);
+  ~GraphicsRectangleSelectionItem() override;
+
+protected:
+  void paint(QPainter* p_painter, QStyleOptionGraphicsItem const*, QWidget* = nullptr) override;
 };
 
 Q_DECLARE_METATYPE(GraphicsObjectItem::State);

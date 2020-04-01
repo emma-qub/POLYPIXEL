@@ -7,6 +7,7 @@
 #include "Core/Geometry/Vector.hxx"
 #include "Core/Geometry/Polygon.hxx"
 
+class QGraphicsItem;
 class GraphicsObjectItem;
 class CreateLevelObjectsListModel;
 class CreateLevelObjectsDetailModel;
@@ -70,7 +71,12 @@ public:
 
   void UpdateView();
 
-  void AddGraphicsItem(GraphicsObjectItem* p_graphicsItem);
+  void AddGraphicsItem(QGraphicsItem* p_graphicsItem);
+  QList<QGraphicsItem*> GetGraphicsItemsList() const;
+  void RemoveGraphicsItem(QGraphicsItem* p_graphicsItem);
+
+  void SetRubberBandDragMode(bool p_rubberBandOn);
+  void SetSelectionArea(const QRect& p_rect);
 
 Q_SIGNALS:
   void TestLevelRequested();
@@ -88,6 +94,7 @@ Q_SIGNALS:
   void KeyUpPressed(bool p_shiftPressed);
   void KeyRightPressed(bool p_shiftPressed);
   void KeyDownPressed(bool p_shiftPressed);
+  void SelectionChanged();
 
 protected:
   enum ViewType {

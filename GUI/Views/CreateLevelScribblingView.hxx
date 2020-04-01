@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 
 class GraphicsObjectItem;
+class GraphicsRectangleSelectionItem;
 class CreateLevelObjectsListModel;
 class ObjectModel;
 class QItemSelectionModel;
@@ -31,9 +32,14 @@ public:
   void ClearImage();
   void UpdateView();
 
-  void AddGraphicsItem(GraphicsObjectItem* p_graphicsItem);
+  void AddGraphicsItem(QGraphicsItem* p_graphicsItem);
+  QList<QGraphicsItem*> GetGraphicsItemsList() const;
+  void RemoveGraphicsItem(QGraphicsItem* p_graphicsItem);
 
   int GetGraphicsItemCount() const;
+
+  void SetRubberBandDragMode(bool p_rubberBandOn);
+  void SetSelectionArea(const QRect& p_rect);
 
 Q_SIGNALS:
   void SnappedToGrid();
@@ -47,6 +53,7 @@ Q_SIGNALS:
   void KeyUpPressed(bool p_shiftPressed);
   void KeyRightPressed(bool p_shiftPressed);
   void KeyDownPressed(bool p_shiftPressed);
+  void SelectionChanged();
 
 protected:
   void mousePressEvent(QMouseEvent* p_event) override;
@@ -59,6 +66,7 @@ private:
   QGraphicsPixmapItem* m_gridPixmapItem;
   CreateLevelObjectsListModel* m_objectsListModel;
   QItemSelectionModel* m_objectSelectionModel;
+  GraphicsRectangleSelectionItem* m_rectangleSelectionItem;
   bool m_viewInitialized;
 };
 

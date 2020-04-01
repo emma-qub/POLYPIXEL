@@ -27,7 +27,8 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   m_nearestVertexRow(-1),
   m_isNearControlPoint(false),
   m_nearestControlPoint(),
-  m_hoveredItem(nullptr) {
+  m_hoveredItem(nullptr),
+  m_clipboardIndex() {
 
   m_createLevelWidget->SetObjectsListModel(m_objectsListModel);
   m_createLevelWidget->SetObjectsDetailModel(m_objectsDetailModel);
@@ -46,6 +47,7 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   connect(m_createLevelWidget, &CreateLevelWidget::KeyUpPressed, this, &CreateLevelController::MoveCurrentUp);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyRightPressed, this, &CreateLevelController::MoveCurrentRight);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyDownPressed, this, &CreateLevelController::MoveCurrentDown);
+  connect(m_createLevelWidget, &CreateLevelWidget::SelectionChanged, this, &CreateLevelController::UpdateSelection);
 }
 
 CreateLevelController::~CreateLevelController() = default;
@@ -100,6 +102,18 @@ void CreateLevelController::SetToolBar(QToolBar* p_toolbar) {
   m_portalAction->setCheckable(true);
   m_actionToolModeMap[m_portalAction] = ePortalMode;
   m_objectTypeAction[CreateLevelObjectsListModel::ePortalObjectType] = m_portalAction;
+
+  m_rectangleSelectionAction = new QAction(QIcon("../POLYPIXEL/resources/icons/tools/rectangleSelectionToolIcon.png"), "Portal (R)", groupAction);
+
+  m_rectangleSelectionAction->setShortcut(QKeySequence(Qt::Key_R));
+  m_toolbar->addAction(m_rectangleSelectionAction);
+  m_rectangleSelectionAction->setCheckable(true);
+  connect(m_rectangleSelectionAction, &QAction::triggered, [this](){
+    m_toolMode = eRectangleSelectionMode;
+    DisableObjectItems();
+    m_hoveredItem = nullptr;
+  });
+  m_actionToolModeMap[m_rectangleSelectionAction] = eRectangleSelectionMode;
 
   ConnectToolsActions();
 
@@ -272,8 +286,7 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
   case eSelectionMode: {
     SelectObjectUnderCursor(p_event->pos());
     break;
-  }
-  case ePolygonMode: {
+  } case ePolygonMode: {
     if (m_isNearVertex) {
       m_createLevelWidget->setCursor(Qt::ClosedHandCursor);
       m_createLevelWidget->SetCurrentVertexIndex(m_nearestVertexRow);
@@ -300,7 +313,12 @@ void CreateLevelController::MousePressEvent(QMouseEvent* p_event) {
       CreateObject();
     }
     break;
-  }
+  } case eRectangleSelectionMode: {
+    m_createLevelWidget->setCursor(Qt::CrossCursor);
+    m_createLevelWidget->SetRubberBandDragMode(true);
+    break;
+  } default:
+    break;
   }
 }
 
@@ -350,7 +368,13 @@ void CreateLevelController::MouseMoveEvent(QMouseEvent* p_event) {
       }
     }
     break;
-  }
+  } case eRectangleSelectionMode: {
+    if (m_mousePressed) {
+      MoveRectangleSelection(p_event->pos());
+    }
+    break;
+  } default:
+    break;
   }
 }
 
@@ -375,6 +399,10 @@ void CreateLevelController::MouseReleaseEvent(QMouseEvent*) {
       portal->SetCreating(false);
       currentIndex.data(CreateLevelObjectsListModel::eGraphicsItemRole).value<GraphicsObjectItem*>()->UpdateControlPoints();
     }
+    break;
+  } case eRectangleSelectionMode: {
+    m_createLevelWidget->SetRubberBandDragMode(false);
+    m_createLevelWidget->setCursor(Qt::ArrowCursor);
     break;
   }
   default:
@@ -566,6 +594,10 @@ void CreateLevelController::HighlightObjectUnderCursor(QPoint const& p_pos) {
   }
 }
 
+void CreateLevelController::MoveRectangleSelection(QPoint const& p_pos) {
+  m_createLevelWidget->SetSelectionArea(QRect(m_objectStartPoint, p_pos));
+}
+
 void CreateLevelController::NewLevel() {
   m_objectStartPoint = QPoint();
   m_creatingNewPolygon = true;
@@ -638,6 +670,17 @@ void CreateLevelController::UpdateGraphicsSelection(QModelIndex const& p_current
     m_createLevelWidget->ShowDetailListView();
   }
   ConnectToolsActions();
+}
+
+void CreateLevelController::UpdateSelection() {
+  for (auto item: m_createLevelWidget->GetGraphicsItemsList()) {
+    if (item->flags().testFlag(QGraphicsItem::ItemIsSelectable)) {
+      auto objectItem = static_cast<GraphicsObjectItem*>(item);
+      objectItem->isSelected()?
+        objectItem->SetState(GraphicsObjectItem::eSelectedState):
+        objectItem->SetState(GraphicsObjectItem::eDisabledState);
+    }
+  }
 }
 
 void CreateLevelController::ChangeCurrentTool() {

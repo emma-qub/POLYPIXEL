@@ -11,15 +11,19 @@
 
 CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
   QGraphicsView(p_parent),
+  m_scene(nullptr),
   m_gridPixmapItem(nullptr),
   m_objectsListModel(nullptr),
   m_objectSelectionModel(nullptr),
+  m_rectangleSelectionItem(new GraphicsRectangleSelectionItem),
   m_viewInitialized(false) {
 
   setMouseTracking(true);
 }
 
-CreateLevelScribblingView::~CreateLevelScribblingView() = default;
+CreateLevelScribblingView::~CreateLevelScribblingView() {
+  delete m_rectangleSelectionItem;
+}
 
 void CreateLevelScribblingView::InitView() {
   if (m_viewInitialized) {
@@ -34,6 +38,7 @@ void CreateLevelScribblingView::InitView() {
   m_scene = new QGraphicsScene(this);
   setScene(m_scene);
   m_scene->setSceneRect(0, 0, width(), height());
+  connect(m_scene, &QGraphicsScene::selectionChanged, this, &CreateLevelScribblingView::SelectionChanged);
 
   int margin = 0;
   int xMin = margin, xMax = width()-margin;
@@ -95,12 +100,40 @@ void CreateLevelScribblingView::UpdateView() {
   m_scene->update();
 }
 
-void CreateLevelScribblingView::AddGraphicsItem(GraphicsObjectItem* p_graphicsItem) {
+void CreateLevelScribblingView::AddGraphicsItem(QGraphicsItem* p_graphicsItem) {
   m_scene->addItem(p_graphicsItem);
+}
+
+QList<QGraphicsItem*> CreateLevelScribblingView::GetGraphicsItemsList() const {
+  return m_scene->items();
+}
+
+void CreateLevelScribblingView::RemoveGraphicsItem(QGraphicsItem* p_graphicsItem) {
+  m_scene->removeItem(p_graphicsItem);
 }
 
 int CreateLevelScribblingView::GetGraphicsItemCount() const {
   return m_scene->items().count();
+}
+
+void CreateLevelScribblingView::SetRubberBandDragMode(bool p_rubberBandOn) {
+  if (p_rubberBandOn) {
+    setDragMode(RubberBandDrag);
+    m_scene->addItem(m_rectangleSelectionItem);
+  } else {
+    setDragMode(NoDrag);
+    m_rectangleSelectionItem->setRect(QRect());
+    m_scene->removeItem(m_rectangleSelectionItem);
+  }
+}
+
+void CreateLevelScribblingView::SetSelectionArea(QRect const& p_rect) {
+  m_rectangleSelectionItem->setRect(p_rect);
+
+  QPainterPath selectionPath;
+  selectionPath.addRect(p_rect);
+
+  m_scene->setSelectionArea(selectionPath);
 }
 
 void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {

@@ -25,7 +25,8 @@ public:
     eTapeMode,
     eMirrorMode,
     eOneWayMode,
-    ePortalMode
+    ePortalMode,
+    eRectangleSelectionMode
   };
 
   explicit CreateLevelController(CreateLevelWidget* p_view,  QObject *parent = nullptr);
@@ -67,10 +68,13 @@ protected:
   void TranslateObject(const ppxl::Vector& p_direction);
   void HighlightObjectUnderCursor(QPoint const& p_pos);
 
+  void MoveRectangleSelection(QPoint const& p_pos);
+
   void NewLevel();
   void OpenLevel(QString const& p_fileName);
 
   void UpdateGraphicsSelection(QModelIndex const& p_current, QModelIndex const&);
+  void UpdateSelection();
 
   void ChangeCurrentTool();
   void ConnectToolsActions();
@@ -100,6 +104,7 @@ private:
   QAction* m_mirrorAction;
   QAction* m_oneWayAction;
   QAction* m_portalAction;
+  QAction* m_rectangleSelectionAction;
 
   QMap<CreateLevelObjectsListModel::ObjectType, QAction*> m_objectTypeAction;
   QMap<QAction*, ToolMode> m_actionToolModeMap;
@@ -117,6 +122,8 @@ private:
   QPair<QPoint, Object::ControlPointType> m_nearestControlPoint;
 
   QStandardItem* m_hoveredItem;
+
+  QModelIndex m_clipboardIndex;
 };
 
 #endif
