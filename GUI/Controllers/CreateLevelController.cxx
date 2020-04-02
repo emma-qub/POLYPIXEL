@@ -34,6 +34,8 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   m_createLevelWidget->SetObjectsDetailModel(m_objectsDetailModel);
   m_createLevelWidget->SetVertexListModel(m_vertexListModel);
 
+  connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsAboutToBeRemoved, this, &CreateLevelController::UpdateClipboardIndex);
+
   connect(m_createLevelWidget, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
   connect(m_createLevelWidget, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
   connect(m_createLevelWidget, &CreateLevelWidget::MouseReleased, this, &CreateLevelController::MouseReleaseEvent);
@@ -49,6 +51,8 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   connect(m_createLevelWidget, &CreateLevelWidget::KeyRightPressed, this, &CreateLevelController::MoveCurrentRight);
   connect(m_createLevelWidget, &CreateLevelWidget::KeyDownPressed, this, &CreateLevelController::MoveCurrentDown);
   connect(m_createLevelWidget, &CreateLevelWidget::SelectionChanged, this, &CreateLevelController::UpdateSelection);
+  connect(m_createLevelWidget, &CreateLevelWidget::CopyRequested, this, &CreateLevelController::CopyItem);
+  connect(m_createLevelWidget, &CreateLevelWidget::PasteRequested, this, &CreateLevelController::PasteItem);
 }
 
 CreateLevelController::~CreateLevelController() = default;
@@ -680,6 +684,51 @@ void CreateLevelController::UpdateSelection() {
       objectItem->isSelected()?
         objectItem->SetState(GraphicsObjectItem::eSelectedState):
         objectItem->SetState(GraphicsObjectItem::eDisabledState);
+    }
+  }
+}
+
+void CreateLevelController::CopyItem() {
+  auto currentIndex = m_createLevelWidget->GetCurrentIndex();
+  if (m_objectsListModel->IsPolygonIndex(currentIndex) || m_objectsListModel->IsObjectIndex(currentIndex)) {
+    m_clipboardIndex = currentIndex;
+  }
+}
+
+void CreateLevelController::PasteItem() {
+  if (m_clipboardIndex.isValid()) {
+    if (auto object = m_objectsListModel->FindObjectFromIndex(m_clipboardIndex); object) {
+      switch (object->GetObjectType()) {
+      case Object::eTape:{
+        m_toolMode = eTapeMode;
+        CreateObject(new Tape(*static_cast<Tape*>(object)));
+        break;
+      } case Object::eMirror:{
+        m_toolMode = eMirrorMode;
+        CreateObject(new Mirror(*static_cast<Mirror*>(object)));
+        break;
+      } case Object::eOneWay:{
+        m_toolMode = eOneWayMode;
+        CreateObject(new OneWay(*static_cast<OneWay*>(object)));
+        break;
+      } case Object::ePortal:{
+        m_toolMode = ePortalMode;
+        CreateObject(new Portal(*static_cast<Portal*>(object)));
+        break;
+      }default:
+        break;
+      }
+    } else if (auto polygon = m_objectsListModel->FindPolygonFromIndex(m_clipboardIndex); polygon) {
+      CreatePolygon(*polygon);
+    }
+  }
+}
+
+void CreateLevelController::UpdateClipboardIndex(QModelIndex const& p_parent, int p_first, int p_last) {
+  for (int row = p_first; row <= p_last; ++row) {
+    if (m_objectsListModel->index(row, 0, p_parent) == m_clipboardIndex) {
+      m_clipboardIndex = QModelIndex();
+      return;
     }
   }
 }

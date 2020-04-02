@@ -97,6 +97,8 @@ Q_SIGNALS:
   void KeyRightPressed(bool p_shiftPressed);
   void KeyDownPressed(bool p_shiftPressed);
   void SelectionChanged();
+  void CopyRequested();
+  void PasteRequested();
 
 protected:
   enum ViewType {

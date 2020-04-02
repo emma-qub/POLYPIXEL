@@ -90,6 +90,10 @@ protected:
   void MoveCurrentRight(bool p_shiftPressed);
   void MoveCurrentDown(bool p_shiftPressed);
 
+  void CopyItem();
+  void PasteItem();
+  void UpdateClipboardIndex(const QModelIndex& p_parent, int p_first, int p_last);
+
 private:
   CreateLevelObjectsListModel* m_objectsListModel;
   CreateLevelObjectsDetailModel* m_objectsDetailModel;

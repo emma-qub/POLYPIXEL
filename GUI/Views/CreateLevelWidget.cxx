@@ -88,6 +88,16 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   connect(snapAllToGridAction, &QAction::triggered, this, &CreateLevelWidget::SnapAllToGridRequested);
   addAction(snapAllToGridAction);
 
+  auto copyAction = new QAction("Copy", this);
+  copyAction->setShortcut(QKeySequence::Copy);
+  connect(copyAction, &QAction::triggered, this, &CreateLevelWidget::CopyRequested);
+  addAction(copyAction);
+
+  auto pasteAction = new QAction("Paste", this);
+  pasteAction->setShortcut(QKeySequence::Paste);
+  connect(pasteAction, &QAction::triggered, this, &CreateLevelWidget::PasteRequested);
+  addAction(pasteAction);
+
   auto newAction = new QAction("New level", this);
   newAction->setShortcut(QKeySequence::New);
   addAction(newAction);
