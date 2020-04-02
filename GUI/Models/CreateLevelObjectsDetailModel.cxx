@@ -109,7 +109,7 @@ void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
     auto normalItem = new QStandardItem("Normal");
     m_oneWayNXItem = new QStandardItem(QString("x: %1").arg(QString::number(oneWayObject->GetNX(), 'f', 0)));
     m_oneWayNYItem = new QStandardItem(QString("y: %1").arg(QString::number(oneWayObject->GetNY(), 'f', 0)));
-    normalItem->appendRow({m_oneWayX2Item, m_oneWayY2Item});
+    normalItem->appendRow({m_oneWayNXItem, m_oneWayNYItem});
     appendRow(normalItem);
 
     break;
