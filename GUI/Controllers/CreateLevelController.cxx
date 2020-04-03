@@ -35,7 +35,13 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   m_createLevelWidget->SetVertexListModel(m_vertexListModel);
 
   connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsAboutToBeRemoved, this, &CreateLevelController::UpdateClipboardIndex);
+  connect(m_objectsListModel, &CreateLevelObjectsListModel::dataChanged, this, &CreateLevelController::CheckTestAvailable);
+  connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsInserted, this, &CreateLevelController::CheckTestAvailable);
+  connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsRemoved, this, &CreateLevelController::CheckTestAvailable);
   connect(m_createLevelWidget, &CreateLevelWidget::CurrentVertexChanged, this, &CreateLevelController::UpdateCurrentVertex);
+  connect(m_vertexListModel, &CreateLevelObjectsListModel::dataChanged, this, &CreateLevelController::CheckTestAvailable);
+  connect(m_vertexListModel, &CreateLevelObjectsListModel::rowsInserted, this, &CreateLevelController::CheckTestAvailable);
+  connect(m_vertexListModel, &CreateLevelObjectsListModel::rowsRemoved, this, &CreateLevelController::CheckTestAvailable);
 
   connect(m_createLevelWidget, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
   connect(m_createLevelWidget, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
@@ -265,16 +271,30 @@ void CreateLevelController::CheckTestAvailable() {
     // Check if a polygon has less than 3 vertices and is not crossed
     if (!polygon->HasEnoughVertices() || !polygon->IsGoodPolygon()) {
       m_createLevelWidget->SetTestAvailable(false);
+      if (!polygon->HasEnoughVertices())
+        /// qDebug() << "Not enough vertices";
+      if (!polygon->IsGoodPolygon())
+        /// qDebug() << "Vertex alignment issue";
       return;
     }
     // Check intersections between polygons
-    for (auto* polygon2: polygonsList) {
+    for (auto polygon2: polygonsList) {
       if (polygon == polygon2) {
         continue;
       }
-      for (auto const& vertex: polygon2->GetVertices()) {
-        if (polygon->IsPointInside(vertex)) {
+      auto vertices2 = polygon2->GetVertices();
+      for (auto k = 0ul; k < vertices2.size(); ++k) {
+        auto A = vertices2.at(k);
+        if (polygon->IsPointInside(A)) {
           m_createLevelWidget->SetTestAvailable(false);
+          /// qDebug() << "Polygons overlap issue";
+          return;
+        }
+
+        auto B = vertices2.at((k+1)%vertices2.size());
+        if (polygon->IsCrossing(ppxl::Segment(A, B))) {
+          m_createLevelWidget->SetTestAvailable(false);
+          /// qDebug() << "Polygons overlap issue";
           return;
         }
       }

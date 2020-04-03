@@ -124,8 +124,6 @@ void GraphicsObjectItem::paint(QPainter* p_painter, const QStyleOptionGraphicsIt
   if (data(eStateRole).value<State>() == eSelectedState) {
     DrawControlPoints(p_painter);
   }
-
-  p_painter->drawRect(boundingRect());
 }
 
 QList<QColor> GraphicsObjectItem::GetHighlightedDownColors() const {
