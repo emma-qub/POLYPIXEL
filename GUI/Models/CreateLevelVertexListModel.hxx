@@ -19,6 +19,7 @@ public:
   CreateLevelVertexListModel(QObject* p_parent = nullptr);
   ~CreateLevelVertexListModel() override;
 
+  void ClearPolygon();
   void SetPolygon(ppxl::Polygon* p_polygon);
   ppxl::Polygon* GetPolygon() const;
   void Update();

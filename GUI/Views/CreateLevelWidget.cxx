@@ -75,8 +75,13 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
 
   auto m_removeAction = new QAction("Remove", this);
   m_removeAction->setShortcut(QKeySequence(Qt::Key_Delete));
-  connect(m_removeAction, &QAction::triggered, this, &CreateLevelWidget::KeyDeletePressed);
+  connect(m_removeAction, &QAction::triggered, this, [this](){Q_EMIT KeyDeletePressed(false);});
   addAction(m_removeAction);
+
+  auto m_removePolygonAction = new QAction("Remove polygon", this);
+  m_removePolygonAction->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
+  connect(m_removePolygonAction, &QAction::triggered, this, [this](){Q_EMIT KeyDeletePressed(true);});
+  addAction(m_removePolygonAction);
 
   auto snapToGridAction = new QAction("Snap to grid", this);
   snapToGridAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -118,7 +123,6 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   connect(m_scribblingView, &CreateLevelScribblingView::KeyRightPressed, this, &CreateLevelWidget::KeyRightPressed);
   connect(m_scribblingView, &CreateLevelScribblingView::KeyDownPressed, this, &CreateLevelWidget::KeyDownPressed);
   connect(m_scribblingView, &CreateLevelScribblingView::SelectionChanged, this, &CreateLevelWidget::SelectionChanged);
-
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateMaxGapToWinPrefix);
@@ -276,6 +280,10 @@ void CreateLevelWidget::SetVertexListModel(CreateLevelVertexListModel* p_vertexL
     for (int column = m_vertexListModel->columnCount()-1; column > -1; --column) {
       m_vertexTreeView->resizeColumnToContents(column);
     }
+  });
+
+  connect(m_vertexTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](QModelIndex const& p_current, QModelIndex const&) {
+    Q_EMIT CurrentVertexChanged(p_current.row());
   });
 }
 

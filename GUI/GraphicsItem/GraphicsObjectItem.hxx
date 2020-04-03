@@ -47,7 +47,6 @@ public:
 
   virtual bool Intersect(ppxl::Point const& p_point) const;
   virtual void ComputeBoundingPolygon() = 0;
-  inline ppxl::Polygon GetBoundingPolygon() { return m_boundingPolygon; }
 
 Q_SIGNALS:
   void StateChanged();
@@ -71,6 +70,7 @@ protected:
 
   QList<QPair<QPoint, Object::ControlPointType>> m_controlPoints;
   ppxl::Polygon m_boundingPolygon;
+  int m_currentControlPointRow;
 };
 
 
@@ -85,6 +85,7 @@ public:
   ~GraphicsPolygonItem() override;
 
   void SetColor(QColor const& p_color);
+  void SetCurrentVertexRow(int p_currentVertexRow);
 
   QRectF boundingRect() const override;
   void ComputeBoundingPolygon() override;

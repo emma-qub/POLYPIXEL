@@ -13,6 +13,7 @@ public:
   CreateLevelObjectsDetailModel(QObject* p_parent = nullptr);
   ~CreateLevelObjectsDetailModel() override;
 
+  void ClearObject();
   void ResetCurrentObject(Object* p_object);
   void UpdateCurrentObject();
 

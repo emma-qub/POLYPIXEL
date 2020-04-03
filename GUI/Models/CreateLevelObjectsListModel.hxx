@@ -81,6 +81,7 @@ public:
   void TranslatePolygon(int p_polygonRow, const ppxl::Vector& p_direction);
   void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
   void SetVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
+  void RemoveVertex(int p_polygonRow, int p_vertexRow);
 
   // Object
   bool IsObjectItem(QStandardItem* p_item) const;

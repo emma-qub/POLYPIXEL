@@ -11,7 +11,10 @@
 #include <QStandardItem>
 
 GraphicsObjectItem::GraphicsObjectItem(QGraphicsItem* p_parent):
-  QGraphicsItem(p_parent){
+  QGraphicsItem(p_parent),
+  m_controlPoints(),
+  m_boundingPolygon(),
+  m_currentControlPointRow(-1) {
 
   SetState(eDisabledState);
 
@@ -47,8 +50,10 @@ void GraphicsObjectItem::DrawControlPoints(QPainter* p_painter)
   p_painter->save();
   p_painter->setPen(Qt::NoPen);
   p_painter->setBrush(QColor("#000000"));
+
   m_controlPoints.clear();
   m_controlPoints = ComputeControlPoints();
+
   int k = 0;
   for (auto const& controlPointAndType: m_controlPoints) {
     auto controlPoint = controlPointAndType.first;
@@ -58,6 +63,13 @@ void GraphicsObjectItem::DrawControlPoints(QPainter* p_painter)
       p_painter->setBrush(Qt::white);
       p_painter->setPen(QPen(QBrush(QColor("#000000")), 2));
       QRectF pointBoundingRect(controlPoint.x()-5, controlPoint.y()-5, 10, 10);
+      p_painter->drawEllipse(pointBoundingRect);
+      p_painter->restore();
+    } else if (m_currentControlPointRow == k) {
+      p_painter->save();
+      p_painter->setBrush(Qt::white);
+      p_painter->setPen(QPen(QBrush(QColor("#38ACEC")), 3));
+      QRectF pointBoundingRect(controlPoint.x()-6, controlPoint.y()-6, 12, 12);
       p_painter->drawEllipse(pointBoundingRect);
       p_painter->restore();
     } else {
@@ -138,6 +150,10 @@ void GraphicsPolygonItem::SetColor(const QColor& p_color) {
   m_enabledColor = p_color;
 }
 
+void GraphicsPolygonItem::SetCurrentVertexRow(int p_currentVertexRow) {
+  m_currentControlPointRow = p_currentVertexRow;
+}
+
 QRectF GraphicsPolygonItem::boundingRect() const {
   auto xmin = std::numeric_limits<double>::infinity();
   auto xmax = -std::numeric_limits<double>::infinity();
@@ -181,11 +197,19 @@ void GraphicsPolygonItem::DrawObject(QPainter* p_painter) {
           m_polygon->IsPointInside(vertexPos.Translate(shiftVector-fontShift)) ?
             vertexPos.Translated(-shiftVector):
             vertexPos.Translated(shiftVector);
-          p_painter->save();
-          p_painter->setPen(QPen(QBrush(Qt::black), 7));
-          p_painter->drawText(QPointF(vertexPos.GetX(), vertexPos.GetY()), QString(QChar(static_cast<char>('A'+vertexRow))));
-          p_painter->restore();
         }
+        p_painter->save();
+        if (static_cast<int>(vertexRow) == m_currentControlPointRow) {
+          p_painter->setPen(QPen(QBrush(QColor("#38ACEC")), 7));
+          auto font = p_painter->font();
+          font.setBold(true);
+          font.setPointSizeF(1.2*font.pointSizeF());
+          p_painter->setFont(font);
+        } else {
+          p_painter->setPen(QPen(QBrush(Qt::black), 7));
+        }
+        p_painter->drawText(QPointF(vertexPos.GetX(), vertexPos.GetY()), QString(QChar(static_cast<char>('A'+vertexRow))));
+        p_painter->restore();
       }
     }
   }
@@ -598,7 +622,7 @@ GraphicsRectangleSelectionItem::~GraphicsRectangleSelectionItem() = default;
 void GraphicsRectangleSelectionItem::paint(QPainter* p_painter, const QStyleOptionGraphicsItem*, QWidget*) {
   p_painter->save();
 
-  QColor selectionColorBorder(56, 172, 236);
+  QColor selectionColorBorder("#38ACEC");
   QColor selectionColorInside = selectionColorBorder;
   selectionColorInside.setAlpha(64);
   p_painter->setPen(QPen(selectionColorBorder, 2));

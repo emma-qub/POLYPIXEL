@@ -42,6 +42,11 @@ CreateLevelObjectsDetailModel::CreateLevelObjectsDetailModel(QObject* p_parent):
 
 CreateLevelObjectsDetailModel::~CreateLevelObjectsDetailModel() = default;
 
+void CreateLevelObjectsDetailModel::ClearObject() {
+  clear();
+  m_object = nullptr;
+}
+
 void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
   m_object = p_object;
   clear();

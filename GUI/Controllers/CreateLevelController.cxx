@@ -35,6 +35,7 @@ CreateLevelController::CreateLevelController(CreateLevelWidget* p_view, QObject*
   m_createLevelWidget->SetVertexListModel(m_vertexListModel);
 
   connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsAboutToBeRemoved, this, &CreateLevelController::UpdateClipboardIndex);
+  connect(m_createLevelWidget, &CreateLevelWidget::CurrentVertexChanged, this, &CreateLevelController::UpdateCurrentVertex);
 
   connect(m_createLevelWidget, &CreateLevelWidget::MousePressed, this, &CreateLevelController::MousePressEvent);
   connect(m_createLevelWidget, &CreateLevelWidget::MouseMoved, this, &CreateLevelController::MouseMoveEvent);
@@ -617,8 +618,8 @@ void CreateLevelController::NewLevel() {
 
   m_createLevelWidget->ClearImage();
   m_objectsListModel->Clear();
-  m_objectsDetailModel->clear();
-  m_vertexListModel->clear();
+  m_objectsDetailModel->ClearObject();
+  m_vertexListModel->ClearPolygon();
   m_createLevelWidget->ResetGameInfo();
 }
 
@@ -733,6 +734,12 @@ void CreateLevelController::UpdateClipboardIndex(QModelIndex const& p_parent, in
   }
 }
 
+void CreateLevelController::UpdateCurrentVertex(int p_currentVertex) {
+  auto graphicsItem = static_cast<GraphicsPolygonItem*>(m_objectsListModel->GetGraphicsFromIndex(m_createLevelWidget->GetCurrentIndex()));
+  graphicsItem->SetCurrentVertexRow(p_currentVertex);
+  m_createLevelWidget->UpdateView();
+}
+
 void CreateLevelController::ChangeCurrentTool() {
   auto action = qobject_cast<QAction*>(sender());
   m_toolMode = m_actionToolModeMap[action];
@@ -799,6 +806,17 @@ void CreateLevelController::MoveVertexAt(int p_vertexIndex, ppxl::Point const& p
   m_vertexListModel->Update();
 }
 
+void CreateLevelController::RemoveCurrentVertex() {
+  auto currentVertexIndex = m_createLevelWidget->GetCurrentVertexIndex();
+  auto currentPolygonIndex = m_createLevelWidget->GetCurrentPolygonIndex();
+  auto currentGraphicsItem = m_objectsListModel->GetGraphicsFromIndex(currentPolygonIndex);
+  m_objectsListModel->RemoveVertex(currentPolygonIndex.row(), currentVertexIndex.row());
+  auto polygon = m_objectsListModel->GetPolygonFromIndex(currentPolygonIndex);
+  m_vertexListModel->SetPolygon(polygon);
+  m_createLevelWidget->SetCurrentVertexIndex(std::max(0, currentVertexIndex.row()-1));
+  currentGraphicsItem->ComputeBoundingPolygon();
+}
+
 void CreateLevelController::UpdateView() {
   m_createLevelWidget->UpdateView();
 }
@@ -813,15 +831,24 @@ void CreateLevelController::PolygonComplete() {
   m_creatingNewPolygon = true;
 }
 
-void CreateLevelController::DeleteCurrent() {
+void CreateLevelController::DeleteCurrent(bool p_shiftPressed) {
   disconnect(m_createLevelWidget, &CreateLevelWidget::CurrentObjectIndexChanged, this, &CreateLevelController::UpdateGraphicsSelection);
 
   auto currentIndex = m_createLevelWidget->GetCurrentIndex();
   auto parentIndex = currentIndex.parent();
-  if (m_objectsListModel->IsObjectIndex(currentIndex)) {
+  if (m_objectsListModel->IsPolygonIndex(currentIndex)) {
+    if (p_shiftPressed) {
+      delete m_objectsListModel->GetPolygonFromIndex(currentIndex);
+      m_vertexListModel->ClearPolygon();
+      m_creatingNewPolygon = true;
+    } else {
+      RemoveCurrentVertex();
+      connect(m_createLevelWidget, &CreateLevelWidget::CurrentObjectIndexChanged, this, &CreateLevelController::UpdateGraphicsSelection);
+      return;
+    }
+  } else if (m_objectsListModel->IsObjectIndex(currentIndex)) {
     delete m_objectsListModel->GetObjectFromIndex(currentIndex);
-  } else if (m_objectsListModel->IsPolygonIndex(currentIndex)) {
-    delete m_objectsListModel->GetPolygonFromIndex(currentIndex);
+    m_objectsDetailModel->ClearObject();
   } else {
     return;
   }

@@ -91,7 +91,7 @@ Q_SIGNALS:
   void MouseReleased(QMouseEvent* p_event);
   void CurrentObjectIndexChanged(QModelIndex const& p_current, QModelIndex const& p_previous);
   void KeyReturnPressed();
-  void KeyDeletePressed();
+  void KeyDeletePressed(bool p_shiftPressed);
   void KeyLeftPressed(bool p_shiftPressed);
   void KeyUpPressed(bool p_shiftPressed);
   void KeyRightPressed(bool p_shiftPressed);
@@ -99,6 +99,7 @@ Q_SIGNALS:
   void SelectionChanged();
   void CopyRequested();
   void PasteRequested();
+  void CurrentVertexChanged(int p_currentVertex);
 
 protected:
   enum ViewType {

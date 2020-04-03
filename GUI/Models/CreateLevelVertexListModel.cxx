@@ -6,6 +6,11 @@ CreateLevelVertexListModel::CreateLevelVertexListModel(QObject* p_parent):
 
 CreateLevelVertexListModel::~CreateLevelVertexListModel() = default;
 
+void CreateLevelVertexListModel::ClearPolygon() {
+  clear();
+  m_polygon = nullptr;
+}
+
 void CreateLevelVertexListModel::SetPolygon(ppxl::Polygon* p_polygon) {
   setRowCount(0);
   setColumnCount(3);

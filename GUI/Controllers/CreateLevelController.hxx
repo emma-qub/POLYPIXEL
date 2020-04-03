@@ -48,6 +48,7 @@ protected:
   void InsertVertex(QPoint const& p_pos);
   void MoveCurrentVertex(ppxl::Point const& p_pos);
   void MoveVertexAt(int p_vertexIndex, ppxl::Point const& p_pos);
+  void RemoveCurrentVertex();
 
   void SnapToGrid();
   void SnapAllToGrid();
@@ -83,7 +84,7 @@ protected:
   ppxl::Point FindNearestGridNode(ppxl::Point const& p_point);
 
   void PolygonComplete();
-  void DeleteCurrent();
+  void DeleteCurrent(bool p_shiftPressed);
   void MoveCurrent(ppxl::Vector const& p_direction, bool p_shiftPressed);
   void MoveCurrentLeft(bool p_shiftPressed);
   void MoveCurrentUp(bool p_shiftPressed);
@@ -92,7 +93,9 @@ protected:
 
   void CopyItem();
   void PasteItem();
-  void UpdateClipboardIndex(const QModelIndex& p_parent, int p_first, int p_last);
+  void UpdateClipboardIndex(const QModelIndex& p_parent, int p_first, int p_last);  
+
+  void UpdateCurrentVertex(int p_currentVertex);
 
 private:
   CreateLevelObjectsListModel* m_objectsListModel;
