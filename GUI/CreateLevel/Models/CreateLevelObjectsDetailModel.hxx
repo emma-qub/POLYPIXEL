@@ -28,6 +28,8 @@ private:
   QStandardItem* m_mirrorY1Item;
   QStandardItem* m_mirrorX2Item;
   QStandardItem* m_mirrorY2Item;
+  QStandardItem* m_mirrorNXItem;
+  QStandardItem* m_mirrorNYItem;
   QStandardItem* m_oneWayX1Item;
   QStandardItem* m_oneWayY1Item;
   QStandardItem* m_oneWayX2Item;

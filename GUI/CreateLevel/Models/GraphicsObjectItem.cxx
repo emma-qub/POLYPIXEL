@@ -332,9 +332,10 @@ QRectF GraphicsMirrorItem::boundingRect() const {
 
 void GraphicsMirrorItem::DrawObject(QPainter* p_painter) {
   auto color = GetColorAccordingToItemState().first();
-  auto factor = 50;
+  auto factor = 40;
   auto mirrorLine = m_mirror->GetLine();
   auto mirrorNormal = mirrorLine.GetNormal();
+  auto mirrorDirection = mirrorLine.GetDirection();
   mirrorLine.Translate(factor/2 * mirrorNormal);
 
   auto ComputeCrossHatching = [](ppxl::Segment const& p_line, int p_factor, int p_spacing) {
@@ -374,14 +375,38 @@ void GraphicsMirrorItem::DrawObject(QPainter* p_painter) {
   };
 
   p_painter->save();
-  p_painter->setBrush(Qt::NoBrush);
-  p_painter->setPen(QPen(QBrush(color), 7));
-  p_painter->drawPolygon(ComputeQuad(mirrorLine, factor));
-  p_painter->setPen(QPen(QBrush(color), 4));
+  p_painter->setBrush(QBrush(color));
+  p_painter->setPen(Qt::NoPen);
+  auto polygon = ComputeQuad(mirrorLine, factor);
+  p_painter->drawPolygon(polygon);
 
-  for (auto line: ComputeCrossHatching(mirrorLine, factor, 30)) {
-    p_painter->drawLine(line);
+  int k = 0;
+  for (auto line: ComputeCrossHatching(mirrorLine, factor, 20)) {
+    if (k%4 == 0) {
+      p_painter->setPen(QPen(QBrush(Qt::white), 12));
+      p_painter->drawLine(line);
+    } else if (k%4 == 1) {
+      p_painter->setPen(QPen(QBrush(Qt::white), 4));
+      p_painter->drawLine(line);
+    }
+    ++k;
   }
+
+
+
+  auto shift = 10.;
+  auto A = polygon.value(0);
+  A.rx() += shift*mirrorNormal.GetX();
+  A.ry() += shift*mirrorDirection.GetY();
+  auto B = polygon.value(1);
+  B.rx() -= shift*mirrorNormal.GetX();
+  B.ry() -= shift*mirrorDirection.GetY();
+  auto C = polygon.value(2);
+  auto D = polygon.value(3);
+  p_painter->setBrush(Qt::NoBrush);
+  p_painter->setPen(QPen(QBrush("#4e487d"), 3));
+  p_painter->drawLine(A, A);
+
 
   p_painter->restore();
 }

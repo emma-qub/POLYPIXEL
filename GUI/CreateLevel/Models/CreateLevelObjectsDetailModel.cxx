@@ -18,6 +18,8 @@ CreateLevelObjectsDetailModel::CreateLevelObjectsDetailModel(QObject* p_parent):
   m_mirrorY1Item(nullptr),
   m_mirrorX2Item(nullptr),
   m_mirrorY2Item(nullptr),
+  m_mirrorNXItem(nullptr),
+  m_mirrorNYItem(nullptr),
   m_oneWayX1Item(nullptr),
   m_oneWayY1Item(nullptr),
   m_oneWayX2Item(nullptr),
@@ -95,6 +97,12 @@ void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
     endItem->appendRow({m_mirrorX2Item, m_mirrorY2Item});
     appendRow(endItem);
 
+    auto normalItem = new QStandardItem("Normal");
+    m_mirrorNXItem = new QStandardItem(QString("x: %1").arg(QString::number(mirrorObject->GetLine().GetNormal().GetX(), 'f', 3)));
+    m_mirrorNYItem = new QStandardItem(QString("y: %1").arg(QString::number(mirrorObject->GetLine().GetNormal().GetY(), 'f', 3)));
+    normalItem->appendRow({m_mirrorNXItem, m_mirrorNYItem});
+    appendRow(normalItem);
+
     break;
   } case Object::eOneWay:{
     auto oneWayObject = static_cast<OneWay*>(p_object);
@@ -112,8 +120,8 @@ void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
     appendRow(endItem);
 
     auto normalItem = new QStandardItem("Normal");
-    m_oneWayNXItem = new QStandardItem(QString("x: %1").arg(QString::number(oneWayObject->GetNX(), 'f', 0)));
-    m_oneWayNYItem = new QStandardItem(QString("y: %1").arg(QString::number(oneWayObject->GetNY(), 'f', 0)));
+    m_oneWayNXItem = new QStandardItem(QString("x: %1").arg(QString::number(oneWayObject->GetNX(), 'f', 3)));
+    m_oneWayNYItem = new QStandardItem(QString("y: %1").arg(QString::number(oneWayObject->GetNY(), 'f', 3)));
     normalItem->appendRow({m_oneWayNXItem, m_oneWayNYItem});
     appendRow(normalItem);
 
@@ -138,8 +146,8 @@ void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
     inItem->appendRow(endInItem);
 
     auto normalInItem = new QStandardItem("Yellow Normal");
-    m_portalInNXItem = new QStandardItem(QString("x: %1").arg(QString::number(portalObject->GetIn().GetNormal().GetX(), 'f', 0)));
-    m_portalInNYItem = new QStandardItem(QString("y: %1").arg(QString::number(portalObject->GetIn().GetNormal().GetY(), 'f', 0)));
+    m_portalInNXItem = new QStandardItem(QString("x: %1").arg(QString::number(portalObject->GetIn().GetNormal().GetX(), 'f', 3)));
+    m_portalInNYItem = new QStandardItem(QString("y: %1").arg(QString::number(portalObject->GetIn().GetNormal().GetY(), 'f', 3)));
     normalInItem->appendRow({m_portalInNXItem, m_portalInNYItem});
     inItem->appendRow(normalInItem);
 
@@ -160,8 +168,8 @@ void CreateLevelObjectsDetailModel::ResetCurrentObject(Object* p_object) {
     outItem->appendRow(endOutItem);
 
     auto normalOutItem = new QStandardItem("Blue Normal");
-    m_portalOutNXItem = new QStandardItem(QString("x: %1").arg(QString::number(portalObject->GetOut().GetNormal().GetX(), 'f', 0)));
-    m_portalOutNYItem = new QStandardItem(QString("y: %1").arg(QString::number(portalObject->GetOut().GetNormal().GetY(), 'f', 0)));
+    m_portalOutNXItem = new QStandardItem(QString("x: %1").arg(QString::number(portalObject->GetOut().GetNormal().GetX(), 'f', 3)));
+    m_portalOutNYItem = new QStandardItem(QString("y: %1").arg(QString::number(portalObject->GetOut().GetNormal().GetY(), 'f', 3)));
     normalOutItem->appendRow({m_portalOutNXItem, m_portalOutNYItem});
     outItem->appendRow(normalOutItem);
 
@@ -197,6 +205,9 @@ void CreateLevelObjectsDetailModel::UpdateCurrentObject() {
     m_mirrorX2Item->setText(QString("x: %1").arg(QString::number(mirrorObject->GetX2(), 'f', 0)));
     m_mirrorY2Item->setText(QString("y: %1").arg(QString::number(mirrorObject->GetY2(), 'f', 0)));
 
+    m_mirrorNXItem->setText(QString("x: %1").arg(QString::number(mirrorObject->GetLine().GetNormal().GetX(), 'f', 3)));
+    m_mirrorNYItem->setText(QString("y: %1").arg(QString::number(mirrorObject->GetLine().GetNormal().GetY(), 'f', 3)));
+
     break;
   } case Object::eOneWay:{
     auto oneWayObject = static_cast<OneWay*>(m_object);
@@ -207,8 +218,8 @@ void CreateLevelObjectsDetailModel::UpdateCurrentObject() {
     m_oneWayX2Item->setText(QString("x: %1").arg(QString::number(oneWayObject->GetX2(), 'f', 0)));
     m_oneWayY2Item->setText(QString("y: %1").arg(QString::number(oneWayObject->GetY2(), 'f', 0)));
 
-    m_oneWayNXItem->setText(QString("x: %1").arg(QString::number(oneWayObject->GetNX(), 'f', 0)));
-    m_oneWayNYItem->setText(QString("y: %1").arg(QString::number(oneWayObject->GetNY(), 'f', 0)));
+    m_oneWayNXItem->setText(QString("x: %1").arg(QString::number(oneWayObject->GetNX(), 'f', 3)));
+    m_oneWayNYItem->setText(QString("y: %1").arg(QString::number(oneWayObject->GetNY(), 'f', 3)));
 
     break;
   } case Object::ePortal:{
@@ -221,8 +232,8 @@ void CreateLevelObjectsDetailModel::UpdateCurrentObject() {
     m_portalInX2Item->setText(QString::number(portalObject->GetIn().GetB().GetX(), 'f', 0));
     m_portalInY2Item->setText(QString::number(portalObject->GetIn().GetB().GetY(), 'f', 0));
 
-    m_portalInNXItem->setText(QString::number(portalObject->GetIn().GetNormal().GetX(), 'f', 0));
-    m_portalInNYItem->setText(QString::number(portalObject->GetIn().GetNormal().GetY(), 'f', 0));
+    m_portalInNXItem->setText(QString::number(portalObject->GetIn().GetNormal().GetX(), 'f', 3));
+    m_portalInNYItem->setText(QString::number(portalObject->GetIn().GetNormal().GetY(), 'f', 3));
 
     // Blue
     m_portalOutX1Item->setText(QString::number(portalObject->GetOut().GetA().GetX(), 'f', 0));
@@ -231,8 +242,8 @@ void CreateLevelObjectsDetailModel::UpdateCurrentObject() {
     m_portalOutX2Item->setText(QString::number(portalObject->GetOut().GetB().GetX(), 'f', 0));
     m_portalOutY2Item->setText(QString::number(portalObject->GetOut().GetB().GetY(), 'f', 0));
 
-    m_portalOutNXItem->setText(QString::number(portalObject->GetOut().GetNormal().GetX(), 'f', 0));
-    m_portalOutNYItem->setText(QString::number(portalObject->GetOut().GetNormal().GetY(), 'f', 0));
+    m_portalOutNXItem->setText(QString::number(portalObject->GetOut().GetNormal().GetX(), 'f', 3));
+    m_portalOutNYItem->setText(QString::number(portalObject->GetOut().GetNormal().GetY(), 'f', 3));
 
     break;
   } default:
