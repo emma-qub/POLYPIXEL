@@ -2,8 +2,6 @@
 
 #include "Core/Geometry/Vector.hxx"
 
-#include <random>
-
 CreateLevelObjectsListModel::CreateLevelObjectsListModel(QObject* p_parent):
   QStandardItemModel(p_parent),
   m_selections(),
@@ -63,24 +61,28 @@ ppxl::Polygon* CreateLevelObjectsListModel::FindPolygonFromRow(int p_row) const 
   return FindPolygonFromItem(m_polygonsItem->child(p_row));
 }
 
-QColor CreateLevelObjectsListModel::GetRandomColor() {
-  std::random_device rd;
-  std::mt19937 rng(rd());
-  std::uniform_int_distribution<> distribution(0, 255);
-
-  auto r = distribution(rng);
-  auto g = distribution(rng);
-  auto b = distribution(rng);
-
-  return QColor(r, g, b);
-}
-
-QList<ppxl::Polygon*> CreateLevelObjectsListModel::GetPolygonsList() const {
-  QList<ppxl::Polygon*> polygonsList;
+std::vector<ppxl::Polygon*> CreateLevelObjectsListModel::GetPolygonsList() const {
+  std::vector<ppxl::Polygon*> polygonsList;
   for (int row = 0; row < m_polygonsItem->rowCount() ;++row) {
-    polygonsList << GetPolygonFromRow(row);
+    polygonsList.push_back(GetPolygonFromRow(row));
   }
   return polygonsList;
+}
+
+std::vector<Object*> CreateLevelObjectsListModel::GetObjectsList() const {
+  std::vector<Object*> objectsList;
+
+  for (int listRow = 0; listRow < rowCount(); ++listRow) {
+    auto listIndex = index(listRow, 0);
+    for (int row = 0; row < rowCount(listIndex); ++row) {
+      auto objectIndex = index(row, 0, listIndex);
+      if (!IsPolygonIndex(objectIndex)) {
+        objectsList.push_back(GetObjectFromIndex(objectIndex));
+      }
+    }
+  }
+
+  return objectsList;
 }
 
 void CreateLevelObjectsListModel::MoveObject(QModelIndex const& p_objectIndex, ppxl::Point const& p_pos, Object::ControlPointType p_controlPointType) {
@@ -98,13 +100,11 @@ void CreateLevelObjectsListModel::TranslateObject(QModelIndex const& p_objectInd
 }
 
 QStandardItem* CreateLevelObjectsListModel::AddPolygon(ppxl::Polygon* p_polygon, GraphicsPolygonItem* p_graphicsObjectItem) {
-  auto color = GetRandomColor();
   auto polygonItem = new QStandardItem(tr("Polygon_%1").arg(m_polygonsItem->rowCount()));
   polygonItem->setData(QVariant::fromValue<ppxl::Polygon*>(p_polygon), ePolygonRole);
-  polygonItem->setData(color, Qt::DecorationRole);
+  polygonItem->setData(p_graphicsObjectItem->GetColor(), Qt::DecorationRole);
   polygonItem->setData(true, eIsPolygonRole);
   polygonItem->setData(true, eIsObjectRole);
-  p_graphicsObjectItem->SetColor(color);
   SetGraphicsToItem(p_graphicsObjectItem, polygonItem);
 
   m_polygonsItem->appendRow(polygonItem);

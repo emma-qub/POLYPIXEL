@@ -67,16 +67,6 @@ public:
   ppxl::Polygon* FindPolygonFromItem(QStandardItem* p_item) const;
   ppxl::Polygon* FindPolygonFromRow(int p_row) const;
 
-  QColor GetRandomColor();
-
-  inline int GetPolygonsCount() const { return m_polygonsItem->rowCount(); }
-  inline QStandardItem* GetPolygonsItem() const { return m_polygonsItem; }
-  inline QStandardItem* GetTapesItem() const { return m_tapesItem; }
-  inline QStandardItem* GetMirrorsItem() const { return m_mirrorsItem; }
-  inline QStandardItem* GetOneWaysItem() const { return m_oneWaysItem; }
-  inline QStandardItem* GetPortalsItem() const { return m_portalsItem; }
-  QList<ppxl::Polygon*> GetPolygonsList() const;
-
   QStandardItem* AddPolygon(ppxl::Polygon* p_polygon, GraphicsPolygonItem* p_graphicsObjectItem);
   void TranslatePolygon(int p_polygonRow, const ppxl::Vector& p_direction);
   void InsertVertex(int p_polygonRow, int p_vertexRow, ppxl::Point const& p_vertex);
@@ -112,9 +102,15 @@ public:
   GraphicsObjectItem* GetGraphicsFromIndex(QModelIndex const& p_index) const;  
   ListType GetListTypFromIndex(const QModelIndex& p_index) const;
 
-Q_SIGNALS:
-  void PolygonListChanged();
+  inline QStandardItem* GetPolygonsItem() const { return m_polygonsItem; }
+  inline QStandardItem* GetTapesItem() const { return m_tapesItem; }
+  inline QStandardItem* GetMirrorsItem() const { return m_mirrorsItem; }
+  inline QStandardItem* GetOneWaysItem() const { return m_oneWaysItem; }
+  inline QStandardItem* GetPortalsItem() const { return m_portalsItem; }
+  std::vector<ppxl::Polygon*> GetPolygonsList() const;
+  std::vector<Object*> GetObjectsList() const;
 
+Q_SIGNALS:
   void ObjectInserted();
   void ObjectChanged();
   void PolygonInserted();

@@ -1,8 +1,8 @@
-#include "CreateLevelWidget.hxx"
+﻿#include "CreateLevelWidget.hxx"
 #include "GUI/CreateLevel/Models/CreateLevelObjectsListModel.hxx"
 #include "GUI/CreateLevel/Models/CreateLevelObjectsDetailModel.hxx"
 #include "GUI/CreateLevel/Models/CreateLevelVertexListModel.hxx"
-#include "GUI/CreateLevel/Views/CreateLevelScribblingView.hxx"
+#include "GUI/CreateLevel/Views/CreateLevelGraphicsView.hxx"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -25,7 +25,7 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   m_menuButton(new QPushButton("Menu")),
   m_objectsListModel(nullptr),
   m_objectsDetailModel(nullptr),
-  m_scribblingView(new CreateLevelScribblingView),
+  m_graphicsView(new CreateLevelGraphicsView),
   m_objectsListTreeView(new QTreeView),
   m_objectsDetailTreeView(new QTreeView),
   m_vertexTreeView(new QTreeView),
@@ -50,14 +50,14 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   menuLayout->addWidget(m_menuButton);
   menuLayout->setAlignment(Qt::AlignCenter);
   auto viewLayout = new QHBoxLayout;
-  viewLayout->addWidget(m_scribblingView);
+  viewLayout->addWidget(m_graphicsView);
   auto rightViewLayout = new QVBoxLayout;
   rightViewLayout->addWidget(m_objectsListTreeView);
   m_detailVertexStackWidget->addWidget(m_objectsDetailTreeView);
   m_detailVertexStackWidget->addWidget(m_vertexTreeView);
   rightViewLayout->addWidget(m_detailVertexStackWidget);
   viewLayout->addLayout(rightViewLayout);
-  viewLayout->setStretchFactor(m_scribblingView, 4);
+  viewLayout->setStretchFactor(m_graphicsView, 4);
   viewLayout->setStretchFactor(rightViewLayout, 1);
   mainLayout->addLayout(menuLayout);
   mainLayout->addLayout(viewLayout);
@@ -70,7 +70,7 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
 
   auto addPolygonAction = new QAction("New polygon", this);
   addPolygonAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
-  //connect(addPolygonAction, &QAction::triggered, this, &CreateLevelScribblingView::AppendPolygon);
+  //connect(addPolygonAction, &QAction::triggered, this, &CreateLevelGraphicsView::AppendPolygon);
   addAction(addPolygonAction);
 
   auto m_removeAction = new QAction("Remove", this);
@@ -113,16 +113,16 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
   addAction(openAction);
   connect(openAction, &QAction::triggered, this, &CreateLevelWidget::ConfirmOpenLevel);
 
-  // Scribble view signals forward
-  connect(m_scribblingView, &CreateLevelScribblingView::MousePressed, this, &CreateLevelWidget::MousePressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::MouseMoved, this, &CreateLevelWidget::MouseMoved);
-  connect(m_scribblingView, &CreateLevelScribblingView::MouseReleased, this, &CreateLevelWidget::MouseReleased);
-  connect(m_scribblingView, &CreateLevelScribblingView::KeyReturnPressed, this, &CreateLevelWidget::KeyReturnPressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::KeyLeftPressed, this, &CreateLevelWidget::KeyLeftPressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::KeyUpPressed, this, &CreateLevelWidget::KeyUpPressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::KeyRightPressed, this, &CreateLevelWidget::KeyRightPressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::KeyDownPressed, this, &CreateLevelWidget::KeyDownPressed);
-  connect(m_scribblingView, &CreateLevelScribblingView::SelectionChanged, this, &CreateLevelWidget::SelectionChanged);
+  // Graphics View signals forward
+  connect(m_graphicsView, &CreateLevelGraphicsView::MousePressed, this, &CreateLevelWidget::MousePressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::MouseMoved, this, &CreateLevelWidget::MouseMoved);
+  connect(m_graphicsView, &CreateLevelGraphicsView::MouseReleased, this, &CreateLevelWidget::MouseReleased);
+  connect(m_graphicsView, &CreateLevelGraphicsView::KeyReturnPressed, this, &CreateLevelWidget::KeyReturnPressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::KeyLeftPressed, this, &CreateLevelWidget::KeyLeftPressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::KeyUpPressed, this, &CreateLevelWidget::KeyUpPressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::KeyRightPressed, this, &CreateLevelWidget::KeyRightPressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::KeyDownPressed, this, &CreateLevelWidget::KeyDownPressed);
+  connect(m_graphicsView, &CreateLevelGraphicsView::SelectionChanged, this, &CreateLevelWidget::SelectionChanged);
 
   // Game info
   connect(m_maxGapToWinSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &CreateLevelWidget::UpdateMaxGapToWinPrefix);
@@ -144,8 +144,8 @@ CreateLevelWidget::CreateLevelWidget(QWidget* parent):
 }
 
 void CreateLevelWidget::InitViews() {
-  m_scribblingView->InitView();
-  m_scribblingView->setFocus();
+  m_graphicsView->InitView();
+  m_graphicsView->setFocus();
 }
 
 int CreateLevelWidget::GetLinesGoal() const {
@@ -188,24 +188,23 @@ void CreateLevelWidget::ResetGameInfo() {
 }
 
 void CreateLevelWidget::AddGraphicsItem(QGraphicsItem* p_graphicsItem) {
-  m_scribblingView->AddGraphicsItem(p_graphicsItem);
+  m_graphicsView->AddGraphicsItem(p_graphicsItem);
 }
 
 QList<QGraphicsItem*> CreateLevelWidget::GetGraphicsItemsList() const {
-  return m_scribblingView->GetGraphicsItemsList();
+  return m_graphicsView->GetGraphicsItemsList();
 }
 
 void CreateLevelWidget::RemoveGraphicsItem(QGraphicsItem* p_graphicsItem) {
-  m_scribblingView->RemoveGraphicsItem(p_graphicsItem);
+  m_graphicsView->RemoveGraphicsItem(p_graphicsItem);
 }
 
 void CreateLevelWidget::SetRubberBandDragMode(bool p_rubberBandOn) {
-  m_scribblingView->SetRubberBandDragMode(p_rubberBandOn);
+  m_graphicsView->SetRubberBandDragMode(p_rubberBandOn);
 }
 
 void CreateLevelWidget::SetSelectionArea(const QRect& p_rect) {
-
-  m_scribblingView->SetSelectionArea(p_rect);
+  m_graphicsView->SetSelectionArea(p_rect);
 }
 
 void CreateLevelWidget::ShowDetailListView() {
@@ -236,11 +235,9 @@ void CreateLevelWidget::UpdateTolerancePrefix(int p_value) {
 
 void CreateLevelWidget::SetObjectsListModel(CreateLevelObjectsListModel* p_objectsListModel) {
   m_objectsListModel = p_objectsListModel;
-  m_scribblingView->SetObjectsListModel(m_objectsListModel);
   m_objectsListTreeView->setModel(m_objectsListModel);
   m_objectsListTreeView->header()->setMinimumSectionSize(50);
   auto selectionModel = m_objectsListTreeView->selectionModel();
-  m_scribblingView->SetSelectionModel(selectionModel);
   connect(selectionModel, &QItemSelectionModel::currentChanged, this, &CreateLevelWidget::CurrentObjectIndexChanged);
 
   connect(m_objectsListModel, &CreateLevelObjectsListModel::rowsInserted, this, [this]() {
@@ -350,7 +347,7 @@ void CreateLevelWidget::SetCurrentObjectOrPolygonIndex(QModelIndex const& p_inde
 }
 
 void CreateLevelWidget::ClearImage() {
-  m_scribblingView->ClearImage();
+  m_graphicsView->ClearImage();
 }
 
 void CreateLevelWidget::SetTestAvailable(bool p_enable)
@@ -359,11 +356,11 @@ void CreateLevelWidget::SetTestAvailable(bool p_enable)
 }
 
 void CreateLevelWidget::UpdateView() {
-  m_scribblingView->UpdateView();
+  m_graphicsView->UpdateView();
 }
 
 bool CreateLevelWidget::ConfirmClear() {
-  return (GetGraphicsItemCount() == 1 ||
+  return (m_graphicsView->GetGraphicsItemsList().count() == 1 ||
     QMessageBox::question(this, tr("Clear"), tr("You are currently creating a level, your modifications will be lost.\nContinue?")) == QMessageBox::Yes);
 }
 
@@ -380,8 +377,4 @@ void CreateLevelWidget::ConfirmOpenLevel() {
       Q_EMIT OpenLevelRequested(fileName);
     }
   }
-}
-
-int CreateLevelWidget::GetGraphicsItemCount() const {
-  return m_scribblingView->GetGraphicsItemCount();
 }

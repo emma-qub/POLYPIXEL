@@ -39,6 +39,8 @@ public:
   int GetPartsGoal() const;
   int GetMaxGapToWin() const;
   int GetTolerance() const;
+  std::vector<ppxl::Polygon*> GetPolygonsList() const;
+  std::vector<Object*> GetObjectsList() const;
 
   void UpdateView();
 

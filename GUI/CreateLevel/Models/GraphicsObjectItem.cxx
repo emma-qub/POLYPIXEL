@@ -7,6 +7,8 @@
 #include "Core/Objects/Deviations/Portal.hxx"
 #include "CreateLevelObjectsListModel.hxx"
 
+#include <random>
+
 #include <QPainter>
 #include <QStandardItem>
 
@@ -14,9 +16,9 @@ GraphicsObjectItem::GraphicsObjectItem(QGraphicsItem* p_parent):
   QGraphicsItem(p_parent),
   m_controlPoints(),
   m_boundingPolygon(),
-  m_currentControlPointRow(-1) {
+  m_currentControlPointRow(-1){
 
-  SetState(eDisabledState);
+  SetState(eEnabledState);
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
@@ -140,12 +142,29 @@ QList<QColor> GraphicsObjectItem::GetHighlightedDownColors() const {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GraphicsPolygonItem::GraphicsPolygonItem(ppxl::Polygon* p_polygon, QGraphicsItem* p_parent):
   GraphicsObjectItem(p_parent),
-  m_polygon(p_polygon) {
+  m_polygon(p_polygon),
+  m_enabledColor(GetRandomColor()) {
 
 }
 
-void GraphicsPolygonItem::SetColor(const QColor& p_color) {
+QColor GraphicsPolygonItem::GetRandomColor() {
+  std::random_device rd;
+  std::mt19937 rng(rd());
+  std::uniform_int_distribution<> distribution(0, 255);
+
+  auto r = distribution(rng);
+  auto g = distribution(rng);
+  auto b = distribution(rng);
+
+  return QColor(r, g, b);
+}
+
+void GraphicsPolygonItem::SetColor(QColor const& p_color) {
   m_enabledColor = p_color;
+}
+
+QColor const& GraphicsPolygonItem::GetColor() const {
+  return m_enabledColor;
 }
 
 void GraphicsPolygonItem::SetCurrentVertexRow(int p_currentVertexRow) {
@@ -391,22 +410,6 @@ void GraphicsMirrorItem::DrawObject(QPainter* p_painter) {
     }
     ++k;
   }
-
-
-
-  auto shift = 10.;
-  auto A = polygon.value(0);
-  A.rx() += shift*mirrorNormal.GetX();
-  A.ry() += shift*mirrorDirection.GetY();
-  auto B = polygon.value(1);
-  B.rx() -= shift*mirrorNormal.GetX();
-  B.ry() -= shift*mirrorDirection.GetY();
-  auto C = polygon.value(2);
-  auto D = polygon.value(3);
-  p_painter->setBrush(Qt::NoBrush);
-  p_painter->setPen(QPen(QBrush("#4e487d"), 3));
-  p_painter->drawLine(A, A);
-
 
   p_painter->restore();
 }
@@ -658,4 +661,91 @@ void GraphicsRectangleSelectionItem::paint(QPainter* p_painter, const QStyleOpti
   p_painter->drawRoundedRect(rect(), 3, 3);
 
   p_painter->restore();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// CUTTING LINE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CuttingLineGraphicsItem::CuttingLineGraphicsItem(QGraphicsItem* p_parent):
+  QGraphicsItem(p_parent) {
+
+  SetNoCut();
+}
+
+void CuttingLineGraphicsItem::SetNoCut() {
+  SetCutState(eNoCut);
+}
+
+void CuttingLineGraphicsItem::SetGoodCut() {
+  SetCutState(eGoodCut);
+}
+
+void CuttingLineGraphicsItem::SetBadCut() {
+  SetCutState(eBadCut);
+}
+
+void CuttingLineGraphicsItem::SetLinesList(std::vector<ppxl::Segment> const& p_linesList) {
+  m_linesList = p_linesList;
+  update();
+}
+
+void CuttingLineGraphicsItem::SetCutState(CuttingLineGraphicsItem::CutState p_cutState)
+{
+  setData(eCutStateRole, p_cutState);
+}
+
+CuttingLineGraphicsItem::CutState CuttingLineGraphicsItem::GetCutState() const {
+  return data(eCutStateRole).value<CutState>();
+}
+
+CuttingLineGraphicsItem::~CuttingLineGraphicsItem() = default;
+
+void CuttingLineGraphicsItem::paint(QPainter* p_painter, const QStyleOptionGraphicsItem*, QWidget*) {
+  p_painter->save();
+
+  auto penWidth = 7;
+
+  switch (GetCutState()) {
+  case eGoodCut: {
+    p_painter->setPen(QPen(QColor("#28a745"), penWidth));
+    break;
+  } case eBadCut: {
+    p_painter->setPen(QPen(QColor("#fd7e14"), penWidth));
+    break;
+  } case eNoCut: {
+    p_painter->setPen(QPen(QColor("#6c757d"), penWidth));
+    break;
+  } default:
+    break;
+  }
+
+  for (auto const& segment: m_linesList) {
+    auto A = segment.GetA();
+    auto B = segment.GetB();
+    p_painter->drawLine(QLineF(QPointF(A.GetX(), A.GetY()), QPointF(B.GetX(), B.GetY())));
+  }
+
+  p_painter->restore();
+}
+
+QRectF CuttingLineGraphicsItem::boundingRect() const {
+  if (m_linesList.empty()) {
+    return QRectF();
+  }
+
+  auto firstLine = m_linesList.at(0);
+  auto A = firstLine.GetA();
+  auto xmin = A.GetX();
+  auto xmax = A.GetX();
+  auto ymin = A.GetY();
+  auto ymax = A.GetY();
+
+  for (auto const& segment: m_linesList) {
+    auto B = segment.GetB();
+    xmin = std::min(B.GetX(), xmin);
+    xmax = std::max(B.GetX(), xmax);
+    ymin = std::min(B.GetY(), ymin);
+  }
+
+  return QRectF(QPointF(xmin-5, ymin-5), QPointF(xmax+5, ymax+5));
 }

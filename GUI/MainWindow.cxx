@@ -112,13 +112,11 @@ MainWindow::MainWindow(QWidget* p_parent):
   optionsState->addTransition(m_optionsWidget, &OptionsWidget::Done, mainMenuState);
 
   connect(m_centralWidget, &QStackedWidget::currentChanged, this, [this]() {
+    m_toolbar->setVisible(m_centralWidget->currentWidget() == m_createLevelWidget || m_centralWidget->currentWidget() == m_testLevelWidget);
     if (m_centralWidget->currentWidget() == m_createLevelWidget) {
       m_createLevelWidget->InitViews();
       m_createLevelController->UpdateView();
-      m_toolbar->show();
     } else {
-      m_toolbar->hide();
-
       if (m_centralWidget->currentWidget() == m_testLevelWidget) {
         m_testLevelWidget->InitView();
       } else if (m_centralWidget->currentWidget() == m_playLevelWidget) {
@@ -150,8 +148,8 @@ void MainWindow::SetModelsToTestController() {
   m_testLevelController->SetPartsGoal(m_createLevelController->GetPartsGoal());
   m_testLevelController->SetMaxGapToWin(m_createLevelController->GetMaxGapToWin());
   m_testLevelController->SetTolerance(m_createLevelController->GetTolerance());
-  //m_testLevelController->SetPolygonModel(m_createLevelController->GetPolygonModel());
-  //m_testLevelController->SetObjectModelsList(m_createLevelController->GetObjectModelsList());
+  m_testLevelController->InitPolygonsList(m_createLevelController->GetPolygonsList());
+  m_testLevelController->SetObjectModelsList(m_createLevelController->GetObjectsList());
   m_testLevelController->PlayLevel();
 }
 

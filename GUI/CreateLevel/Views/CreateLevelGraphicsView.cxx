@@ -1,4 +1,4 @@
-﻿#include "CreateLevelScribblingView.hxx"
+﻿#include "CreateLevelGraphicsView.hxx"
 
 #include "Core/Objects/Object.hxx"
 #include "GUI/CreateLevel/Models/CreateLevelObjectsListModel.hxx"
@@ -9,23 +9,21 @@
 #include <QItemSelectionModel>
 #include <QFontMetrics>
 
-CreateLevelScribblingView::CreateLevelScribblingView(QWidget* p_parent):
+CreateLevelGraphicsView::CreateLevelGraphicsView(QWidget* p_parent):
   QGraphicsView(p_parent),
   m_scene(nullptr),
   m_gridPixmapItem(nullptr),
-  m_objectsListModel(nullptr),
-  m_objectSelectionModel(nullptr),
   m_rectangleSelectionItem(new GraphicsRectangleSelectionItem),
   m_viewInitialized(false) {
 
   setMouseTracking(true);
 }
 
-CreateLevelScribblingView::~CreateLevelScribblingView() {
+CreateLevelGraphicsView::~CreateLevelGraphicsView() {
   delete m_rectangleSelectionItem;
 }
 
-void CreateLevelScribblingView::InitView() {
+void CreateLevelGraphicsView::InitView() {
   if (m_viewInitialized) {
     return;
   }
@@ -38,7 +36,7 @@ void CreateLevelScribblingView::InitView() {
   m_scene = new QGraphicsScene(this);
   setScene(m_scene);
   m_scene->setSceneRect(0, 0, width(), height());
-  connect(m_scene, &QGraphicsScene::selectionChanged, this, &CreateLevelScribblingView::SelectionChanged);
+  connect(m_scene, &QGraphicsScene::selectionChanged, this, &CreateLevelGraphicsView::SelectionChanged);
 
   int margin = 0;
   int xMin = margin, xMax = width()-margin;
@@ -78,16 +76,7 @@ void CreateLevelScribblingView::InitView() {
   m_viewInitialized = true;
 }
 
-void CreateLevelScribblingView::SetObjectsListModel(CreateLevelObjectsListModel* p_objectsListModel) {
-  m_objectsListModel = p_objectsListModel;
-}
-
-void CreateLevelScribblingView::SetSelectionModel(QItemSelectionModel* p_selectionModel) {
-  m_objectSelectionModel = p_selectionModel;
-  m_objectSelectionModel->setCurrentIndex(m_objectsListModel->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-}
-
-void CreateLevelScribblingView::ClearImage() {
+void CreateLevelGraphicsView::ClearImage() {
   for (auto* item: m_scene->items()) {
     if (item != m_gridPixmapItem) {
       m_scene->removeItem(item);
@@ -96,27 +85,23 @@ void CreateLevelScribblingView::ClearImage() {
   }
 }
 
-void CreateLevelScribblingView::UpdateView() {
+void CreateLevelGraphicsView::UpdateView() {
   m_scene->update();
 }
 
-void CreateLevelScribblingView::AddGraphicsItem(QGraphicsItem* p_graphicsItem) {
+void CreateLevelGraphicsView::AddGraphicsItem(QGraphicsItem* p_graphicsItem) {
   m_scene->addItem(p_graphicsItem);
 }
 
-QList<QGraphicsItem*> CreateLevelScribblingView::GetGraphicsItemsList() const {
+QList<QGraphicsItem*> CreateLevelGraphicsView::GetGraphicsItemsList() const {
   return m_scene->items();
 }
 
-void CreateLevelScribblingView::RemoveGraphicsItem(QGraphicsItem* p_graphicsItem) {
+void CreateLevelGraphicsView::RemoveGraphicsItem(QGraphicsItem* p_graphicsItem) {
   m_scene->removeItem(p_graphicsItem);
 }
 
-int CreateLevelScribblingView::GetGraphicsItemCount() const {
-  return m_scene->items().count();
-}
-
-void CreateLevelScribblingView::SetRubberBandDragMode(bool p_rubberBandOn) {
+void CreateLevelGraphicsView::SetRubberBandDragMode(bool p_rubberBandOn) {
   if (p_rubberBandOn) {
     setDragMode(RubberBandDrag);
     m_scene->addItem(m_rectangleSelectionItem);
@@ -127,7 +112,7 @@ void CreateLevelScribblingView::SetRubberBandDragMode(bool p_rubberBandOn) {
   }
 }
 
-void CreateLevelScribblingView::SetSelectionArea(QRect const& p_rect) {
+void CreateLevelGraphicsView::SetSelectionArea(QRect const& p_rect) {
   m_rectangleSelectionItem->setRect(p_rect);
 
   QPainterPath selectionPath;
@@ -136,19 +121,19 @@ void CreateLevelScribblingView::SetSelectionArea(QRect const& p_rect) {
   m_scene->setSelectionArea(selectionPath);
 }
 
-void CreateLevelScribblingView::mousePressEvent(QMouseEvent* p_event) {
+void CreateLevelGraphicsView::mousePressEvent(QMouseEvent* p_event) {
   Q_EMIT MousePressed(p_event);
 }
 
-void CreateLevelScribblingView::mouseMoveEvent(QMouseEvent* p_event) {
+void CreateLevelGraphicsView::mouseMoveEvent(QMouseEvent* p_event) {
   Q_EMIT MouseMoved(p_event);
 }
 
-void CreateLevelScribblingView::mouseReleaseEvent(QMouseEvent* p_event) {
+void CreateLevelGraphicsView::mouseReleaseEvent(QMouseEvent* p_event) {
   Q_EMIT MouseReleased(p_event);
 }
 
-void CreateLevelScribblingView::keyPressEvent(QKeyEvent* p_event) {
+void CreateLevelGraphicsView::keyPressEvent(QKeyEvent* p_event) {
   auto shiftPressed = p_event->modifiers().testFlag(Qt::ShiftModifier);
   switch (p_event->key()) {
   case Qt::Key_Return: {

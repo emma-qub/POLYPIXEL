@@ -153,6 +153,14 @@ int CreateLevelController::GetTolerance() const {
   return m_createLevelWidget->GetTolerance();
 }
 
+std::vector<ppxl::Polygon*> CreateLevelController::GetPolygonsList() const {
+  return m_objectsListModel->GetPolygonsList();
+}
+
+std::vector<Object*> CreateLevelController::GetObjectsList() const {
+  return m_objectsListModel->GetObjectsList();
+}
+
 void CreateLevelController::SnapToGrid() {
   auto currentIndex = m_createLevelWidget->FindCurrentPolygonIndex();
   if (currentIndex.isValid()) {

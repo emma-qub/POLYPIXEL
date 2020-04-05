@@ -232,7 +232,7 @@ Point Segment::IntersectionPoint(Segment const& AB, Segment const& PQ) {
   double t = -(Ax*PQy - Px*PQy - PQx*Ay + PQx*Py) / (ABx*PQy - ABy*PQx);
 
   Vector tvAB(t*vAB);
-  Point tAB(std::round(tvAB.GetX()), std::round(tvAB.GetY()));
+  Point tAB((tvAB.GetX()), (tvAB.GetY()));
   return Point(A + tAB);
 }
 

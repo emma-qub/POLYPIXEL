@@ -9,25 +9,15 @@
 
 class GraphicsObjectItem;
 class GraphicsRectangleSelectionItem;
-class CreateLevelObjectsListModel;
-class ObjectModel;
-class QItemSelectionModel;
-class QStandardItem;
 
-class CreateLevelScribblingView: public QGraphicsView {
+class CreateLevelGraphicsView: public QGraphicsView {
   Q_OBJECT
 
 public:
-  CreateLevelScribblingView(QWidget* parent = nullptr);
-  ~CreateLevelScribblingView() override;
+  CreateLevelGraphicsView(QWidget* p_parent = nullptr);
+  ~CreateLevelGraphicsView() override;
 
   void InitView();
-
-  void SetObjectsListModel(CreateLevelObjectsListModel* p_objectsListModel);
-  void SetObjectModelsList(QList<ObjectModel*> const& p_objectModelsList);
-  void SetSelectionModel(QItemSelectionModel* p_selectionModel);
-  void SetCurrentPolygonItem(QStandardItem* p_currentPolygonItem);
-  void SetCurrentObjectItem(QStandardItem* p_currentObjectItem);
 
   void ClearImage();
   void UpdateView();
@@ -35,8 +25,6 @@ public:
   void AddGraphicsItem(QGraphicsItem* p_graphicsItem);
   QList<QGraphicsItem*> GetGraphicsItemsList() const;
   void RemoveGraphicsItem(QGraphicsItem* p_graphicsItem);
-
-  int GetGraphicsItemCount() const;
 
   void SetRubberBandDragMode(bool p_rubberBandOn);
   void SetSelectionArea(const QRect& p_rect);
@@ -64,8 +52,6 @@ protected:
 private:
   QGraphicsScene* m_scene;
   QGraphicsPixmapItem* m_gridPixmapItem;
-  CreateLevelObjectsListModel* m_objectsListModel;
-  QItemSelectionModel* m_objectSelectionModel;
   GraphicsRectangleSelectionItem* m_rectangleSelectionItem;
   bool m_viewInitialized;
 };

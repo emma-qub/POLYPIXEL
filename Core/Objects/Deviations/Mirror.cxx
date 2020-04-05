@@ -24,6 +24,7 @@ std::string Mirror::GetName() const {
 }
 
 bool Mirror::Intersect(const ppxl::Point& p_point, double p_tolerance) const {
+  qDebug() << "INTERSECT";
   return m_line.PointIsOnSegment(p_point, p_tolerance);
 }
 

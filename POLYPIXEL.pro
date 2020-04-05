@@ -14,6 +14,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 CONFIG += c++17
 
 SOURCES += \
+  GUI/TestLevel/Views/TestLevelGraphicsView.cxx \
     main.cxx \
 #CORE
 # GEOMETRY
@@ -64,7 +65,7 @@ SOURCES += \
     GUI/CreateLevel/Models/CreateLevelVertexListModel.cxx \
     GUI/CreateLevel/Models/GraphicsObjectItem.cxx \
 #  VIEW
-    GUI/CreateLevel/Views/CreateLevelScribblingView.cxx \
+    GUI/CreateLevel/Views/CreateLevelGraphicsView.cxx \
     GUI/CreateLevel/Views/CreateLevelWidget.cxx \
 #  CONTROLLER
     GUI/CreateLevel/Controllers/CreateLevelController.cxx \
@@ -147,13 +148,14 @@ HEADERS += \
     GUI/CreateLevel/Models/CreateLevelVertexListModel.hxx \
     GUI/CreateLevel/Models/GraphicsObjectItem.hxx \
 #  VIEW
-    GUI/CreateLevel/Views/CreateLevelScribblingView.hxx \
+    GUI/CreateLevel/Views/CreateLevelGraphicsView.hxx \
     GUI/CreateLevel/Views/CreateLevelWidget.hxx \
 #  CONTROLLER
     GUI/CreateLevel/Controllers/CreateLevelController.hxx \
 # TEST
 #  MODEL
 #  VIEW
+  GUI/TestLevel/Views/TestLevelGraphicsView.hxx \
     GUI/TestLevel/Views/TestLevelWidget.hxx \
 #  CONTROLLER
     GUI/TestLevel/Controllers/TestLevelController.hxx \

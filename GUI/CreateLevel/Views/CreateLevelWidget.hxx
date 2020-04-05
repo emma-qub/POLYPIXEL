@@ -12,7 +12,7 @@ class GraphicsObjectItem;
 class CreateLevelObjectsListModel;
 class CreateLevelObjectsDetailModel;
 class CreateLevelVertexListModel;
-class CreateLevelScribblingView;
+class CreateLevelGraphicsView;
 class QLabel;
 class QPushButton;
 class QTreeView;
@@ -114,8 +114,6 @@ protected:
   void ConfirmNewLevel();
   void ConfirmOpenLevel();
 
-  int GetGraphicsItemCount() const;
-
 private:
   QLabel* m_createLevelLabel;
   QPushButton* m_testLevelButton;
@@ -123,7 +121,7 @@ private:
   CreateLevelObjectsListModel* m_objectsListModel;
   CreateLevelObjectsDetailModel* m_objectsDetailModel;
   CreateLevelVertexListModel* m_vertexListModel;
-  CreateLevelScribblingView* m_scribblingView;
+  CreateLevelGraphicsView* m_graphicsView;
   QTreeView* m_objectsListTreeView;
   QTreeView* m_objectsDetailTreeView;
   QTreeView* m_vertexTreeView;

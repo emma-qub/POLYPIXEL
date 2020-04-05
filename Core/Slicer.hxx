@@ -30,12 +30,13 @@ public:
   inline void SetStartPoint(ppxl::Point const& p_startPoint) { m_startPoint = p_startPoint; }
   inline void SetOrientedAreaTotal(double p_orientedAreaTotal) { m_orientedAreaTotal = p_orientedAreaTotal; }
   static inline bool ComparePoints(const ppxl::Point* A, const ppxl::Point* B) { return *A < *B; }
+  void SeObjectsList(std::vector<Object*> const& p_objectsList);
 
   /// SLICING ALGORITHM
   bool SliceIt(ppxl::Point const& p_endPoint);
   std::vector<ppxl::Segment> ComputeSlicingLines(ppxl::Point const& p_endPoint);
   LineType ComputeLinesType(std::vector<ppxl::Segment> const& p_lines) const;
-  void ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& line, std::vector<ppxl::Segment>& lines) const;
+  void ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& line, std::vector<ppxl::Segment>& lines, int& p_counter, Deviation** p_lastDeviation) const;
   Deviation* GetNearestDeviation(ppxl::Segment const& line) const;
   void ComputeNewPolygonList(std::vector<ppxl::Polygon>& p_newPolygonList, ppxl::Segment const& p_line) const;
   void GetVerticesAndIntersections(ppxl::Segment const& line, ppxl::Polygon const& polygon,

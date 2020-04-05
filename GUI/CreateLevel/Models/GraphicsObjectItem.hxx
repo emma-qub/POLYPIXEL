@@ -84,17 +84,23 @@ public:
   GraphicsPolygonItem(ppxl::Polygon* p_polygon, QGraphicsItem* p_parent = nullptr);
   ~GraphicsPolygonItem() override;
 
-  void SetColor(QColor const& p_color);
   void SetCurrentVertexRow(int p_currentVertexRow);
 
   bool Intersect(ppxl::Point const& p_point) const override;
   QRectF boundingRect() const override;
   void ComputeBoundingPolygon() override;
 
+  void SetColor(QColor const& p_color);
+  QColor const& GetColor() const;
+
+  void DeletePolygon() { delete m_polygon; m_polygon = nullptr; }
+
 protected:
   void DrawObject(QPainter* p_painter) override;
   QList<QPair<QPoint, Object::ControlPointType>> ComputeControlPoints() const override;
   QList<QColor> GetEnabledColors() const override { return {m_enabledColor}; };
+
+  QColor GetRandomColor();
 
 private:
   ppxl::Polygon* m_polygon;
@@ -246,6 +252,45 @@ protected:
   void paint(QPainter* p_painter, QStyleOptionGraphicsItem const*, QWidget* = nullptr) override;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// CUTTING LINE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CuttingLineGraphicsItem: public QGraphicsItem {
+
+public:
+  enum CutState {
+    eNoCut,
+    eGoodCut,
+    eBadCut
+  };
+
+  CuttingLineGraphicsItem(QGraphicsItem* p_parent = nullptr);
+  ~CuttingLineGraphicsItem() override;
+
+  void SetNoCut();
+  void SetGoodCut();
+  void SetBadCut();
+  void SetLinesList(std::vector<ppxl::Segment> const& p_linesList);
+
+protected:
+  enum DataRole {
+    eCutStateRole = Qt::UserRole + 1
+  };
+
+  void SetCutState(CutState p_cutState);
+  CutState GetCutState() const;
+
+  void paint(QPainter* p_painter, QStyleOptionGraphicsItem const*, QWidget* = nullptr) override;
+
+  QRectF boundingRect() const override;
+
+private:
+  std::vector<ppxl::Segment> m_linesList;
+};
+
+
 Q_DECLARE_METATYPE(GraphicsObjectItem::State);
+Q_DECLARE_METATYPE(CuttingLineGraphicsItem::CutState);
+
 
 #endif

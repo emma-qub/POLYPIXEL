@@ -14,6 +14,24 @@ Slicer::Slicer():
 
 Slicer::~Slicer() = default;
 
+void Slicer::SeObjectsList(std::vector<Object*> const& p_objectsList) {
+  for (auto object: p_objectsList) {
+    switch(object->GetCategoryType()) {
+    case Object::eDeviation: {
+      m_deviationsList.push_back(object);
+      break;
+    } case Object::eMutable: {
+      m_mutablesList.push_back(object);
+      break;
+    } case Object::eObstacle: {
+      m_obstaclesList.push_back(object);
+      break;
+    } default:
+      break;
+    }
+  }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// SLICING ALGORITHM
@@ -40,7 +58,8 @@ std::vector<ppxl::Segment> Slicer::ComputeSlicingLines(ppxl::Point const& p_endP
   std::vector<ppxl::Segment> lines;
 
   ppxl::Segment line(m_startPoint, p_endPoint);
-  ComputeDeviatedLines(-1, line, lines);
+  int k = 0;
+  ComputeDeviatedLines(-1, line, lines, k, nullptr);
 
   return lines;
 }
@@ -80,17 +99,17 @@ Slicer::LineType Slicer::ComputeLinesType(std::vector<ppxl::Segment> const& p_li
   }
 }
 
-void Slicer::ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& line, std::vector<ppxl::Segment>& lines) const {
+void Slicer::ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& line, std::vector<ppxl::Segment>& lines, int& p_counter, Deviation** p_lastDeviation) const {
   Deviation* nearestDeviation = GetNearestDeviation(line);
 
-  if (nearestDeviation) {
+  if (nearestDeviation && (p_counter == 0 || nearestDeviation != *p_lastDeviation)) {
     std::vector<ppxl::Segment> deviateLines = nearestDeviation->DeviateLine(line);
     // Init firstLineLength
     if (firstLineLength < 0.) {
       firstLineLength = deviateLines.at(0).Length();
     }
 
-    // At least two line has to be here: the line drawn and its reflexion
+    // At least two lines have to be here: the line drawn and its deviation
     assert(deviateLines.size() > 1);
 
     // Erase previous line, since it goes through current mirror
@@ -110,7 +129,11 @@ void Slicer::ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& l
     lines.push_back(deviateLines.at(0));
     lines.push_back(deviateLine);
 
-    ComputeDeviatedLines(firstLineLength, deviateLine, lines);
+    if (p_counter == 0)
+      qDebug() << "\n######";
+    qDebug() << p_counter << lines;
+
+    ComputeDeviatedLines(firstLineLength, deviateLine, lines, ++p_counter, &nearestDeviation);
   } else {
     if (lines.size() > 1) {
       lines.erase(lines.end()-1);
@@ -120,20 +143,18 @@ void Slicer::ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& l
 }
 
 Deviation* Slicer::GetNearestDeviation(ppxl::Segment const& line) const {
-  double minDist = -1.;
+  double minDist = std::numeric_limits<double>::infinity();
   Deviation* nearestDeviation = nullptr;
 
-  for (auto* deviation: m_deviationsList) {
+  for (auto deviation: m_deviationsList) {
     auto deviationCast = static_cast<Deviation*>(deviation);
     std::vector<ppxl::Segment> deviateLines = deviationCast->DeviateLine(line);
     // If there is at least one reflected line
     if (deviateLines.size() > 1) {
-      if (minDist < 0.) {
-        deviateLines.at(0).Length();
-      } else {
-        qMin(minDist, deviateLines.at(0).Length());
+      if (deviateLines.at(0).Length() < minDist) {
+        minDist = deviateLines.at(0).Length();
+        nearestDeviation = deviationCast;
       }
-      nearestDeviation = deviationCast;
     }
   }
 
