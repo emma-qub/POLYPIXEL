@@ -231,9 +231,9 @@ void CreateLevelController::SnapObjectToGrid(QModelIndex const& p_currentIndex) 
     break;
   } case Object::eOneWay:{
     auto oneWay = static_cast<OneWay*>(object);
-    if (static_cast<int>(oneWay->GetX1()) == static_cast<int>(oneWay->GetX2())
-      || static_cast<int>(oneWay->GetY1()) == static_cast<int>(oneWay->GetY2())
-      || static_cast<int>(std::abs(oneWay->GetX2()-oneWay->GetX1())) == static_cast<int>(oneWay->GetY2()-oneWay->GetY1())) {
+    if (static_cast<int>(std::abs(oneWay->GetX1()) - oneWay->GetX2()) == 0
+      || static_cast<int>(std::abs(oneWay->GetY1() - oneWay->GetY2())) == 0
+      || static_cast<int>(std::abs(oneWay->GetX2()-oneWay->GetX1()) - std::abs(oneWay->GetY2()-oneWay->GetY1())) == 0) {
       object->MoveControlPoint(FindNearestGridNode(object->GetTopLeft()), Object::eTopLeft);
       object->MoveControlPoint(FindNearestGridNode(object->GetBottomRight()), Object::eBottomRight);
     }
