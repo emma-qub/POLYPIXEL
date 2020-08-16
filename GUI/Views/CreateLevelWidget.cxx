@@ -301,7 +301,7 @@ QModelIndex CreateLevelWidget::GetCurrentObjectIndex() const {
 
 QModelIndex CreateLevelWidget::FindCurrentObjectIndex() const {
   auto currentIndex = m_objectsListTreeView->selectionModel()->currentIndex();
-  if (m_objectsListModel->IsObjectIndex(currentIndex)) {
+  if (m_objectsListModel->IsNotPolygonIndex(currentIndex)) {
     return currentIndex;
   }
 

@@ -3,7 +3,6 @@
 #include "GUI/Views/CreateLevelWidget.hxx"
 #include "Parser/Parser.hxx"
 
-#include <QUndoStack>
 #include <QAction>
 #include <QItemSelectionModel>
 #include <QToolBar>
@@ -609,7 +608,9 @@ void CreateLevelController::HighlightObjectUnderCursor(QPoint const& p_pos) {
       auto index = m_objectsListModel->index(row, 0, listIndex);
       auto graphicsItem = m_objectsListModel->GetGraphicsFromIndex(index);
       if (graphicsItem) {
-        if (graphicsItem->Intersect(pos)) {
+        if (m_hoveredItem) {
+          graphicsItem->SetState(GraphicsObjectItem::eHighlightDownState);
+        } else if (graphicsItem->Intersect(pos)) {
           graphicsItem->SetState(GraphicsObjectItem::eHighlightUpState);
           m_hoveredItem = m_objectsListModel->itemFromIndex(index);
         } else {
@@ -674,6 +675,7 @@ void CreateLevelController::OpenLevel(const QString& p_fileName) {
 
 /// REWORK
 void CreateLevelController::UpdateGraphicsSelection(QModelIndex const& p_current, QModelIndex const&) {
+  qDebug() << "UPDATE GRAPHICS SELECTION";
   DisableObjectItems();
   auto objectListType = CreateLevelObjectsListModel::eUnknownObjectListType;
   QModelIndex listIndex;
@@ -699,6 +701,8 @@ void CreateLevelController::UpdateGraphicsSelection(QModelIndex const& p_current
 }
 
 void CreateLevelController::UpdateSelection() {
+  /// NOT CALLED?
+  qDebug() << "UPDATE SELECTION";
   for (auto item: m_createLevelWidget->GetGraphicsItemsList()) {
     if (item->flags().testFlag(QGraphicsItem::ItemIsSelectable)) {
       auto objectItem = static_cast<GraphicsObjectItem*>(item);

@@ -87,6 +87,7 @@ public:
   void SetColor(QColor const& p_color);
   void SetCurrentVertexRow(int p_currentVertexRow);
 
+  bool Intersect(ppxl::Point const& p_point) const override;
   QRectF boundingRect() const override;
   void ComputeBoundingPolygon() override;
 

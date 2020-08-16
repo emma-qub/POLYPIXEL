@@ -54,6 +54,7 @@ public:
 
   bool PointIsInBoundingBox(const Point& C) const;
   bool PointIsOnSegment(Point const& C, double p_tolerence = DBL_EPSILON) const;
+  bool PointIsNear(Point const& M, double p_tolerance = DBL_EPSILON) const;
 
   void Translate(Vector const& p_direction);
   void Translate(double x, double y);

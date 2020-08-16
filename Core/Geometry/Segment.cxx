@@ -263,7 +263,18 @@ bool Segment::PointIsOnSegment(Point const& C, double p_tolerence) const {
 //  if (dotproduct > squaredlengthba)
 //    return false;
 
-//  return true;
+  //  return true;
+}
+
+bool Segment::PointIsNear(Point const& M, double p_tolerance) const {
+  auto t = Vector(m_a, M)*GetDirection();
+  if (0 <= t && t <= Length()) {
+    auto H = m_a + (GetDirection()*t);
+    if (Point::Distance(M, H) < p_tolerance) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool operator==(Segment const& p_segment1, Segment const& p_segment2) {

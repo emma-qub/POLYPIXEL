@@ -56,7 +56,7 @@ void PlayingController::SetObjectModelsList(const QList<ObjectModel*>& p_objectM
     << m_objectModelsList.at(ObjectModel::eOneWayModel)->GetObjectsList()
     << m_objectModelsList.at(ObjectModel::eTapeModel)->GetObjectsList();
 
-  m_slicer.SetDeviationsList(m_deviationsList.toVector().toStdVector());
+  m_slicer.SetDeviationsList(std::vector<Object*>(m_deviationsList.begin(), m_deviationsList.end()));
 
   p_objectModelsList.at(ObjectModel::eMirrorModel);
 }
@@ -92,7 +92,7 @@ void PlayingController::InvertScribbleLine(QPoint const& p_cursorPosition) {
 
 QList<ppxl::Segment> PlayingController::MoveLine(QPoint const& p_endPoint) {
   auto slicingLines = m_slicer.ComputeSlicingLines(ppxl::Point(p_endPoint.x(), p_endPoint.y()));
-  auto lines = QList<ppxl::Segment>::fromVector(QVector<ppxl::Segment>::fromStdVector(slicingLines));
+  auto lines = QList<ppxl::Segment>(slicingLines.begin(), slicingLines.end());
 
   Redraw();
   auto linesColor = GetLinesColor(lines);
@@ -105,7 +105,7 @@ QList<ppxl::Segment> PlayingController::MoveLine(QPoint const& p_endPoint) {
 }
 
 QColor PlayingController::GetLinesColor(QList<ppxl::Segment> const& p_lines) const {
-  auto lineType = m_slicer.ComputeLinesType(p_lines.toVector().toStdVector());
+  auto lineType = m_slicer.ComputeLinesType(std::vector<ppxl::Segment>(p_lines.begin(), p_lines.end()));
   QColor color;
 
   switch (lineType) {
@@ -129,7 +129,8 @@ QColor PlayingController::GetLinesColor(QList<ppxl::Segment> const& p_lines) con
 void PlayingController::SliceIt(QPoint const& p_endPoint) {
 
   if (m_slicer.SliceIt(ppxl::Point(p_endPoint.x(), p_endPoint.y()))) {
-    m_polygonModel->SetPolygonsList(QList<ppxl::Polygon>::fromVector(QVector<ppxl::Polygon>::fromStdVector(m_slicer.GetPolygonsList())));
+    auto polygonsList = m_slicer.GetPolygonsList();
+    m_polygonModel->SetPolygonsList(QList<ppxl::Polygon>(polygonsList.begin(), polygonsList.end()));
     ++m_gameInfo.m_linesCount;
     m_gameInfo.m_partsCount = m_polygonModel->GetPolygonsCount();
     UpdateViewFromGameInfo();
@@ -156,7 +157,7 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   // Polygon model
   auto polygonsList = parser.GetPolygonsList();
   m_polygonModel->SetPolygonsList(polygonsList);
-  m_slicer.SetPolygonsList(polygonsList.toVector().toStdVector());
+  m_slicer.SetPolygonsList(std::vector<ppxl::Polygon>(polygonsList.begin(), polygonsList.end()));
 
   // Level Info
   m_gameInfo = GameInfo(0, parser.GetLinesGoal(), m_polygonModel->GetPolygonsCount(), parser.GetPartsGoal(),
@@ -211,9 +212,9 @@ void PlayingController::OpenLevel(QString const& p_levelPath) {
   m_objectsList << m_deviationsList << m_mutablesList << m_obstaclesList;
   m_view->SetObjectsList(m_objectsList);
 
-  m_slicer.SetDeviationsList(m_deviationsList.toVector().toStdVector());
-  m_slicer.SetMutablesList(m_mutablesList.toVector().toStdVector());
-  m_slicer.SetObstaclesList(m_obstaclesList.toVector().toStdVector());
+  m_slicer.SetDeviationsList(std::vector<Object*>(m_deviationsList.begin(), m_deviationsList.end()));
+  m_slicer.SetMutablesList(std::vector<Object*>(m_mutablesList.begin(), m_mutablesList.end()));
+  m_slicer.SetObstaclesList(std::vector<Object*>(m_obstaclesList.begin(), m_obstaclesList.end()));
 
   m_slicer.InitTotalOrientedArea();
 
@@ -250,8 +251,10 @@ void PlayingController::CheckWinning() {
     double minArea;
     double maxArea;
     auto globalBarycenter = m_slicer.ComputeGlobalBarycenter();
-    auto shiftVectorsList = QList<ppxl::Vector>::fromVector(QVector<ppxl::Vector>::fromStdVector(m_slicer.ComputeShiftVectorsList(globalBarycenter)));
-    auto areasList = QList<double>::fromVector(QVector<double>::fromStdVector(m_slicer.ComputeAreas(minArea, maxArea)));
+    auto shiftVectorList = m_slicer.ComputeShiftVectorsList(globalBarycenter);
+    auto shiftVectorsList = QList<ppxl::Vector>(shiftVectorList.begin(), shiftVectorList.end());
+    auto areas = m_slicer.ComputeAreas(minArea, maxArea);
+    auto areasList = QList<double>(areas.begin(), areas.end());
     double gap = std::abs(maxArea - minArea);
 
     auto starsCount = ComputeStarsCount(gap);

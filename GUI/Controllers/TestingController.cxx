@@ -6,6 +6,7 @@
 #include "Parser/Serializer.hxx"
 
 #include <QFileDialog>
+#include <QVector>
 
 TestingController::TestingController(TestingWidget* p_view, QObject* p_parent):
   PlayingController(p_view, p_parent) {
@@ -79,7 +80,7 @@ void TestingController::Redraw() {
 void TestingController::DisplayAreas(QPoint const& p_endPoint) {
   auto lines = MoveLine(p_endPoint);
 
-  if (m_slicer.ComputeLinesType(lines.toVector().toStdVector()) == Slicer::eGoodCrossing) {
+  if (m_slicer.ComputeLinesType(std::vector<ppxl::Segment>(lines.begin(), lines.end())) == Slicer::eGoodCrossing) {
     QList<ppxl::Polygon> newPolygonList;
 
     double orientedAreaTotal = 0.;
@@ -98,7 +99,7 @@ void TestingController::CheckWinning() {
   if (m_gameInfo.m_linesCount >= m_gameInfo.m_linesGoal || m_gameInfo.m_partsCount >= m_gameInfo.m_partsGoal) {
     double minArea;
     double maxArea;
-    auto areasList = QList<double>::fromVector(QVector<double>::fromStdVector(m_slicer.ComputeAreas(minArea, maxArea)));
+    auto areasList = m_slicer.ComputeAreas(minArea, maxArea);
     double gap = std::abs(maxArea - minArea);
 
     auto starsCount = ComputeStarsCount(gap);

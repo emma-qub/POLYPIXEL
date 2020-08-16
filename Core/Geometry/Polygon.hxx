@@ -38,6 +38,7 @@ public:
   bool NewPointIsGood(Point const& p_vertex) const;
 
   bool IsPointInside(Point const& P) const;
+  bool IsPointNearOneEdge(Point const& M, double p_tolerance) const;
 
   bool IsCrossing(Segment const& p_line) const;
   bool IsGoodSegment(Segment const& p_line) const;

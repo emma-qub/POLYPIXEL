@@ -121,6 +121,19 @@ bool Polygon::IsPointInside(Point const& P) const {
   return static_cast<int>(std::abs(theta)) == 6;
 }
 
+bool Polygon::IsPointNearOneEdge(Point const& M, double p_tolerance) const {
+  auto countVertices = m_vertices.size();
+  for (unsigned int k = 0; k < countVertices; k++) {
+    Point A(m_vertices.at(k));
+    Point B(m_vertices.at((k+1)%countVertices));
+    Segment AB(A, B);
+    if (AB.PointIsNear(M, p_tolerance)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool Polygon::IsCrossing(Segment const& p_line) const {
   auto verticesCount = m_vertices.size();
 

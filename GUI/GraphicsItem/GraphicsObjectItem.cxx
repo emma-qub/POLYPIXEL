@@ -149,7 +149,11 @@ void GraphicsPolygonItem::SetColor(const QColor& p_color) {
 }
 
 void GraphicsPolygonItem::SetCurrentVertexRow(int p_currentVertexRow) {
-  m_currentControlPointRow = p_currentVertexRow;
+    m_currentControlPointRow = p_currentVertexRow;
+}
+
+bool GraphicsPolygonItem::Intersect(const ppxl::Point &p_point) const {
+  return m_polygon->IsPointNearOneEdge(p_point, 10);
 }
 
 QRectF GraphicsPolygonItem::boundingRect() const {
