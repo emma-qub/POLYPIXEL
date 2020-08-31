@@ -15,6 +15,7 @@ public:
   void RemoveGraphicsItem(QGraphicsItem* p_graphicsItem);
 
   void UpdateView();
+  void ClearScene();
 
 Q_SIGNALS:
   void MousePressed(QMouseEvent* p_event);

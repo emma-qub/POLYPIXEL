@@ -54,7 +54,7 @@ bool Slicer::SliceIt(ppxl::Point const& p_endPoint) {
   return false;
 }
 
-std::vector<ppxl::Segment> Slicer::ComputeSlicingLines(ppxl::Point const& p_endPoint) {
+std::vector<ppxl::Segment> Slicer::ComputeSlicingLines(ppxl::Point const& p_endPoint) const {
   std::vector<ppxl::Segment> lines;
 
   ppxl::Segment line(m_startPoint, p_endPoint);
@@ -334,10 +334,8 @@ ppxl::Point* Slicer::GetOtherBound(ppxl::Point const* intersection, std::vector<
 /// AREAS AND BARYCENTERS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> Slicer::ComputeAreas(double& p_minArea, double& p_maxArea) {
+std::vector<double> Slicer::ComputeAreas(double& p_minArea, double& p_maxArea) const {
   std::vector<double> orientedAreas;
-  p_minArea = 100.;
-  p_maxArea = 0.;
 
   double areaCumul = 0.;
   for (unsigned int row = 0; row < m_polygonsList.size(); ++row) {
@@ -352,8 +350,17 @@ std::vector<double> Slicer::ComputeAreas(double& p_minArea, double& p_maxArea) {
     }
 
     orientedAreas.push_back(currArea);
-    p_minArea = std::min(currArea, p_minArea);
-    p_maxArea = std::max(currArea, p_maxArea);
+
+    if (row == 0) {
+      p_minArea = currArea;
+      p_maxArea = currArea;
+    } else {
+      p_minArea = std::min(currArea, p_minArea);
+      p_maxArea = std::max(currArea, p_maxArea);
+    }
+
+    qDebug() << p_minArea << p_maxArea;
+
   }
 
   return orientedAreas;

@@ -36,6 +36,10 @@ void TestLevelGraphicsView::UpdateView() {
   m_scene->update();
 }
 
+void TestLevelGraphicsView::ClearScene() {
+  m_scene->clear();
+}
+
 void TestLevelGraphicsView::mousePressEvent(QMouseEvent* p_event) {
   Q_EMIT MousePressed(p_event);
 }

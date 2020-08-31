@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class QGraphicsItem;
+class QPushButton;
 class CuttingLineGraphicsItem;
 class TestLevelGraphicsView;
 
@@ -19,6 +20,7 @@ public:
   ~TestLevelWidget() override;
 
   void InitView();
+  void ClearGraphicsView();
 
   void AddGraphicsItem(QGraphicsItem* p_item);
 
@@ -29,16 +31,24 @@ public:
   void SetGoodCutState();
   void SetBadCutState();
 
+  void SetSaveButtonEnabled(bool p_enabled);
+
 Q_SIGNALS:
-  void AmendLevelRequested();
   void Done();
   void MousePressed(QMouseEvent* p_event);
   void MouseMoved(QMouseEvent* p_event);
   void MouseReleased(QMouseEvent* p_event);
+  void SaveRequested();
+  void RetryRequested();
+  void AmendRequested();
 
 private:
   TestLevelGraphicsView* m_graphicsView;
   CuttingLineGraphicsItem* m_cuttingLinesGraphicsItem;
+
+  QPushButton* m_saveButton;
+  QPushButton* m_retryButton;
+  QPushButton* m_amendButton;
 };
 
 #endif

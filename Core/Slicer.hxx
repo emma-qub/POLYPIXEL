@@ -34,7 +34,7 @@ public:
 
   /// SLICING ALGORITHM
   bool SliceIt(ppxl::Point const& p_endPoint);
-  std::vector<ppxl::Segment> ComputeSlicingLines(ppxl::Point const& p_endPoint);
+  std::vector<ppxl::Segment> ComputeSlicingLines(ppxl::Point const& p_endPoint) const;
   LineType ComputeLinesType(std::vector<ppxl::Segment> const& p_lines) const;
   void ComputeDeviatedLines(double firstLineLength, ppxl::Segment const& line, std::vector<ppxl::Segment>& lines, int& p_counter, Deviation** p_lastDeviation) const;
   Deviation* GetNearestDeviation(ppxl::Segment const& line) const;
@@ -47,7 +47,7 @@ public:
   ppxl::Point* GetOtherBound(ppxl::Point const* intersection, std::vector<std::pair<ppxl::Point*, ppxl::Point*>> const& cuttingSegments) const;
 
   /// AREAS AND BARYCENTERS
-  std::vector<double> ComputeAreas(double& p_minArea, double& p_maxArea);
+  std::vector<double> ComputeAreas(double& p_minArea, double& p_maxArea) const;
   ppxl::Point ComputeGlobalBarycenter() const;
   std::vector<ppxl::Vector> ComputeShiftVectorsList(ppxl::Point const& p_globalBarycenter);
   void InitTotalOrientedArea();

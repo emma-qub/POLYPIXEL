@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget* p_parent):
   pauseState->addTransition(m_pauseWidget, &PauseWidget::ResumeRequested, playLevelState);
   pauseState->addTransition(m_pauseWidget, &PauseWidget::RestartRequested, playLevelState);
   pauseState->addTransition(m_pauseWidget, &PauseWidget::ChooseLevelRequested, levelState);
-  testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::AmendLevelRequested, createLevelState);
+  testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::AmendRequested, createLevelState);
   testLevelState->addTransition(m_testLevelWidget, &TestLevelWidget::Done, mainMenuState);
   optionsState->addTransition(m_optionsWidget, &OptionsWidget::Done, mainMenuState);
 
